@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<!-- =========================================================================
+     testng_Boost_AI_Subscription.xml — ISOLATED suite for the three new
+     subscription-related features.
+
+     PURPOSE:
+       Run JUST the Boost Your Account / AI Photo Generation / Subscription
+       test classes without dragging in the rest of the regression suite.
+       Useful for:
+         - Fast iteration while these tests are still maturing
+         - Verifying these flows after app changes touch SubscribeDog /
+           Subscription / Wrapper / FeaturedPlanCard
+         - Pre-PR sanity run on the subscription stack
+
+     COVERS:
+       Dogpack_BoostAccount        (10 tests — login, settings nav,
+                                    + 8 feature tests for Boost Your
+                                    Account / Boost Your Business Account)
+       Dogpack_AiPhotoGeneration   (9 tests  — login, settings nav,
+                                    + 7 feature tests for AI photo
+                                    generations / unlock AI credits)
+       Dogpack_Subscription        (11 tests — login, settings nav,
+                                    + 9 feature tests for Subscription
+                                    overview screen with both tabs)
+       Total: 30 test methods.
+
+     RUN COMMAND (direct):
+       mvn test -DsuiteXmlFile=testNGSuites/testng_Boost_AI_Subscription.xml
+
+     RUN COMMAND (via profile — see pom.xml snippet in the README):
+       mvn test -P SubscriptionFeatures
+
+     RUNTIME ESTIMATE: ~18–22 min on a single device (each class spends
+       ~2 min on login + settings nav, then ~4–5 min on feature tests).
+
+     PRE-REQUISITES:
+       - Test user defined in LoginData.json[0]:
+           email=iamkiara02, password=Test@123
+       - Boost tests work best on an UNVERIFIED user (is_verified != 1).
+         Verified users will see the Boost menu row hidden and tests
+         #3–10 will skip with a logged reason.
+       - AI Photo Generation tests require an AR-capable device
+         (isArSupported = true). Older devices skip with logged reason.
+       - Subscription tests work in BOTH active-plan and empty-state
+         scenarios — they branch internally and skip the inapplicable
+         path. To get both paths fully exercised, run once with each
+         user state.
+
+     IAP NOTE:
+       Tests stop at the Subscribe / Purchase button tap. They verify
+       the IAP flow is ENGAGED (Play sheet appears OR ConfirmModal
+       appears OR pay-error toast shows) but do NOT complete a real
+       purchase. Add a Google Play sandbox account on the device if
+       you want to drive the purchase to completion.
+     ========================================================================= -->
+
+<suite name="DogPack Subscription Features (Isolated)"
+       parallel="false"
+       thread-count="1">
+
+    <listeners>
+        <listener class-name="org.rahulshettyacademy.TestUtils.Listeners" />
+    </listeners>
+
+    <test name="Boost / AI / Subscription Tests" preserve-order="true">
+
+        <classes>
+            <!-- ============================================================ -->
+            <!-- 1. Boost Your Account                                       -->
+            <!--    App entry: MenuScreen.js  "boya" sub_btn                 -->
+            <!--    Screen:    SubscribeDog -> SubscribeDogRender /          -->
+            <!--               SubscribeBusinessRender                       -->
+            <!-- ============================================================ -->
+            <class name="org.rahulshettyacademy.Dogpack_BoostAccount" />
+
+            <!-- ============================================================ -->
+            <!-- 2. AI Photo Generation                                      -->
+            <!--    App entry: MenuScreen.js  "ai_p" sub_btn                 -->
+            <!--    Screen:    SubscribeDog -> AiFilterPurchasesRender       -->
+            <!--               (isDogBus = "aifiler")                        -->
+            <!-- ============================================================ -->
+            <class name="org.rahulshettyacademy.Dogpack_AiPhotoGeneration" />
+
+            <!-- ============================================================ -->
+            <!-- 3. Subscription overview                                    -->
+            <!--    App entry: MenuScreen.js  "subn" btn                     -->
+            <!--    Screen:    Subscription.tsx (Verification +              -->
+            <!--               AI image credits tabs, ActivePlanBanner OR    -->
+            <!--               EmptyView with View Plans button)             -->
+            <!-- ============================================================ -->
+            <class name="org.rahulshettyacademy.Dogpack_Subscription" />
+        </classes>
+
+    </test>
+
+</suite>
