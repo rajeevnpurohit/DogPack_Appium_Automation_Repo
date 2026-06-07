@@ -1,0 +1,38 @@
+[
+
+  {
+    "_comment": "Index 0 - EmptyCredSignup test - empty fields trigger validation",
+    "email": "",
+    "password": ""
+  },
+
+  {
+    "_comment": "Index 1 - ExistingSignupUser test - real registered email triggers 'already exists' modal. UPDATE if account is deleted.",
+    "email": "iamkiara02@mailinator.com",
+    "password": "Test@123"
+  },
+
+  {
+    "_comment": "Index 2 - UniqueDogUserAccountManual - AUTO generates fresh dog<timestamp>@mailinator.com each run",
+    "email": "AUTO:dog",
+    "password": "12345678"
+  },
+
+  {
+    "_comment": "Index 3 - CreateBusinessAccountManual - AUTO generates fresh biz<timestamp>@mailinator.com each run",
+    "email": "AUTO:biz",
+    "password": "12345678"
+  },
+
+  {
+    "_comment": "Index 4 - UniqueUserWithNoInformation - AUTO generates fresh noinfo<timestamp>@mailinator.com each run",
+    "email": "AUTO:noinfo",
+    "password": "12345678"
+  },
+
+  {
+    "_comment": "Index 5 - CreateUnclaimedBusinessAccountManual - AUTO generates fresh unclaim<timestamp>@mailinator.com each run",
+    "email": "AUTO:unclaim",
+    "password": "12345678"
+  }
+]

@@ -1,0 +1,38 @@
+[
+
+{
+   "email":"tip@yopmail.com",
+   "password": "Test@123"
+    
+},
+
+{
+	"email":"",
+	"password": ""
+    
+},
+
+{
+	"email":"iamkiara01",
+	"password": "0987654321"
+    
+},
+
+{
+	"email":"iamkiara555",
+	"password": "0987654321"
+    
+}
+,
+
+{
+	"email":"iamkabir01",
+	"password": "12345678"
+}
+,
+
+{
+	"email":"dpdelete@yopmail.com",
+	"password": "Test@123"
+}
+]
