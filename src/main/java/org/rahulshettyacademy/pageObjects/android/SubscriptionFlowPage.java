@@ -14,7 +14,7 @@ import io.appium.java_client.android.AndroidDriver;
 
 /**
  * SubscriptionFlowPage - page object for the Subscription feature flow
- * (Verification + AI image credits cards -> View Plans -> close -> back).
+ * (Verification + Magic image credits cards -> View Plans -> close -> back).
  *
  * NAMED 'SubscriptionFlowPage' instead of 'SubscriptionPage' because a
  * pre-existing SubscriptionPage.java (749 lines) already lives in this
@@ -36,7 +36,7 @@ import io.appium.java_client.android.AndroidDriver;
  *   #4  Tap "View Plans"
  *   #5  Assert "Boost Your Business Account" header is visible
  *   #6  Tap close (X)
- *   #7  Tap "AI image credits" card
+ *   #7  Tap "Magic image credits" card
  *   #8  Tap "View Plans"
  *   #9  Assert "Unlock more AI credits" header is visible
  *   #10 Tap close (X)
@@ -54,7 +54,7 @@ public class SubscriptionFlowPage extends AndroidActions {
      *   DOG      -> "Boost Your Account"
      *   BUSINESS -> "Boost Your Business Account"
      * Everything else (Subscription row, Verification card, View Plans,
-     * AI image credits card, Unlock more AI credits header, Close,
+     * Magic image credits card, Unlock more AI credits header, Close,
      * back arrow, Settings header) is identical between account types.
      */
     public enum AccountType { DOG, BUSINESS }
@@ -103,9 +103,9 @@ public class SubscriptionFlowPage extends AndroidActions {
     private static final String VERIFICATION_CARD_XPATH =
         "//android.widget.TextView[@text=\"Verification\"]";
 
-    /** "AI image credits" subscription card. */
-    private static final String AI_IMAGE_CREDITS_CARD_XPATH =
-        "//android.widget.TextView[@text=\"AI image credits\"]";
+    /** "Magic image credits" subscription card. */
+    private static final String MAGIC_IMAGE_CREDITS_CARD_XPATH =
+        "//android.widget.TextView[@text=\"Magic image credits\"]";
 
     /**
      * Header text on the Verification-View-Plans screen:
@@ -193,7 +193,7 @@ public class SubscriptionFlowPage extends AndroidActions {
 
     /**
      * #4 + #8 - Tap the "View Plans" button. Used twice - once after
-     * Verification is selected, once after AI image credits is selected.
+     * Verification is selected, once after Magic image credits is selected.
      */
     public void ClickViewPlans() {
         log("===> ClickViewPlans");
@@ -259,7 +259,7 @@ public class SubscriptionFlowPage extends AndroidActions {
     /**
      * #6 + #10 - Tap close (X) on the per-card details screen. Returns
      * to the Subscription overview screen. Used after both Verification
-     * and AI image credits details screens.
+     * and Magic image credits details screens.
      */
     public void CloseCardScreen() {
         log("===> CloseCardScreen");
@@ -271,13 +271,13 @@ public class SubscriptionFlowPage extends AndroidActions {
         sleepQuiet(1500);
     }
 
-    /** #7 - Tap the "AI image credits" card. */
-    public void ClickAiImageCreditsCard() {
-        log("===> ClickAiImageCreditsCard");
+    /** #7 - Tap the "Magic image credits" card. */
+    public void ClickMagicImageCreditsCard() {
+        log("===> ClickMagicImageCreditsCard");
         WebElement card = wait.until(ExpectedConditions.elementToBeClickable(
-                AppiumBy.xpath(AI_IMAGE_CREDITS_CARD_XPATH)));
+                AppiumBy.xpath(MAGIC_IMAGE_CREDITS_CARD_XPATH)));
         card.click();
-        log("[OK]       Tapped AI image credits card");
+        log("[OK]       Tapped Magic image credits card");
     }
 
     /**
@@ -300,7 +300,7 @@ public class SubscriptionFlowPage extends AndroidActions {
         log("           Actual:   \"" + actual + "\"");
         log("           Expected: \"" + EXPECTED_UNLOCK_AI_CREDITS_HEADER + "\"");
         Assert.assertEquals(actual, EXPECTED_UNLOCK_AI_CREDITS_HEADER,
-                "AI image credits details screen header does not match.");
+                "Magic image credits details screen header does not match.");
         log("[PASS]     Unlock more AI credits header verified");
     }
 

@@ -26,7 +26,7 @@ import org.testng.annotations.Test;
  * context destroys the same underlying user account that
  * Dogpack_AccountDeletion deletes from dog context.
  *
- * Account: dpdelete@yopmail.com / Test@123 (LoginData.json index 5).
+ * Account: dpdelete@yopmail.com / Test@123 (SmokeLoginData.json index 1).
  * PREREQUISITE: a business entity must be provisioned on this
  * account before the first run. Re-submitting the delete request
  * (from a previous test run) is idempotent on the server, so the
@@ -37,7 +37,7 @@ import org.testng.annotations.Test;
  * they run at the very end of the suite.
  *
  * Flow (14 priorities):
- *   #1  Login as dpdelete@yopmail.com (LoginData.json index 5)
+ *   #1  Login as dpdelete@yopmail.com (SmokeLoginData.json index 1)
  *   #2  Switch to first business profile (NEW for business)
  *   #3  Tap Profile tab
  *   #4  Open hamburger / Settings & Activity
@@ -73,7 +73,7 @@ public class Dogpack_AccountDeletion_Business extends AndroidBaseTest {
 	// ==========    SETUP - Login + switch to business         =======
 	// ================================================================
 
-	/** #1 - Login as the dedicated deletion-test account (index 5). */
+	/** #1 - Login as the dedicated deletion-test account (index 1). */
 	@Test(priority = 1, dataProvider = "getDpDeleteLogin",
 			groups = { "Smoke", "Regression" })
 	public void Login_AccountDeletionBiz(HashMap<String, String> input)
@@ -228,7 +228,7 @@ public class Dogpack_AccountDeletion_Business extends AndroidBaseTest {
 	}
 
 	/**
-	 * Provides dpdelete credentials from LoginData.json (index 5).
+	 * Provides dpdelete credentials from SmokeLoginData.json (index 1).
 	 * Same JSON-loading pattern + same credentials as the dog version.
 	 */
 	@DataProvider(name = "getDpDeleteLogin")
@@ -236,8 +236,8 @@ public class Dogpack_AccountDeletion_Business extends AndroidBaseTest {
 		String jsonPath = Paths.get(
 				System.getProperty("user.dir"),
 				"src", "test", "java", "org", "rahulshettyacademy",
-				"testData", "LoginData.json").toString();
+				"testData", "SmokeLoginData.json").toString();
 		List<HashMap<String, String>> data = getJsonData(jsonPath);
-		return new Object[][] { { data.get(5) } };
+		return new Object[][] { { data.get(1) } };
 	}
 }

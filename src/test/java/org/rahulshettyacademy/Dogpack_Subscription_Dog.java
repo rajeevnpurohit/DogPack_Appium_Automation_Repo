@@ -35,7 +35,7 @@ import org.testng.annotations.Test;
  *     #5  Tap View Plans
  *     #6  Assert "Boost Your Account" header (dog variant)
  *     #7  Tap close (X)
- *     #8  Tap AI image credits card
+ *     #8  Tap Magic image credits card
  *     #9  Tap View Plans
  *     #10 Assert "Unlock more AI credits" header
  *     #11 Tap close (X)
@@ -153,17 +153,17 @@ public class Dogpack_Subscription_Dog extends AndroidBaseTest {
         subFlow.CloseCardScreen();
     }
 
-    /** #8 - Tap AI image credits card. */
+    /** #8 - Tap Magic image credits card. */
     @Test(priority = 8,
             dependsOnMethods = { "CloseVerificationCard_Dog" },
             groups = { "Smoke", "Regression" })
-    public void ClickAiImageCreditsCard_Dog() {
-        subFlow.ClickAiImageCreditsCard();
+    public void ClickMagicImageCreditsCard_Dog() {
+        subFlow.ClickMagicImageCreditsCard();
     }
 
     /** #9 - Tap View Plans (AI credits details screen opens). */
     @Test(priority = 9,
-            dependsOnMethods = { "ClickAiImageCreditsCard_Dog" },
+            dependsOnMethods = { "ClickMagicImageCreditsCard_Dog" },
             groups = { "Smoke", "Regression" })
     public void ClickViewPlans_AiCredits_Dog() {
         subFlow.ClickViewPlans();
@@ -206,7 +206,7 @@ public class Dogpack_Subscription_Dog extends AndroidBaseTest {
         String jsonPath = Paths.get(
                 System.getProperty("user.dir"),
                 "src", "test", "java", "org", "rahulshettyacademy",
-                "testData", "LoginData.json").toString();
+                "testData", "SmokeLoginData.json").toString();
         List<HashMap<String, String>> data = getJsonData(jsonPath);
         return new Object[][] { { data.get(0) } };
     }

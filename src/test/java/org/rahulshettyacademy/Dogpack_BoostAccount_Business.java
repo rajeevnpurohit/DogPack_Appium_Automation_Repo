@@ -196,7 +196,7 @@ public class Dogpack_BoostAccount_Business extends AndroidBaseTest {
 
     /**
      * Returns the shared tip@yopmail.com credentials from
-     * LoginData.json index [0] - same login as the dog tests use, but
+     * SmokeLoginData.json index [0] - same login as the dog tests use, but
      * after step #2 the active entity will be Tipper9Business.
      */
     @DataProvider(name = "getBusinessUserLogin")
@@ -204,7 +204,7 @@ public class Dogpack_BoostAccount_Business extends AndroidBaseTest {
         String jsonPath = Paths.get(
                 System.getProperty("user.dir"),
                 "src", "test", "java", "org", "rahulshettyacademy",
-                "testData", "LoginData.json").toString();
+                "testData", "SmokeLoginData.json").toString();
         List<HashMap<String, String>> data = getJsonData(jsonPath);
         return new Object[][] { { data.get(0) } };
     }

@@ -23,7 +23,7 @@ import org.testng.annotations.Test;
  * the account remains usable, and a successful login REACTIVATES
  * it. This makes the test safely repeatable.
  *
- * Account: dpdelete@yopmail.com / Test@123 (LoginData.json index 5).
+ * Account: dpdelete@yopmail.com / Test@123 (SmokeLoginData.json index 1).
  * Dedicated account - not shared with any other test class.
  *
  * Position in suite XML: LAST class. Destructive nature means it
@@ -31,7 +31,7 @@ import org.testng.annotations.Test;
  * inherits its end state.
  *
  * Flow (13 priorities):
- *   #1  Login as dpdelete@yopmail.com (LoginData.json index 5)
+ *   #1  Login as dpdelete@yopmail.com (SmokeLoginData.json index 1)
  *   #2  Tap Profile tab
  *   #3  Open hamburger / Settings & Activity
  *   #4  Tap Account and info
@@ -64,7 +64,7 @@ public class Dogpack_AccountDeletion extends AndroidBaseTest {
 	// ==========    SETUP - Login + reach Account screen        ======
 	// ================================================================
 
-	/** #1 - Login as the dedicated deletion-test account (index 5). */
+	/** #1 - Login as the dedicated deletion-test account (index 1). */
 	@Test(priority = 1, dataProvider = "getDpDeleteLogin",
 			groups = { "Smoke", "Regression" })
 	public void Login_AccountDeletion(HashMap<String, String> input)
@@ -188,7 +188,7 @@ public class Dogpack_AccountDeletion extends AndroidBaseTest {
 	}
 
 	/**
-	 * Provides dpdelete credentials from LoginData.json (index 5).
+	 * Provides dpdelete credentials from SmokeLoginData.json (index 1).
 	 * Same JSON-loading pattern used by other suite test classes.
 	 */
 	@DataProvider(name = "getDpDeleteLogin")
@@ -196,8 +196,8 @@ public class Dogpack_AccountDeletion extends AndroidBaseTest {
 		String jsonPath = Paths.get(
 				System.getProperty("user.dir"),
 				"src", "test", "java", "org", "rahulshettyacademy",
-				"testData", "LoginData.json").toString();
+				"testData", "SmokeLoginData.json").toString();
 		List<HashMap<String, String>> data = getJsonData(jsonPath);
-		return new Object[][] { { data.get(5) } };
+		return new Object[][] { { data.get(1) } };
 	}
 }

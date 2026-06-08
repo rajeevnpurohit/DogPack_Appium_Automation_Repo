@@ -34,7 +34,7 @@ import org.testng.annotations.Test;
  *     #6  Tap View Plans
  *     #7  Assert "Boost Your Business Account" header
  *     #8  Tap close (X)
- *     #9  Tap AI image credits card
+ *     #9  Tap Magic image credits card
  *     #10 Tap View Plans
  *     #11 Assert "Unlock more AI credits" header
  *     #12 Tap close (X)
@@ -154,17 +154,17 @@ public class Dogpack_Subscription_Business extends AndroidBaseTest {
         subFlow.CloseCardScreen();
     }
 
-    /** #9 - Tap AI image credits card. */
+    /** #9 - Tap Magic image credits card. */
     @Test(priority = 9,
             dependsOnMethods = { "CloseVerificationCard_Business" },
             groups = { "Smoke", "Regression" })
-    public void ClickAiImageCreditsCard_Business() {
-        subFlow.ClickAiImageCreditsCard();
+    public void ClickMagicImageCreditsCard_Business() {
+        subFlow.ClickMagicImageCreditsCard();
     }
 
     /** #10 - Tap View Plans (AI credits details screen opens). */
     @Test(priority = 10,
-            dependsOnMethods = { "ClickAiImageCreditsCard_Business" },
+            dependsOnMethods = { "ClickMagicImageCreditsCard_Business" },
             groups = { "Smoke", "Regression" })
     public void ClickViewPlans_AiCredits_Business() {
         subFlow.ClickViewPlans();
@@ -207,7 +207,7 @@ public class Dogpack_Subscription_Business extends AndroidBaseTest {
         String jsonPath = Paths.get(
                 System.getProperty("user.dir"),
                 "src", "test", "java", "org", "rahulshettyacademy",
-                "testData", "LoginData.json").toString();
+                "testData", "SmokeLoginData.json").toString();
         List<HashMap<String, String>> data = getJsonData(jsonPath);
         return new Object[][] { { data.get(0) } };
     }

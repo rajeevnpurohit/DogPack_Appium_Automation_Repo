@@ -17,7 +17,7 @@ import org.testng.annotations.Test;
  * Dogpack_Notifications - Dog-profile notifications smoke test.
  *
  * Validates the basic notifications flow on the dog profile:
- *   #1  Login as tip@yopmail.com (LoginData.json index 0)
+ *   #1  Login as tip@yopmail.com (SmokeLoginData.json index 0)
  *   #2  Tap Feed tab
  *   #3  Tap notifications icon
  *   #4  Tap "All" filter chip
@@ -114,7 +114,7 @@ public class Dogpack_Notifications extends AndroidBaseTest {
 	}
 
 	/**
-	 * Provides tip@yopmail.com credentials from LoginData.json
+	 * Provides tip@yopmail.com credentials from SmokeLoginData.json
 	 * (index 0). Same shared dog account used by every other dog
 	 * test class in the suite.
 	 */
@@ -123,7 +123,7 @@ public class Dogpack_Notifications extends AndroidBaseTest {
 		String jsonPath = Paths.get(
 				System.getProperty("user.dir"),
 				"src", "test", "java", "org", "rahulshettyacademy",
-				"testData", "LoginData.json").toString();
+				"testData", "SmokeLoginData.json").toString();
 		List<HashMap<String, String>> data = getJsonData(jsonPath);
 		return new Object[][] { { data.get(0) } };
 	}

@@ -739,7 +739,7 @@ public class Dogpack_Marketplace extends AndroidBaseTest {
         String jsonPath = Paths.get(
                 System.getProperty("user.dir"),
                 "src", "test", "java", "org", "rahulshettyacademy",
-                "testData", "LoginData.json").toString();
+                "testData", "SmokeLoginData.json").toString();
         List<HashMap<String, String>> data = getJsonData(jsonPath);
         return new Object[][] { { data.get(0) } };
     }

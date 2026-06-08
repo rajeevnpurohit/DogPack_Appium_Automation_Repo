@@ -265,7 +265,7 @@ public class Dogpack_AiPhotoGeneration_Business extends AndroidBaseTest {
     }
 
     /**
-     * Returns the shared tip@yopmail.com credentials from LoginData.json
+     * Returns the shared tip@yopmail.com credentials from SmokeLoginData.json
      * index [0] - same login as all other classes, with the active
      * entity switched to Tipper9Business by SwitchToBusinessForAI.
      */
@@ -274,7 +274,7 @@ public class Dogpack_AiPhotoGeneration_Business extends AndroidBaseTest {
         String jsonPath = Paths.get(
                 System.getProperty("user.dir"),
                 "src", "test", "java", "org", "rahulshettyacademy",
-                "testData", "LoginData.json").toString();
+                "testData", "SmokeLoginData.json").toString();
         List<HashMap<String, String>> data = getJsonData(jsonPath);
         return new Object[][] { { data.get(0) } };
     }

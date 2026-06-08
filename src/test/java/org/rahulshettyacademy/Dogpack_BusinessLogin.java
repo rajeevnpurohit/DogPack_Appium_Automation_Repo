@@ -19,7 +19,7 @@ import org.testng.annotations.Test;
  * PURPOSE:
  *   Run AFTER the dog-profile feature tests (Boost + AI Photo Generation).
  *   Performs ONLY:
- *     #1  Log in AGAIN as the same shared account (LoginData.json index
+ *     #1  Log in AGAIN as the same shared account (SmokeLoginData.json index
  *         [0] - tip@yopmail.com). After login the account defaults to the
  *         dog entity ('Tipper9'), exactly like the Phase 1 / Phase 2 tests.
  *     #2  Switch the active entity to the BUSINESS profile ('Tipper9Business')
@@ -81,7 +81,7 @@ public class Dogpack_BusinessLogin extends AndroidBaseTest {
      *
      * Reuses the exact same login flow that the dog tests use - the steps
      * are identical for both account types, only the credentials differ.
-     * Credentials come from LoginData.json index [5] via the data provider
+     * Credentials come from SmokeLoginData.json index [0] via the data provider
      * below.
      *
      * The session starts unauthenticated (noReset=false ensures the
@@ -142,7 +142,7 @@ public class Dogpack_BusinessLogin extends AndroidBaseTest {
     }
 
     /**
-     * Returns the shared tip@yopmail.com credentials from LoginData.json
+     * Returns the shared tip@yopmail.com credentials from SmokeLoginData.json
      * index [0]. This is the SAME entry used by Dogpack_BoostAccount and
      * Dogpack_AiPhotoGeneration - because the same login serves both the
      * dog entity (Phases 1/2) and the business entity (Phase 3, after the
@@ -153,7 +153,7 @@ public class Dogpack_BusinessLogin extends AndroidBaseTest {
         String jsonPath = Paths.get(
                 System.getProperty("user.dir"),
                 "src", "test", "java", "org", "rahulshettyacademy",
-                "testData", "LoginData.json").toString();
+                "testData", "SmokeLoginData.json").toString();
         List<HashMap<String, String>> data = getJsonData(jsonPath);
         return new Object[][] { { data.get(0) } };
     }

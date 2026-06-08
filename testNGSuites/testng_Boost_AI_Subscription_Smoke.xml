@@ -79,18 +79,18 @@
         </groups>
 
         <classes>
-<!--            <class name="org.rahulshettyacademy.Dogpack_BoostAccount" />-->
-<!--            <class name="org.rahulshettyacademy.Dogpack_AiPhotoGeneration" />-->
-<!--            <class name="org.rahulshettyacademy.Dogpack_BusinessLogin" />-->
-<!--            <class name="org.rahulshettyacademy.Dogpack_BoostAccount_Business" />-->
-<!--            <class name="org.rahulshettyacademy.Dogpack_AiPhotoGeneration_Business" />-->
-<!--            <class name="org.rahulshettyacademy.Dogpack_Subscription_Business" />-->
-<!--            <class name="org.rahulshettyacademy.Dogpack_Subscription_Dog" />-->
-            <class name="org.rahulshettyacademy.Dogpack_Notifications" />
-<!--            <class name="org.rahulshettyacademy.Dogpack_Marketplace" />-->
-<!--            <class name="org.rahulshettyacademy.Dogpack_Marketplace_Business" />-->
-<!--            <class name="org.rahulshettyacademy.Dogpack_AccountDeletion" />-->
-<!--            <class name="org.rahulshettyacademy.Dogpack_AccountDeletion_Business" />-->
+            <class name="org.rahulshettyacademy.Dogpack_BoostAccount" />
+            <class name="org.rahulshettyacademy.Dogpack_AiPhotoGeneration" />
+            <class name="org.rahulshettyacademy.Dogpack_BusinessLogin" />
+            <class name="org.rahulshettyacademy.Dogpack_BoostAccount_Business" />
+            <class name="org.rahulshettyacademy.Dogpack_AiPhotoGeneration_Business" />
+            <class name="org.rahulshettyacademy.Dogpack_Subscription_Business" />
+            <class name="org.rahulshettyacademy.Dogpack_Subscription_Dog" />
+<!--            <class name="org.rahulshettyacademy.Dogpack_Notifications" />-->
+            <class name="org.rahulshettyacademy.Dogpack_Marketplace" />
+            <class name="org.rahulshettyacademy.Dogpack_Marketplace_Business" />
+            <class name="org.rahulshettyacademy.Dogpack_AccountDeletion" />
+            <class name="org.rahulshettyacademy.Dogpack_AccountDeletion_Business" />
         </classes>
 
     </test>
