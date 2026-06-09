@@ -38,7 +38,7 @@ import io.appium.java_client.android.AndroidDriver;
  *   #6  Tap close (X)
  *   #7  Tap "Magic image credits" card
  *   #8  Tap "View Plans"
- *   #9  Assert "Unlock more AI credits" header is visible
+ *   #9  Assert "Unlock more magic credits" header is visible
  *   #10 Tap close (X)
  *   #11 Tap back arrow (first ImageView on screen via UiAutomator)
  *   #12 Assert "Settings and activity" header is visible
@@ -54,7 +54,7 @@ public class SubscriptionFlowPage extends AndroidActions {
      *   DOG      -> "Boost Your Account"
      *   BUSINESS -> "Boost Your Business Account"
      * Everything else (Subscription row, Verification card, View Plans,
-     * Magic image credits card, Unlock more AI credits header, Close,
+     * Magic image credits card, Unlock more magic credits header, Close,
      * back arrow, Settings header) is identical between account types.
      */
     public enum AccountType { DOG, BUSINESS }
@@ -127,7 +127,7 @@ public class SubscriptionFlowPage extends AndroidActions {
 
     /** Header text on the AI-credits-View-Plans screen. */
     private static final String UNLOCK_AI_CREDITS_HEADER_XPATH =
-        "//android.widget.TextView[@text=\"Unlock more AI credits\"]";
+        "//android.widget.TextView[@text=\"Unlock more magic credits\"]";
 
     /** Close (X) button on the per-card details screens. */
     private static final String CLOSE_BTN_XPATH =
@@ -150,7 +150,7 @@ public class SubscriptionFlowPage extends AndroidActions {
     // Expected header text values for assertions
     // (Boost header expected text is account-aware - see helper above.)
     private static final String EXPECTED_UNLOCK_AI_CREDITS_HEADER =
-        "Unlock more AI credits";
+        "Unlock more magic credits";
 
     // ================================================================
     // ==========           PUBLIC METHODS                       ======
@@ -282,7 +282,7 @@ public class SubscriptionFlowPage extends AndroidActions {
 
     /**
      * #9 - Assert the AI-credits details screen's header text equals
-     *      "Unlock more AI credits" (same for both account types).
+     *      "Unlock more magic credits" (same for both account types).
      */
     public void AssertUnlockAiCreditsHeader() {
         log("===> AssertUnlockAiCreditsHeader");
@@ -292,7 +292,7 @@ public class SubscriptionFlowPage extends AndroidActions {
                     .until(ExpectedConditions.visibilityOfElementLocated(
                             AppiumBy.xpath(UNLOCK_AI_CREDITS_HEADER_XPATH)));
         } catch (Exception e) {
-            log("[FAIL]     'Unlock more AI credits' header not visible after 15s.");
+            log("[FAIL]     'Unlock more magic credits' header not visible after 15s.");
             dumpVisibleText();
             throw e;
         }
@@ -301,7 +301,7 @@ public class SubscriptionFlowPage extends AndroidActions {
         log("           Expected: \"" + EXPECTED_UNLOCK_AI_CREDITS_HEADER + "\"");
         Assert.assertEquals(actual, EXPECTED_UNLOCK_AI_CREDITS_HEADER,
                 "Magic image credits details screen header does not match.");
-        log("[PASS]     Unlock more AI credits header verified");
+        log("[PASS]     Unlock more magic credits header verified");
     }
 
     /**

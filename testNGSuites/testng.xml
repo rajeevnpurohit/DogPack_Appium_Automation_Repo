@@ -36,15 +36,15 @@
 		<classes>
 			<!-- ============================================================ -->
 			<!-- Dogpack_Settings - kept commented (out of regression scope)  -->
-			<!-- ============================================================ 
-			<class name="org.rahulshettyacademy.Dogpack_Settings" />-->
-
-
 			<!-- ============================================================ -->
-			<!-- [GREEN] CATEGORY 1: 100% PASSED - No doubt, fully stable     -->
-			<!-- These classes ran with ZERO real failures in regression.    -->
-			<!-- Safe to run together, fast, reliable.                       -->
-			<!-- ============================================================ 	-->
+			<class name="org.rahulshettyacademy.Dogpack_Settings" />
+
+
+			 ============================================================ 
+			 [GREEN] CATEGORY 1: 100% PASSED - No doubt, fully stable     
+			 These classes ran with ZERO real failures in regression.    
+			 Safe to run together, fast, reliable.                       
+			 ============================================================  -->	
 
 			<class name="org.rahulshettyacademy.dogpack_Login" />
 
@@ -77,10 +77,10 @@
 			<!--                                                              -->
 			<!-- Dogpack_FacebookLogin   ->  SocialLoginPage.java line 348    -->
 			<!--   FAIL: SignupWithFacebook                                  -->
-			<!--   "Post-auth: no expected screen appeared within 35s"      
+			<!--   "Post-auth: no expected screen appeared within 35s"      -->
 			<class name="org.rahulshettyacademy.Dogpack_FacebookLogin" />
 
-			 -->
+
 			
 			<!-- DogPack_ManualBusinessSignup -> ManualSignupPage.java 1439  -->
 			<!--   FAIL: CreateBusinessAccountManual                         -->
@@ -114,14 +114,14 @@
 			<class name="org.rahulshettyacademy.Dogpack_PostingExperienceTextPost" />
 
 		
-			<class name="org.rahulshettyacademy.Dogpack_Search" /> 
+<!--			<class name="org.rahulshettyacademy.Dogpack_Search" /> -->
 
 			<!-- ============================================================ -->
 			<!-- Pending (kept commented as requested)                       -->
 			<!-- ============================================================ -->
 			<!-- -->
-			<!-- <class name="org.rahulshettyacademy.dogpack_PhotoChallange" /> -->
-			<!-- <class name="org.rahulshettyacademy.Dogpack_Map" /> -->
+			 <class name="org.rahulshettyacademy.dogpack_PhotoChallange" /> 
+			 <class name="org.rahulshettyacademy.Dogpack_Map" /> 
 
 		</classes>
 	</test>

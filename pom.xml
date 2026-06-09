@@ -174,6 +174,29 @@
 				</plugins>
 			</build>
 		</profile>
+
+		<!-- ============================================================ -->
+		<!-- NEW: Full Run (Smoke + Regression combined)                  -->
+		<!-- Run:  mvn test -P FullRun                                    -->
+		<!-- 26 active classes (11 smoke + 15 regression), ~50-90 min     -->
+		<!-- ============================================================ -->
+		<profile>
+			<id>FullRun</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>3.3.0</version>
+						<configuration>
+							<suiteXmlFiles>
+								<suiteXmlFile>testNGSuites/testng_Full_Run.xml</suiteXmlFile>
+							</suiteXmlFiles>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 	</profiles>
 
 	<build>
@@ -191,11 +214,21 @@
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>3.13.0</version>
 				</plugin>
-				<plugin>
-					<artifactId>maven-surefire-plugin</artifactId>
-					<version>3.3.0</version>
-				</plugin>
 			</plugins>
 		</pluginManagement>
+
+		<!-- Surefire moved out of pluginManagement to make it ACTIVE by default.
+		     Reason: pluginManagement only sets defaults for plugins that are already
+		     active. Without active Surefire here, "mvn test -DsuiteXmlFile=..."
+		     would fall back to Maven's bundled Surefire (older version) which
+		     alphabetizes classes - causing Dogpack_AccountDeletion (dpdelete) to
+		     run before Dogpack_BoostAccount (tip). Active Surefire 3.3.0 respects
+		     XML class-declaration order. -->
+		<plugins>
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.3.0</version>
+			</plugin>
+		</plugins>
 	</build>
 </project>

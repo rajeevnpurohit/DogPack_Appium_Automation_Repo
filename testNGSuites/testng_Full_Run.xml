@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<!-- =========================================================================
+     testng_Full_Run.xml - COMBINED SUITE: Smoke + Regression
+     =========================================================================
+     Runs the smoke suite FIRST (filtered to "Smoke" group), then the
+     regression suite (no group filter - all tests). Equivalent to running
+     testng_Boost_AI_Subscription_Smoke.xml followed by testng.xml back-to-back
+     but in a single Maven invocation with one combined ExtentReport.
+
+     EXECUTION ORDER:
+       PHASE 1 - SMOKE TESTS (11 active classes, Smoke group filter)
+          1. Dogpack_BoostAccount
+          2. Dogpack_AiPhotoGeneration
+          3. Dogpack_BusinessLogin
+          4. Dogpack_BoostAccount_Business
+          5. Dogpack_AiPhotoGeneration_Business
+          6. Dogpack_Subscription_Business
+          7. Dogpack_Subscription_Dog
+             (Dogpack_Notifications - commented out, preserved as-is)
+          8. Dogpack_Marketplace
+          9. Dogpack_Marketplace_Business
+         10. Dogpack_AccountDeletion
+         11. Dogpack_AccountDeletion_Business
+
+       PHASE 2 - REGRESSION TESTS (15 active classes, no group filter)
+          1. Dogpack_Settings
+          2. dogpack_Login
+          3. Dogpack_GmailLogin
+          4. DogPack_ForgotPassword
+          5. DogPack_ManualSignup
+          6. DogPack_ManualSignupSkipCase
+          7. DogPack_ManualBusinessSignupUnclaimed
+          8. Dogpack_WithoutLogin
+          9. Dogpack_FacebookLogin
+         10. DogPack_ManualBusinessSignup
+         11. Dogpack_Homepage
+         12. Dogpack_Profile
+         13. DogPack_BusinessUserEditProfile
+         14. Dogpack_PostingExperience
+         15. Dogpack_PostingExperienceTextPost
+             (dogpack_PhotoChallange - commented out, preserved as-is)
+             (Dogpack_Map - commented out, preserved as-is)
+
+     RUN COMMAND (direct):
+       mvn test -DsuiteXmlFile=testNGSuites/testng_Full_Run.xml
+
+     RUNTIME ESTIMATE: ~50-90 min on a single device. Both phases run
+     sequentially in one Appium session lifecycle.
+
+     KNOWN FAILURES (from testng.xml's own categorization):
+       Dogpack_FacebookLogin       - SocialLoginPage.java:348 timeout
+       DogPack_ManualBusinessSignup - ManualSignupPage.java:1439 "Phone Number"
+       Dogpack_Homepage            - HomePage.java:926 filter open
+       Dogpack_Profile             - ProfilePage.java:321 + 635 app crash
+     These will fail in the combined run too - expected, not new.
+     ========================================================================= -->
+
+<suite name="DogPack Full Run (Smoke + Regression)"
+       parallel="false"
+       thread-count="1">
+
+    <listeners>
+        <listener class-name="org.rahulshettyacademy.TestUtils.Listeners" />
+    </listeners>
+
+    <!-- =====================================================================
+         PHASE 1 - SMOKE TESTS
+         No group filter - all @Test methods in the listed classes run.
+         (Filter removed: it was scrambling class-declaration order because
+         TestNG pools priority-equal methods across classes when a filter is
+         active. Every smoke @Test already has groups={"Smoke","Regression"}
+         so dropping the filter excludes nothing - just restores order.)
+         ===================================================================== -->
+    <test name="Smoke Tests" preserve-order="true">
+
+        <classes>
+            <class name="org.rahulshettyacademy.Dogpack_BoostAccount" />
+            <class name="org.rahulshettyacademy.Dogpack_AiPhotoGeneration" />
+            <class name="org.rahulshettyacademy.Dogpack_BusinessLogin" />
+            <class name="org.rahulshettyacademy.Dogpack_BoostAccount_Business" />
+            <class name="org.rahulshettyacademy.Dogpack_AiPhotoGeneration_Business" />
+            <class name="org.rahulshettyacademy.Dogpack_Subscription_Business" />
+            <class name="org.rahulshettyacademy.Dogpack_Subscription_Dog" />
+            <!-- <class name="org.rahulshettyacademy.Dogpack_Notifications" /> -->
+            <class name="org.rahulshettyacademy.Dogpack_Marketplace" />
+            <class name="org.rahulshettyacademy.Dogpack_Marketplace_Business" />
+            <class name="org.rahulshettyacademy.Dogpack_AccountDeletion" />
+            <class name="org.rahulshettyacademy.Dogpack_AccountDeletion_Business" />
+        </classes>
+
+    </test>
+
+    <!-- =====================================================================
+         PHASE 2 - REGRESSION TESTS
+         No group filter - runs ALL tests in the listed classes.
+         Mirror of testng.xml's active class list.
+         ===================================================================== -->
+    <test name="Regression Tests" preserve-order="true">
+
+        <classes>
+            <class name="org.rahulshettyacademy.Dogpack_Settings" />
+            <class name="org.rahulshettyacademy.dogpack_Login" />
+            <class name="org.rahulshettyacademy.Dogpack_GmailLogin" />
+            <class name="org.rahulshettyacademy.DogPack_ForgotPassword" />
+            <class name="org.rahulshettyacademy.DogPack_ManualSignup" />
+            <class name="org.rahulshettyacademy.DogPack_ManualSignupSkipCase" />
+            <class name="org.rahulshettyacademy.DogPack_ManualBusinessSignupUnclaimed" />
+            <class name="org.rahulshettyacademy.Dogpack_WithoutLogin" />
+            <class name="org.rahulshettyacademy.Dogpack_FacebookLogin" />
+            <class name="org.rahulshettyacademy.DogPack_ManualBusinessSignup" />
+            <class name="org.rahulshettyacademy.Dogpack_Homepage" />
+            <class name="org.rahulshettyacademy.Dogpack_Profile" />
+            <class name="org.rahulshettyacademy.DogPack_BusinessUserEditProfile" />
+            <class name="org.rahulshettyacademy.Dogpack_PostingExperience" />
+            <class name="org.rahulshettyacademy.Dogpack_PostingExperienceTextPost" />
+<!--            <class name="org.rahulshettyacademy.dogpack_PhotoChallange" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_Map" />-->
+        </classes>
+
+    </test>
+
+</suite>

@@ -1,7 +1,7 @@
 [
 
 {
-   "email":"iamkiara02",
+   "email":"tip@yopmail.com",
    "password": "Test@123"
     
 },
@@ -28,5 +28,11 @@
 {
 	"email":"iamkabir01",
 	"password": "12345678"
+}
+,
+
+{
+	"email":"dpdelete@yopmail.com",
+	"password": "Test@123"
 }
 ]

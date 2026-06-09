@@ -37,7 +37,7 @@ import org.testng.annotations.Test;
  *     #7  Tap close (X)
  *     #8  Tap Magic image credits card
  *     #9  Tap View Plans
- *     #10 Assert "Unlock more AI credits" header
+ *     #10 Assert "Unlock more magic credits" header
  *     #11 Tap close (X)
  *     #12 Tap back arrow (first ImageView on screen)
  *     #13 Assert "Settings and activity" header (verifies back nav)
@@ -169,7 +169,7 @@ public class Dogpack_Subscription_Dog extends AndroidBaseTest {
         subFlow.ClickViewPlans();
     }
 
-    /** #10 - Assert "Unlock more AI credits" header. */
+    /** #10 - Assert "Unlock more magic credits" header. */
     @Test(priority = 10,
             dependsOnMethods = { "ClickViewPlans_AiCredits_Dog" },
             groups = { "Smoke", "Regression" })
