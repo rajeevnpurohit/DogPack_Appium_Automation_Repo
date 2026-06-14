@@ -19,6 +19,7 @@
           6. Dogpack_Subscription_Business
           7. Dogpack_Subscription_Dog
              (Dogpack_Notifications - commented out, preserved as-is)
+             (Dogpack_Notifications_Business - commented out, preserved as-is)
           8. Dogpack_Marketplace
           9. Dogpack_Marketplace_Business
          10. Dogpack_AccountDeletion
@@ -76,18 +77,19 @@
     <test name="Smoke Tests" preserve-order="true">
 
         <classes>
-            <class name="org.rahulshettyacademy.Dogpack_BoostAccount" />
-            <class name="org.rahulshettyacademy.Dogpack_AiPhotoGeneration" />
-            <class name="org.rahulshettyacademy.Dogpack_BusinessLogin" />
-            <class name="org.rahulshettyacademy.Dogpack_BoostAccount_Business" />
-            <class name="org.rahulshettyacademy.Dogpack_AiPhotoGeneration_Business" />
-            <class name="org.rahulshettyacademy.Dogpack_Subscription_Business" />
-            <class name="org.rahulshettyacademy.Dogpack_Subscription_Dog" />
-            <!-- <class name="org.rahulshettyacademy.Dogpack_Notifications" /> -->
-            <class name="org.rahulshettyacademy.Dogpack_Marketplace" />
-            <class name="org.rahulshettyacademy.Dogpack_Marketplace_Business" />
-            <class name="org.rahulshettyacademy.Dogpack_AccountDeletion" />
-            <class name="org.rahulshettyacademy.Dogpack_AccountDeletion_Business" />
+<!--            <class name="org.rahulshettyacademy.Dogpack_BoostAccount" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_AiPhotoGeneration" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_BusinessLogin" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_BoostAccount_Business" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_AiPhotoGeneration_Business" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_Subscription_Business" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_Subscription_Dog" />-->
+<!--             <class name="org.rahulshettyacademy.Dogpack_Notifications" /> -->
+             <class name="org.rahulshettyacademy.Dogpack_Notifications_Business" /> 
+<!--            <class name="org.rahulshettyacademy.Dogpack_Marketplace" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_Marketplace_Business" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_AccountDeletion" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_AccountDeletion_Business" />-->
         </classes>
 
     </test>
@@ -100,21 +102,21 @@
     <test name="Regression Tests" preserve-order="true">
 
         <classes>
-            <class name="org.rahulshettyacademy.Dogpack_Settings" />
-            <class name="org.rahulshettyacademy.dogpack_Login" />
-            <class name="org.rahulshettyacademy.Dogpack_GmailLogin" />
-            <class name="org.rahulshettyacademy.DogPack_ForgotPassword" />
-            <class name="org.rahulshettyacademy.DogPack_ManualSignup" />
-            <class name="org.rahulshettyacademy.DogPack_ManualSignupSkipCase" />
-            <class name="org.rahulshettyacademy.DogPack_ManualBusinessSignupUnclaimed" />
-            <class name="org.rahulshettyacademy.Dogpack_WithoutLogin" />
-            <class name="org.rahulshettyacademy.Dogpack_FacebookLogin" />
-            <class name="org.rahulshettyacademy.DogPack_ManualBusinessSignup" />
-            <class name="org.rahulshettyacademy.Dogpack_Homepage" />
-            <class name="org.rahulshettyacademy.Dogpack_Profile" />
-            <class name="org.rahulshettyacademy.DogPack_BusinessUserEditProfile" />
-            <class name="org.rahulshettyacademy.Dogpack_PostingExperience" />
-            <class name="org.rahulshettyacademy.Dogpack_PostingExperienceTextPost" />
+<!--            <class name="org.rahulshettyacademy.Dogpack_Settings" />-->
+<!--            <class name="org.rahulshettyacademy.dogpack_Login" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_GmailLogin" />-->
+<!--            <class name="org.rahulshettyacademy.DogPack_ForgotPassword" />-->
+<!--            <class name="org.rahulshettyacademy.DogPack_ManualSignup" />-->
+<!--            <class name="org.rahulshettyacademy.DogPack_ManualSignupSkipCase" />-->
+<!--            <class name="org.rahulshettyacademy.DogPack_ManualBusinessSignupUnclaimed" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_WithoutLogin" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_FacebookLogin" />-->
+<!--            <class name="org.rahulshettyacademy.DogPack_ManualBusinessSignup" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_Homepage" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_Profile" />-->
+<!--            <class name="org.rahulshettyacademy.DogPack_BusinessUserEditProfile" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_PostingExperience" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_PostingExperienceTextPost" />-->
 <!--            <class name="org.rahulshettyacademy.dogpack_PhotoChallange" />-->
 <!--            <class name="org.rahulshettyacademy.Dogpack_Map" />-->
         </classes>

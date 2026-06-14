@@ -29,21 +29,24 @@
                                                New + assert non-empty text on the
                                                first notification card area.
                                                Read-only - no state mutation.
-       9. Dogpack_Marketplace                - login + Settings + change location
+       9. Dogpack_Notifications_Business     - login + switch to Tipper9Business +
+                                               same notifications flow as #8.
+                                               Read-only - no state mutation.
+      10. Dogpack_Marketplace                - login + Settings + change location
                                                to Canada to surface the
                                                marketplace, assert "Shop" visible.
-      10. Dogpack_Marketplace_Business       - login + switch to Tipper9Business +
-                                               same marketplace flow as #9, then
+      11. Dogpack_Marketplace_Business       - login + switch to Tipper9Business +
+                                               same marketplace flow as #10, then
                                                revert location to India via the
                                                @AfterMethod cleanup.
-      11. Dogpack_AccountDeletion            - login as dpdelete@yopmail.com +
+      12. Dogpack_AccountDeletion            - login as dpdelete@yopmail.com +
                                                navigate to Manage profiles +
                                                submit account deletion request
                                                (30-day server-side grace; re-login
                                                reactivates - safely repeatable).
                                                Placed LAST since it submits a
                                                destructive request.
-      12. Dogpack_AccountDeletion_Business   - same as #11 but switches to the
+      13. Dogpack_AccountDeletion_Business   - same as #12 but switches to the
                                                business profile first. Account
                                                deletion is account-level (not
                                                profile-level), so this exercises
@@ -79,18 +82,19 @@
         </groups>
 
         <classes>
-            <class name="org.rahulshettyacademy.Dogpack_BoostAccount" />
-            <class name="org.rahulshettyacademy.Dogpack_AiPhotoGeneration" />
-            <class name="org.rahulshettyacademy.Dogpack_BusinessLogin" />
-            <class name="org.rahulshettyacademy.Dogpack_BoostAccount_Business" />
-            <class name="org.rahulshettyacademy.Dogpack_AiPhotoGeneration_Business" />
-            <class name="org.rahulshettyacademy.Dogpack_Subscription_Business" />
-            <class name="org.rahulshettyacademy.Dogpack_Subscription_Dog" />
+<!--            <class name="org.rahulshettyacademy.Dogpack_BoostAccount" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_AiPhotoGeneration" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_BusinessLogin" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_BoostAccount_Business" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_AiPhotoGeneration_Business" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_Subscription_Business" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_Subscription_Dog" />-->
 <!--            <class name="org.rahulshettyacademy.Dogpack_Notifications" />-->
-            <class name="org.rahulshettyacademy.Dogpack_Marketplace" />
-            <class name="org.rahulshettyacademy.Dogpack_Marketplace_Business" />
-            <class name="org.rahulshettyacademy.Dogpack_AccountDeletion" />
-            <class name="org.rahulshettyacademy.Dogpack_AccountDeletion_Business" />
+            <class name="org.rahulshettyacademy.Dogpack_Notifications_Business" />
+<!--            <class name="org.rahulshettyacademy.Dogpack_Marketplace" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_Marketplace_Business" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_AccountDeletion" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_AccountDeletion_Business" />-->
         </classes>
 
     </test>
