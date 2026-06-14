@@ -10,6 +10,7 @@ import org.rahulshettyacademy.pageObjects.android.LoginPage;
 import org.rahulshettyacademy.pageObjects.android.NotificationsPage;
 import org.rahulshettyacademy.pageObjects.android.ProfilePage;
 import org.rahulshettyacademy.pageObjects.android.ProfileSwitcherPage;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -67,6 +68,14 @@ import org.testng.annotations.Test;
  * and login.CompleteLoginProccess - we deliberately do NOT call
  * DismissAllOnboarding before navigateToProfileScreen here, matching
  * the proven setup pattern from Dogpack_Subscription_Business.
+ *
+ * Cleanup: @AfterClass(alwaysRun = true) reverts the active entity
+ * back to the dog profile after all tests complete (pass or fail).
+ * Hygiene-only since Notifications is read-only - the revert just
+ * prevents subsequent suite re-runs or manual app access from
+ * inheriting business-entity state. Failures inside cleanup are
+ * logged but never thrown, so they cannot mask real test results.
+ * See revertToDogProfile() at the bottom of this class.
  */
 public class Dogpack_Notifications_Business extends AndroidBaseTest {
 
@@ -298,6 +307,69 @@ public class Dogpack_Notifications_Business extends AndroidBaseTest {
 			groups = { "Smoke", "Regression" })
 	public void ClickParkGroups_Business() {
 		notifications.ClickParkGroups();
+	}
+
+	// ================================================================
+	// ==========    CLEANUP (revert business -> dog profile)   =======
+	// ================================================================
+
+	/**
+	 * Revert the active entity back to the dog profile after all tests
+	 * in this class complete. Runs unconditionally (alwaysRun = true)
+	 * so the user is not left on the business profile if any test
+	 * failed mid-flow.
+	 *
+	 * This is hygiene-only - Notifications doesn't mutate any
+	 * server-side or device state. The cleanup ensures that
+	 * re-running the suite or opening the app manually right after
+	 * this class doesn't inherit business-entity state.
+	 *
+	 * Sequence (5 steps):
+	 *   0. ClickBackButton - exit the Notifications/Inbox screen
+	 *      first, since the bottom-nav Profile tab is hidden while
+	 *      the notifications screen is active. Without this step
+	 *      the dog-switch's step 1 (tap Profile tab) cannot find
+	 *      its target.
+	 *   1-4. Reuses the 4 validated business->dog methods on
+	 *      ProfileSwitcherPage (same sequence used inside
+	 *      Dogpack_Marketplace_Business's @AfterMethod cleanup):
+	 *        1. ClickProfileTabByTextView
+	 *        2. ClickArrowDownForProfileSwitching
+	 *        3. ClickDogProfileSwitcher
+	 *        4. ClickSelectProfileForDog
+	 *
+	 * Wrapped in try/catch so a failure here only LOGS - it does
+	 * NOT throw. Cleanup must never mask a real test failure;
+	 * if the revert breaks, the test report still reflects the
+	 * actual test outcomes accurately.
+	 *
+	 * TestNG lifecycle: subclass @AfterClass runs BEFORE the
+	 * superclass (AndroidBaseTest) @AfterClass, so we get a chance
+	 * to switch profiles while the driver is still alive and the
+	 * app is still running.
+	 */
+	@AfterClass(alwaysRun = true)
+	public void revertToDogProfile() {
+		System.out.println(
+				"[CLEANUP] === Reverting business -> dog profile ===");
+		try {
+			// Step 0: exit the Notifications/Inbox screen so the
+			// bottom-nav Profile tab becomes accessible again.
+			notifications.ClickBackButton();
+			// Steps 1-4: standard business -> dog switch sequence.
+			profileSwitcher.ClickProfileTabByTextView();
+			profileSwitcher.ClickArrowDownForProfileSwitching();
+			profileSwitcher.ClickDogProfileSwitcher();
+			profileSwitcher.ClickSelectProfileForDog();
+			System.out.println("[CLEANUP] Dog profile switch complete.");
+		} catch (Exception e) {
+			System.out.println("[CLEANUP] !!! Dog profile revert FAILED "
+					+ "(non-fatal): " + e.getClass().getSimpleName()
+					+ ": " + e.getMessage()
+					+ ". User may be left on business profile - "
+					+ "manual intervention recommended before next run.");
+			e.printStackTrace(System.out);
+		}
 	}
 
 	/**

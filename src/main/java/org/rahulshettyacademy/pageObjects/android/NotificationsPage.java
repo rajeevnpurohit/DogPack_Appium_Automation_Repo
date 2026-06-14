@@ -40,6 +40,7 @@ import io.appium.java_client.pagefactory.AppiumFieldDecorator;
  *   ClickUnread()                     - tap "Unread" chip (Inbox)
  *   ClickGroups()                     - tap "Groups" chip (Inbox)
  *   ClickParkGroups()                 - tap "Park Groups" chip (Inbox, scrolls)
+ *   ClickBackButton()                 - tap top-left back button (cleanup helper)
  *   DismissAllOnboarding()            - dismiss first-time-user popups
  */
 public class NotificationsPage extends AndroidActions {
@@ -172,6 +173,22 @@ public class NotificationsPage extends AndroidActions {
 	/** "Park Groups" filter chip on the Inbox tab (off-screen right). */
 	private static final String PARK_GROUPS_XPATH =
 			"//android.widget.TextView[@text=\"Park Groups\"]";
+
+	/**
+	 * Top-left back button on the Notifications / Inbox screen.
+	 * Carries content-desc="left_click_back". This is the screen-level
+	 * back button - tapping it exits the Notifications screen and
+	 * returns to the screen that opened it (typically Feed). Used by
+	 * test classes for cleanup, since the bottom-nav (Profile tab,
+	 * etc.) is hidden while the Notifications screen is active.
+	 *
+	 * Distinct from GO_BACK_BUTTON_XPATH above, which targets the
+	 * search/discovery screen's back button (content-desc=
+	 * "search_isGoBack") - a completely different element.
+	 */
+	private static final String BACK_BUTTON_XPATH =
+			"//android.view.ViewGroup[@content-desc=\"left_click_back\"]"
+			+ "/android.widget.ImageView";
 
 	// ================================================================
 	// =====           PUBLIC METHODS                            ======
@@ -425,6 +442,27 @@ public class NotificationsPage extends AndroidActions {
 				AppiumBy.xpath(PARK_GROUPS_XPATH)));
 		el.click();
 		System.out.println("[OK]       Tapped 'Park Groups' filter chip");
+		sleepShort();
+	}
+
+	/**
+	 * Step 12 - Tap the top-left back button on the Notifications /
+	 * Inbox screen, returning to the screen that opened Notifications
+	 * (typically Feed).
+	 *
+	 * Used by test class cleanup (@AfterClass) when reverting from
+	 * business profile back to dog profile. The dog-switch sequence
+	 * starts by tapping the bottom-nav Profile tab, which is hidden
+	 * while the Notifications screen is active - so we must exit the
+	 * Notifications screen first.
+	 */
+	public void ClickBackButton() {
+		System.out.println("===> ClickBackButton");
+		WebElement el = wait.until(ExpectedConditions.elementToBeClickable(
+				AppiumBy.xpath(BACK_BUTTON_XPATH)));
+		el.click();
+		System.out.println("[OK]       Tapped back button "
+				+ "(exited Notifications screen)");
 		sleepShort();
 	}
 
