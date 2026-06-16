@@ -107,7 +107,7 @@ public class BoostAccountPage extends AndroidActions {
      * inside method bodies instead of referencing a constant.
      */
     private String getSubscribeBtnXpath() {
-        String price = (accountType == AccountType.BUSINESS) ? "520.00" : "6.00";
+        String price = (accountType == AccountType.BUSINESS) ? "520.00" : "200.00";
         return "//android.widget.TextView[@text=\"Subscribe Monthly Plan for "
                 + RUPEE + price + "\"]";
     }
