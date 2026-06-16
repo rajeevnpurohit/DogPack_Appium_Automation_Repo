@@ -1,5 +1,9 @@
 package org.rahulshettyacademy.TestUtils;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,6 +59,21 @@ public class Listeners extends AppiumUtils implements ITestListener {
 	private static final Map<String, ExtentTest> classTests = new HashMap<>();
 
 	/**
+	 * Per-class counter of child nodes attached to each parent. Used
+	 * in onFinish() to append "Test Cases (N)" to each parent's
+	 * display name - the count then renders alongside the class name
+	 * in both the Features list (left panel) and the test header
+	 * (right panel) of the Spark report.
+	 *
+	 * Incremented inside every code path that calls parent.createNode():
+	 *   - onTestStart            (normal test invocation)
+	 *   - onTestSkipped          (when a fresh node has to be created
+	 *                             for tests that never received onTestStart,
+	 *                             e.g. skipped via dependsOnMethods chain)
+	 */
+	private static final Map<String, Integer> classTestCount = new HashMap<>();
+
+	/**
 	 * Get the parent ExtentTest for the given simple class name,
 	 * creating it on first request. Synchronized to be safe if
 	 * TestNG ever runs tests in parallel - the current suite is
@@ -86,8 +105,10 @@ public class Listeners extends AppiumUtils implements ITestListener {
 	public void onTestStart(ITestResult result) {
 		// Get or create the parent ExtentTest for this class, then
 		// attach this test method as a child node under it.
-		ExtentTest parent = getOrCreateClassParent(getSimpleClassName(result));
+		String simpleName = getSimpleClassName(result);
+		ExtentTest parent = getOrCreateClassParent(simpleName);
 		test = parent.createNode(result.getMethod().getMethodName());
+		classTestCount.merge(simpleName, 1, Integer::sum);
 	}
 
 	@Override
@@ -116,8 +137,10 @@ public class Listeners extends AppiumUtils implements ITestListener {
 				|| !result.getMethod().getMethodName().equals(
 						getCurrentTestNodeName());
 		if (needFreshNode) {
-			ExtentTest parent = getOrCreateClassParent(getSimpleClassName(result));
+			String simpleName = getSimpleClassName(result);
+			ExtentTest parent = getOrCreateClassParent(simpleName);
 			test = parent.createNode(result.getMethod().getMethodName());
+			classTestCount.merge(simpleName, 1, Integer::sum);
 		}
 
 		Throwable t = result.getThrowable();
@@ -155,7 +178,115 @@ public class Listeners extends AppiumUtils implements ITestListener {
 
 	@Override
 	public void onFinish(ITestContext context) {
+		appendTestCaseCountsToParentNames();
 		extent.flush();
+		postProcessReportLabels();
+	}
+
+	// ====================================================================
+	// 🔴 PARENT NAME DECORATION (Test Case count)
+	// ====================================================================
+	/**
+	 * Iterate every parent ExtentTest cached in classTests and append
+	 * " | Test Cases (N)" to its display name, where N is the number
+	 * of child nodes attached to that parent (tracked in
+	 * classTestCount).
+	 *
+	 * The renamed parent shows up in TWO places in the Spark report:
+	 *   - Left panel ("Features" list)
+	 *   - Right panel (test header above the start/end timestamps)
+	 * Both render the parent's name field, so a single rename
+	 * propagates to both.
+	 *
+	 * MUST run BEFORE extent.flush() because flush() is what
+	 * serializes the in-memory model into reports/index.html.
+	 * Renaming after flush would not affect the generated file.
+	 *
+	 * Wrapped in try/catch per parent so one bad rename can't block
+	 * the others. Failures are logged but not thrown - a broken
+	 * rename should never prevent the report from being written.
+	 */
+	private void appendTestCaseCountsToParentNames() {
+		int renamed = 0;
+		for (Map.Entry<String, ExtentTest> entry : classTests.entrySet()) {
+			String className = entry.getKey();
+			ExtentTest parent = entry.getValue();
+			int count = classTestCount.getOrDefault(className, 0);
+			try {
+				String newName = className + "  |  Test Cases (" + count + ")";
+				parent.getModel().setName(newName);
+				renamed++;
+			} catch (Exception e) {
+				System.out.println("[WARN] Could not append count to parent "
+						+ "for class '" + className + "' (non-fatal): "
+						+ e.getClass().getSimpleName() + ": " + e.getMessage());
+			}
+		}
+		System.out.println("[OK]   Decorated " + renamed + " parent test(s) "
+				+ "with 'Test Cases (N)' suffix");
+	}
+
+	// ====================================================================
+	// 🔴 REPORT-LABEL CUSTOMIZATION
+	// ====================================================================
+	/**
+	 * Rewrites a small set of UI labels in the generated Spark HTML report
+	 * after extent.flush() has produced it. Spark bundles these strings
+	 * directly in its template HTML/JS - there is no built-in config to
+	 * change them - so the only reliable customization is post-processing
+	 * the file once it's been written.
+	 *
+	 * Replacements:
+	 *   ">Tests<"  -> ">Features<"     (dashboard card label, sidebar)
+	 *   ">Steps<"  -> ">Test Cases<"   (dashboard card label, sidebar)
+	 *   "(N tests)" -> "(N Test Cases)"  (class header counts, pie captions)
+	 *
+	 * The first two patterns are anchored to angle brackets so they only
+	 * match HTML tag content - class names and method names in
+	 * data-attributes won't be touched. The numeric regex on "tests"
+	 * only fires when preceded by a digit so unrelated text containing
+	 * the substring "tests" (e.g. "tested", "testsuite") is safe.
+	 *
+	 * Idempotent and defensive - if the report file doesn't exist or
+	 * any I/O fails, logs a warning and continues without throwing.
+	 */
+	private void postProcessReportLabels() {
+		try {
+			Path htmlPath = Paths.get(System.getProperty("user.dir"),
+					"reports", "index.html");
+			if (!Files.exists(htmlPath)) {
+				System.out.println("[WARN] Report HTML not found at "
+						+ htmlPath + " - skipping label rewrite");
+				return;
+			}
+
+			String original = new String(
+					Files.readAllBytes(htmlPath), StandardCharsets.UTF_8);
+			String content = original;
+
+			// Dashboard / sidebar tag-content labels
+			content = content.replace(">Tests<", ">Features<");
+			content = content.replace(">Steps<", ">Test Cases<");
+
+			// Numeric "tests" forms - matches "8 tests", "0 tests", etc.
+			// (anchored on a digit prefix so unrelated text is safe)
+			content = content.replaceAll(
+					"(\\d+)\\s+tests\\b", "$1 Test Cases");
+
+			if (!content.equals(original)) {
+				Files.write(htmlPath, content.getBytes(StandardCharsets.UTF_8));
+				System.out.println("[OK]   Report labels rewritten: "
+						+ "Tests->Features, Steps->Test Cases, tests->Test Cases");
+			} else {
+				System.out.println("[INFO] No target labels found in report "
+						+ "- nothing to rewrite (may indicate a Spark version "
+						+ "change; verify labels by opening reports/index.html)");
+			}
+		} catch (Exception e) {
+			System.out.println("[WARN] Post-processing report labels failed "
+					+ "(non-fatal): " + e.getClass().getSimpleName()
+					+ ": " + e.getMessage());
+		}
 	}
 
 	// ====================================================================
