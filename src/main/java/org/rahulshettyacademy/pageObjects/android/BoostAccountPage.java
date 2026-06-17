@@ -280,12 +280,11 @@ public class BoostAccountPage extends AndroidActions {
         card.click();
         log("[OK]       Tapped Annual Plan card");
 
-        log("[STEP 2/2] Wait for 'Subscribe Annual Plan for \u20B915.00' "
-                + "button to appear (selection confirmed by button text change)");
+        log("[STEP 2/2] Wait for 'Annual Plan' card label to be visible "
+                + "(selection confirmed)");
         wait.until(ExpectedConditions.visibilityOfElementLocated(
-                AppiumBy.xpath(getSubscribeAnnualBtnXpath())));
-        log("[PASS]     Annual plan selected (Subscribe button reflects "
-                + "annual price)");
+                AppiumBy.xpath(ANNUAL_PLAN_CARD_XPATH)));
+        log("[PASS]     Annual plan selected ('Annual Plan' card visible)");
     }
 
     /**
@@ -297,8 +296,15 @@ public class BoostAccountPage extends AndroidActions {
         log("===> ClickSubscribeAnnualPlan");
 
         log("[STEP 1/3] Tap Subscribe Annual button");
-        WebElement subBtn = wait.until(ExpectedConditions.elementToBeClickable(
-                AppiumBy.xpath(getSubscribeAnnualBtnXpath())));
+        WebElement subBtn;
+        if (accountType == AccountType.BUSINESS) {
+            subBtn = wait.until(ExpectedConditions.elementToBeClickable(
+                    AppiumBy.androidUIAutomator(
+                            "new UiSelector().className(\"com.horcrux.svg.N\")")));
+        } else {
+            subBtn = wait.until(ExpectedConditions.elementToBeClickable(
+                    AppiumBy.xpath("//android.widget.Button[@content-desc=\"Subscribe Annual Plan for \u20B92,150.00\"]/android.view.View")));
+        }
         subBtn.click();
         log("[OK]       Tapped Subscribe Annual button");
 

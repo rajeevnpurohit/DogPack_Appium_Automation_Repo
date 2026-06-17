@@ -300,14 +300,14 @@ public class AiPhotoGenerationPage extends AndroidActions {
         tab.click();
         log("[OK]       Tapped Subscribe tab");
 
-        log("[STEP 2/2] Wait for Monthly card to appear (40s)");
+        log("[STEP 2/2] Wait for Subscribe tab to be active (40s)");
         WebDriverWait longWait = new WebDriverWait(driver, Duration.ofSeconds(40));
         try {
             longWait.until(ExpectedConditions.visibilityOfElementLocated(
-                    AppiumBy.xpath(getMonthlyCardXpath())));
-            log("[PASS]     Subscribe tab active (Monthly card visible)");
+                    AppiumBy.xpath("//android.view.ViewGroup[@content-desc=\"Subscribe\"]")));
+            log("[PASS]     Subscribe tab active ('Subscribe' visible)");
         } catch (Exception e) {
-            log("[FAIL]     Monthly card not visible after 40s.");
+            log("[FAIL]     Subscribe tab not active after 40s.");
             dumpVisibleText();
             throw e;
         }
@@ -322,7 +322,7 @@ public class AiPhotoGenerationPage extends AndroidActions {
 
         log("[STEP 1/2] Tap 'Monthly' plan card");
         WebElement card = wait.until(ExpectedConditions.elementToBeClickable(
-                AppiumBy.xpath(getMonthlyCardXpath())));
+                AppiumBy.xpath("//android.widget.TextView[@text=\"Monthly\"]")));
         card.click();
         log("[OK]       Tapped Monthly card");
 
