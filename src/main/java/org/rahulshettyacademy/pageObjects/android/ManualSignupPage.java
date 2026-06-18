@@ -675,6 +675,9 @@ public class ManualSignupPage extends AndroidActions {
 		// 7. Business 3rd screen: phone -> submit
 		fillBusinessThirdScreen();
 
+		// 7b. "Verify Your Business" upsell -> stay on free (non-licensed) tier
+		dismissVerifyBusinessUpsellIfPresent();
+
 		// 8. Notification + Home
 		completeNotificationAndDistanceFlow();
 
@@ -1200,7 +1203,7 @@ public class ManualSignupPage extends AndroidActions {
 		fillFieldRobustly(companyFirstNameField, firstName, "firstName");
 		fillFieldRobustly(companyLastNameField, lastName, "lastName");
 		fillFieldRobustly(companyWorkEmailField, email, "work_email");
-		fillFieldRobustly(companyConfirmEmailField, confirmEmail, "con_email");
+		fillConfirmEmailWithScroll(confirmEmail);
 
 		// Hide keyboard and scroll to make sure button is visible
 		tryHideKeyboard();
@@ -1322,16 +1325,172 @@ public class ManualSignupPage extends AndroidActions {
 	 *  5. Hide keyboard so next field click works
 	 */
 	private void fillFieldRobustly(WebElement field, String value, String label) {
+		int maxAttempts = 3;
+		for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+			try {
+				WebElement el = wait.until(ExpectedConditions.elementToBeClickable(field));
+				el.click();
+				clearFieldRobustly(el, label);
+				el.sendKeys(value);
+				System.out.println("[INPUT] " + label + " = " + value);
+				tryHideKeyboard();
+				return;
+			} catch (Exception e) {
+				if (attempt == maxAttempts) {
+					logEditableFieldsForDiagnostics();
+					Assert.fail("[FAIL] Could not fill field '" + label + "': "
+							+ e.getMessage());
+				}
+				// Recovery before retry:
+				//   attempt 1 -> hide keyboard (it may be covering the field)
+				//   attempt 2 -> scroll the form forward to bring an off-screen
+				//                field (e.g. confirmEmail) into the a11y tree
+				if (attempt == 1) {
+					System.out.println("[INFO] '" + label
+							+ "' not ready - hiding keyboard and retrying");
+					tryHideKeyboard();
+				} else {
+					System.out.println("[INFO] '" + label
+							+ "' still not visible - scrolling form to reveal it");
+					tryHideKeyboard();
+					scrollFormForwardOnce();
+				}
+			}
+		}
+	}
+
+	/**
+	 * Scroll the first scrollable container forward by ~one viewport to
+	 * bring an off-screen field into the accessibility tree. No-op if there
+	 * is no scrollable container or the form is already at the bottom.
+	 */
+	private void scrollFormForwardOnce() {
+		// 1) Native scroll container - works only when the container is
+		//    exposed as scrollable(true) in the a11y tree.
 		try {
-			WebElement el = wait.until(ExpectedConditions.elementToBeClickable(field));
-			el.click();
-			clearFieldRobustly(el, label);
-			el.sendKeys(value);
+			driver.findElement(AppiumBy.androidUIAutomator(
+					"new UiScrollable(new UiSelector().scrollable(true))"
+							+ ".scrollForward()"));
+			return;
+		} catch (Exception ignore) {
+			// React Native ScrollViews are frequently NOT marked
+			// scrollable(true), so UiScrollable is a no-op. Fall back to a
+			// coordinate gesture which scrolls regardless of that flag.
+		}
+		// 2) Coordinate-based scroll gesture (React Native friendly).
+		try {
+			org.openqa.selenium.Dimension size =
+					driver.manage().window().getSize();
+			java.util.Map<String, Object> args = new java.util.HashMap<>();
+			args.put("left", (int) (size.getWidth() * 0.1));
+			args.put("top", (int) (size.getHeight() * 0.25));
+			args.put("width", (int) (size.getWidth() * 0.8));
+			args.put("height", (int) (size.getHeight() * 0.45));
+			args.put("direction", "down");
+			args.put("percent", 0.85);
+			driver.executeScript("mobile: scrollGesture", args);
+		} catch (Exception ignore) {
+			// gesture unsupported / failed - leave screen as-is
+		}
+	}
+
+	/**
+	 * Diagnostic: print every EditText currently in the a11y tree with
+	 * its content-desc / resource-id / text. Helps identify the real
+	 * locator (or confirm a field is absent) when a fill can't find one.
+	 */
+	private void logEditableFieldsForDiagnostics() {
+		try {
+			java.util.List<WebElement> fields =
+					driver.findElements(By.className("android.widget.EditText"));
+			System.out.println("[DIAG] EditText fields on screen: " + fields.size());
+			for (WebElement f : fields) {
+				System.out.println("[DIAG]   content-desc='" + safeAttr(f, "content-desc")
+						+ "' resource-id='" + safeAttr(f, "resource-id")
+						+ "' text='" + safeAttr(f, "text") + "'");
+			}
+		} catch (Exception e) {
+			System.out.println("[DIAG] Could not enumerate fields: " + e.getMessage());
+		}
+	}
+
+	private String safeAttr(WebElement el, String name) {
+		try {
+			String v = el.getAttribute(name);
+			return v == null ? "" : v;
+		} catch (Exception e) {
+			return "";
+		}
+	}
+
+	/**
+	 * Confirm Email needs special handling: the box sits just below the
+	 * keyboard line and is not reliably in the a11y tree until focused.
+	 * Strategy (per observed device behaviour):
+	 *   1. Locate the box (presence-based; scroll the form forward first
+	 *      if it is not yet in the tree).
+	 *   2. Click it to focus - the app lifts the focused field above the IME.
+	 *   3. Swipe the screen upwards so it clears the keyboard.
+	 *   4. Clear and type the value.
+	 */
+	private void fillConfirmEmailWithScroll(String value) {
+		String label = "con_email";
+		WebElement field = findFieldByAccId("confirmEmail");
+		if (field == null) {
+			scrollFormForwardOnce();
+			field = findFieldByAccId("confirmEmail");
+		}
+		if (field == null) {
+			logEditableFieldsForDiagnostics();
+			Assert.fail("[FAIL] Could not locate '" + label
+					+ "' (confirmEmail) even after scrolling. "
+					+ "See [DIAG] field list above.");
+			return;
+		}
+		try {
+			field.click();
+			System.out.println("[ACTION] Focused con_email box");
+			swipeScreenUp();
+			clearFieldRobustly(field, label);
+			field.sendKeys(value);
 			System.out.println("[INPUT] " + label + " = " + value);
 			tryHideKeyboard();
 		} catch (Exception e) {
+			logEditableFieldsForDiagnostics();
 			Assert.fail("[FAIL] Could not fill field '" + label + "': "
 					+ e.getMessage());
+		}
+	}
+
+	private WebElement findFieldByAccId(String accId) {
+		try {
+			java.util.List<WebElement> els =
+					driver.findElements(AppiumBy.accessibilityId(accId));
+			return els.isEmpty() ? null : els.get(0);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	/**
+	 * Swipe the content area upwards (finger bottom->top) so a focused
+	 * field is lifted above the soft keyboard. RN-friendly - does not
+	 * depend on a scrollable(true) container.
+	 */
+	private void swipeScreenUp() {
+		try {
+			org.openqa.selenium.Dimension size =
+					driver.manage().window().getSize();
+			java.util.Map<String, Object> args = new java.util.HashMap<>();
+			args.put("left", (int) (size.getWidth() * 0.1));
+			args.put("top", (int) (size.getHeight() * 0.2));
+			args.put("width", (int) (size.getWidth() * 0.8));
+			args.put("height", (int) (size.getHeight() * 0.35));
+			args.put("direction", "up");
+			args.put("percent", 0.6);
+			driver.executeScript("mobile: swipeGesture", args);
+		} catch (Exception ignore) {
+			// gesture unsupported / failed - leave as-is
 		}
 	}
 
@@ -1407,6 +1566,26 @@ public class ManualSignupPage extends AndroidActions {
 			System.out.println("[WARN] Service selection failed: " + e.getMessage());
 		}
 
+		// Listing checkbox - select the "test" business listing
+		try {
+			By testListing = By.xpath(
+					"//android.view.ViewGroup[@content-desc=\"test\"]"
+							+ "/android.view.ViewGroup/android.view.ViewGroup");
+			wait.until(ExpectedConditions.elementToBeClickable(testListing)).click();
+			System.out.println("[INPUT] Selected 'test' business listing checkbox");
+			// Best-effort confirmation the row is now selected
+			try {
+				WebElement row = driver.findElement(
+						By.xpath("//android.view.ViewGroup[@content-desc=\"test\"]"));
+				System.out.println("[INFO] 'test' row selected="
+						+ safeAttr(row, "selected") + " checked="
+						+ safeAttr(row, "checked"));
+			} catch (Exception ignore) { /* state read is best-effort */ }
+		} catch (Exception e) {
+			System.out.println("[WARN] 'test' listing checkbox selection failed: "
+					+ e.getMessage());
+		}
+
 		// Image
 		try {
 			wait.until(ExpectedConditions.elementToBeClickable(firstBusinessImageSlot)).click();
@@ -1432,6 +1611,23 @@ public class ManualSignupPage extends AndroidActions {
 
 		wait.until(ExpectedConditions.elementToBeClickable(businessSecondContinueBtn)).click();
 		System.out.println("[ACTION] businessSecondCon clicked");
+	}
+
+	/**
+	 * Best-effort: dismiss the "Verify Your Business" upsell that appears
+	 * between the 3rd business screen and the Notifications screen, by
+	 * tapping "Stay on Free" to remain on the free (non-licensed) tier.
+	 * No-op if the screen does not appear.
+	 */
+	private void dismissVerifyBusinessUpsellIfPresent() {
+		try {
+			shortWait.until(ExpectedConditions.elementToBeClickable(
+					By.xpath("//android.widget.TextView[@text=\"Stay on Free\"]")))
+					.click();
+			System.out.println("[ACTION] Verify Your Business upsell - tapped 'Stay on Free'");
+		} catch (Exception e) {
+			System.out.println("[INFO] Verify Your Business upsell not shown - skipping");
+		}
 	}
 
 	private void fillBusinessThirdScreen() {
