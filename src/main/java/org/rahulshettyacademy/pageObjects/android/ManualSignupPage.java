@@ -614,6 +614,9 @@ public class ManualSignupPage extends AndroidActions {
 		wait.until(ExpectedConditions.elementToBeClickable(finishSignupBtn)).click();
 		System.out.println("[ACTION] Clicked Finish");
 
+		// 4b. "Verify Your Business" upsell -> stay on free (non-licensed) tier
+		dismissStayOnFreeUpsellIfPresent();
+
 		// 5. Notification + Home
 		completeNotificationAndDistanceFlow();
 
@@ -676,7 +679,7 @@ public class ManualSignupPage extends AndroidActions {
 		fillBusinessThirdScreen();
 
 		// 7b. "Verify Your Business" upsell -> stay on free (non-licensed) tier
-		dismissVerifyBusinessUpsellIfPresent();
+		dismissStayOnFreeUpsellIfPresent();
 
 		// 8. Notification + Home
 		completeNotificationAndDistanceFlow();
@@ -743,6 +746,9 @@ public class ManualSignupPage extends AndroidActions {
 
 		// 6. "Great!" success modal (CustomBusinessModal with bottonGreat=true)
 		clickGreatWithVerification();
+
+		// 6b. "Verify Your Business" upsell -> stay on free (non-licensed) tier
+		dismissStayOnFreeUpsellIfPresent();
 
 		// 7. RateUs screen - CONDITIONAL based on storage flags
 		handleRateUsScreenIfPresent();
@@ -1614,12 +1620,12 @@ public class ManualSignupPage extends AndroidActions {
 	}
 
 	/**
-	 * Best-effort: dismiss the "Verify Your Business" upsell that appears
-	 * between the 3rd business screen and the Notifications screen, by
-	 * tapping "Stay on Free" to remain on the free (non-licensed) tier.
-	 * No-op if the screen does not appear.
+	 * Best-effort: dismiss the "Verify Your Business" upsell (which appears
+	 * before the Notifications screen in BOTH the dog and business signup
+	 * flows) by tapping "Stay on Free" to remain on the free (non-licensed)
+	 * tier. No-op if the screen does not appear.
 	 */
-	private void dismissVerifyBusinessUpsellIfPresent() {
+	private void dismissStayOnFreeUpsellIfPresent() {
 		try {
 			shortWait.until(ExpectedConditions.elementToBeClickable(
 					By.xpath("//android.widget.TextView[@text=\"Stay on Free\"]")))
