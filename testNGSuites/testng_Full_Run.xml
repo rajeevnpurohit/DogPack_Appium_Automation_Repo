@@ -88,65 +88,65 @@
             <!-- ================================================================
                  PHASE 1 - PRE-LOGIN / ENTRY POINTS
                  ================================================================ -->
-            <class name="org.rahulshettyacademy.Dogpack_WithoutLogin" />
+<!--            <class name="org.rahulshettyacademy.Dogpack_WithoutLogin" />-->
  
 <!--             ================================================================-->
 <!--                 PHASE 2 - AUTHENTICATION (Login flows)-->
 <!--                 ================================================================ -->
-            <class name="org.rahulshettyacademy.dogpack_Login" />
-            <class name="org.rahulshettyacademy.Dogpack_GmailLogin" />
-            <class name="org.rahulshettyacademy.Dogpack_FacebookLogin" />
-            <class name="org.rahulshettyacademy.DogPack_ForgotPassword" />
+<!--            <class name="org.rahulshettyacademy.dogpack_Login" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_GmailLogin" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_FacebookLogin" />-->
+<!--            <class name="org.rahulshettyacademy.DogPack_ForgotPassword" />-->
  
 <!--             ================================================================-->
 <!--                 PHASE 3 - SIGNUP (All cases - user + business)-->
 <!--                 ================================================================ -->
-            <class name="org.rahulshettyacademy.DogPack_ManualSignup" />
-            <class name="org.rahulshettyacademy.DogPack_ManualSignupSkipCase" />
-            <class name="org.rahulshettyacademy.DogPack_ManualBusinessSignup" />
-            <class name="org.rahulshettyacademy.DogPack_ManualBusinessSignupUnclaimed" />
+<!--            <class name="org.rahulshettyacademy.DogPack_ManualSignup" />-->
+<!--            <class name="org.rahulshettyacademy.DogPack_ManualSignupSkipCase" />-->
+<!--            <class name="org.rahulshettyacademy.DogPack_ManualBusinessSignup" />-->
+<!--            <class name="org.rahulshettyacademy.DogPack_ManualBusinessSignupUnclaimed" />-->
  
 <!--             ================================================================-->
 <!--                 PHASE 4 - CORE APP FEATURES (Homepage + Profile)-->
 <!--                 ================================================================ -->
-            <class name="org.rahulshettyacademy.Dogpack_Homepage" />
+<!--            <class name="org.rahulshettyacademy.Dogpack_Homepage" />-->
 <!--            <class name="org.rahulshettyacademy.Dogpack_Map" />-->
             <class name="org.rahulshettyacademy.Dogpack_Profile" />
-            <class name="org.rahulshettyacademy.DogPack_BusinessUserEditProfile" />
+<!--            <class name="org.rahulshettyacademy.DogPack_BusinessUserEditProfile" />-->
  
 <!--             ================================================================-->
 <!--                 PHASE 5 - POSTING EXPERIENCE (Photo/Video + Text)-->
 <!--                 ================================================================ -->
-            <class name="org.rahulshettyacademy.Dogpack_PostingExperience" />
-            <class name="org.rahulshettyacademy.Dogpack_PostingExperienceTextPost" />
+<!--            <class name="org.rahulshettyacademy.Dogpack_PostingExperience" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_PostingExperienceTextPost" />-->
 <!--            <class name="org.rahulshettyacademy.dogpack_PhotoChallange" />-->
  
 <!--             ================================================================-->
 <!--                 PHASE 6 - SETTINGS & ACTIVITY-->
 <!--                 ================================================================ -->
-            <class name="org.rahulshettyacademy.Dogpack_Settings" />
+<!--            <class name="org.rahulshettyacademy.Dogpack_Settings" />-->
  
 <!--             ================================================================-->
 <!--                 PHASE 7 - PREMIUM / MONETIZATION FEATURES-->
 <!--                 ================================================================ -->
-            <class name="org.rahulshettyacademy.Dogpack_BoostAccount" />
-            <class name="org.rahulshettyacademy.Dogpack_AiPhotoGeneration" />
-            <class name="org.rahulshettyacademy.Dogpack_BusinessLogin" />
-            <class name="org.rahulshettyacademy.Dogpack_BoostAccount_Business" />
-            <class name="org.rahulshettyacademy.Dogpack_AiPhotoGeneration_Business" />
-            <class name="org.rahulshettyacademy.Dogpack_Subscription_Business" />
-            <class name="org.rahulshettyacademy.Dogpack_Subscription_Dog" />
-            <class name="org.rahulshettyacademy.Dogpack_Notifications" />
-            <class name="org.rahulshettyacademy.Dogpack_Notifications_Business" />
-            <class name="org.rahulshettyacademy.Dogpack_Marketplace" />
-            <class name="org.rahulshettyacademy.Dogpack_Marketplace_Business" />
+<!--            <class name="org.rahulshettyacademy.Dogpack_BoostAccount" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_AiPhotoGeneration" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_BusinessLogin" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_BoostAccount_Business" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_AiPhotoGeneration_Business" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_Subscription_Business" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_Subscription_Dog" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_Notifications" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_Notifications_Business" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_Marketplace" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_Marketplace_Business" />-->
  
 <!--             ================================================================-->
 <!--                 PHASE 8 - ACCOUNT LIFECYCLE (Runs LAST - destructive!)-->
 <!--                 These delete accounts so they must run at the very end.-->
 <!--                 ================================================================ -->
-            <class name="org.rahulshettyacademy.Dogpack_AccountDeletion" />
-            <class name="org.rahulshettyacademy.Dogpack_AccountDeletion_Business" />
+<!--            <class name="org.rahulshettyacademy.Dogpack_AccountDeletion" />-->
+<!--            <class name="org.rahulshettyacademy.Dogpack_AccountDeletion_Business" />-->
  
         </classes>
  

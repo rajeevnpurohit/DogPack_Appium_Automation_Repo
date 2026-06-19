@@ -58,7 +58,7 @@ public class ProfilePage extends AndroidActions {
 	@AndroidFindBy(accessibility = "profile-view")
 	private WebElement profileViewBtn;
 
-	@AndroidFindBy(accessibility = "dog_det_edPro")
+	@AndroidFindBy(xpath = "//android.view.ViewGroup[@content-desc=\"dog_det_edPro\"]")
 	private WebElement editButton;
 
 	@AndroidFindBy(accessibility = "dog_det_share")
@@ -79,10 +79,10 @@ public class ProfilePage extends AndroidActions {
 	@AndroidFindBy(xpath = "//android.widget.EditText[@text=\"Search\"]")
 	private WebElement searchField;
 
-	@AndroidFindBy(accessibility = "profile-post")
+	@AndroidFindBy(xpath = "//android.widget.ImageView[@content-desc=\"profile-gallery\"]")
 	private WebElement profilePost;
 
-	@AndroidFindBy(accessibility = "profile-info")
+	@AndroidFindBy(xpath = "//android.widget.HorizontalScrollView/android.view.ViewGroup/android.view.ViewGroup[4]")
 	private WebElement profileInfo;
 
 	@AndroidFindBy(accessibility = "profile-questions")
@@ -94,7 +94,7 @@ public class ProfilePage extends AndroidActions {
 	@AndroidFindBy(accessibility = "breed")
 	private WebElement profileBreed;
 
-	@AndroidFindBy(accessibility = "modal_close_click")
+	@AndroidFindBy(xpath = "//android.view.ViewGroup[@content-desc=\"modal_close_click\"]/android.widget.ImageView")
 	private WebElement modalCloseIcon;
 
 	@AndroidFindBy(accessibility = "edit-dog-profile_pic")
@@ -348,19 +348,12 @@ public class ProfilePage extends AndroidActions {
 		wait.until(ExpectedConditions.elementToBeClickable(modalCloseIcon)).click();
 		System.out.println("[ASSERT PASS] Breed modal opened and closed");
 
-		// Questions tab
-		wait.until(ExpectedConditions.visibilityOf(profileQuestion));
-		wait.until(ExpectedConditions.elementToBeClickable(profileQuestion)).click();
-		System.out.println("[ACTION] Clicked Questions tab");
+		// Questions sub-tab REMOVED from the app (no longer in the profile
+		// tab bar), so it is intentionally not exercised. Walk ends at Info.
 
-		try {
-			WebDriverWait shortWait = new WebDriverWait(driver, Duration.ofSeconds(8));
-			shortWait.until(ExpectedConditions.visibilityOf(profileFeedThreeDot));
-			System.out.println("[ASSERT PASS] Questions tab has items");
-		} catch (Exception e) {
-			System.out.println("[INFO] No questions visible");
-			Thread.sleep(2000);
-		}
+		// The Info/Breed interaction scrolls the header out of view; scroll
+		// back to the top so the Edit button is on-screen before asserting.
+		scrollProfileToTop();
 
 		Assert.assertTrue(isDisplayedSafe(editButton),
 				"Edit button no longer visible - may have navigated away");
@@ -1107,6 +1100,32 @@ public class ProfilePage extends AndroidActions {
 			System.out.println("[FLOW] mobile:shell fallback - granted " + shellGranted + " permissions");
 		} else {
 			System.out.println("[FLOW] Pre-grant unavailable - will rely on popup handling");
+		}
+	}
+
+	/**
+	 * Scroll the profile back to the top so the header (with the Edit
+	 * button) returns to the viewport - the Info/Breed interaction scrolls
+	 * it out of view. RN-friendly coordinate swipe-down (mirrors the
+	 * AndroidActions swipeGesture pattern); retries a few times and stops
+	 * early once the Edit button is visible.
+	 */
+	private void scrollProfileToTop() {
+		for (int i = 0; i < 4 && !isDisplayedSafe(editButton); i++) {
+			try {
+				org.openqa.selenium.Dimension size = driver.manage().window().getSize();
+				((org.openqa.selenium.JavascriptExecutor) driver).executeScript(
+						"mobile: swipeGesture",
+						java.util.Map.of(
+								"left", (int) (size.getWidth() * 0.2),
+								"top", (int) (size.getHeight() * 0.25),
+								"width", (int) (size.getWidth() * 0.6),
+								"height", (int) (size.getHeight() * 0.45),
+								"direction", "down",
+								"percent", 0.85));
+			} catch (Exception ignore) {
+				return;
+			}
 		}
 	}
 
