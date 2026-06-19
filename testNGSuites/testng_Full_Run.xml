@@ -111,7 +111,7 @@
 <!--                 ================================================================ -->
 <!--            <class name="org.rahulshettyacademy.Dogpack_Homepage" />-->
 <!--            <class name="org.rahulshettyacademy.Dogpack_Map" />-->
-            <class name="org.rahulshettyacademy.Dogpack_Profile" />
+<!--            <class name="org.rahulshettyacademy.Dogpack_Profile" />-->
 <!--            <class name="org.rahulshettyacademy.DogPack_BusinessUserEditProfile" />-->
  
 <!--             ================================================================-->
@@ -147,6 +147,8 @@
 <!--                 ================================================================ -->
 <!--            <class name="org.rahulshettyacademy.Dogpack_AccountDeletion" />-->
 <!--            <class name="org.rahulshettyacademy.Dogpack_AccountDeletion_Business" />-->
+
+            <class name="org.rahulshettyacademy.Dogpack_VideoFeed" />
  
         </classes>
  
