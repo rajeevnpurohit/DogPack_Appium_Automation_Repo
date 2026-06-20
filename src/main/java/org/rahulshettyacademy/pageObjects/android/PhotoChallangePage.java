@@ -107,8 +107,9 @@ public class PhotoChallangePage extends AndroidActions {
 		wait.until(ExpectedConditions.visibilityOf(feedChallengeBtn));
 		wait.until(ExpectedConditions.elementToBeClickable(feedChallengeBtn)).click();
 
-		wait.until(ExpectedConditions.or(ExpectedConditions.visibilityOf(yesterdayChallengeLabel),
-				ExpectedConditions.visibilityOf(todayChallengeLabel)));
+//		Below commented to resolve the query about what if do not have a challange in the app for testing
+//		wait.until(ExpectedConditions.or(ExpectedConditions.visibilityOf(yesterdayChallengeLabel),
+//				ExpectedConditions.visibilityOf(todayChallengeLabel)));
 
 	}
 
@@ -615,7 +616,7 @@ public class PhotoChallangePage extends AndroidActions {
 		wait.until(ExpectedConditions.visibilityOf(winnerMessageBtn));
 
 	}
-	@AndroidFindBy(xpath = "//android.view.ViewGroup[@content-desc=\"goToChat\"]/android.widget.ImageView")
+	@AndroidFindBy(xpath = "//android.view.ViewGroup[@content-desc=\"go_to_chat\"]/android.widget.ImageView")
 	private WebElement threeDot;	
 
 	@AndroidFindBy(xpath = "//android.widget.TextView[@text=\"Message\"]")
@@ -643,8 +644,70 @@ public class PhotoChallangePage extends AndroidActions {
 	@AndroidFindBy(accessibility = "onCancel")
 	private WebElement onCancelAction;
 	
-	@AndroidFindBy(xpath = "//android.widget.TextView[@text=\"User successfully reported.\"]")
+	@AndroidFindBy(xpath = "//android.widget.TextView[@text=\"User reported successfully.\"]")
 	private WebElement reportMessage;
+
+	// --- Report flow: message + image attachment + submit ---
+	@AndroidFindBy(xpath = "//android.widget.EditText[@text=\"Type a message\"]")
+	private WebElement typeMessageBox;
+
+	@AndroidFindBy(xpath = "//android.widget.TextView[@text=\"Upload Image\"]")
+	private WebElement uploadImageOption;
+
+	@AndroidFindBy(id = "com.android.permissioncontroller:id/permission_allow_foreground_only_button")
+	private WebElement whileUsingAppBtn;
+
+	@AndroidFindBy(id = "com.android.permissioncontroller:id/permission_allow_all_button")
+	private WebElement allowAllBtn;
+
+	@AndroidFindBy(xpath = "(//android.widget.TextView[@resource-id=\"com.dogpack:id/tvCheck\"])[4]")
+	private WebElement selectImage;
+
+	@AndroidFindBy(xpath = "//android.widget.TextView[@resource-id=\"com.dogpack:id/ps_tv_complete\"]")
+	private WebElement doneBtn;
+
+	@AndroidFindBy(xpath = "//android.widget.TextView[@text=\"Submit\"]")
+	private WebElement submitReportBtn;
+
+	/**
+	 * Click that tolerates StaleElementReferenceException: the action menu
+	 * re-renders between locate and click, which can stale the reference.
+	 * Re-locates and retries up to 3 times before giving up.
+	 */
+	private void clickStaleSafe(WebElement el) {
+		WebDriverWait w = new WebDriverWait(driver, Duration.ofSeconds(10));
+		for (int attempt = 1; attempt <= 3; attempt++) {
+			try {
+				w.until(ExpectedConditions.visibilityOf(el));
+				w.until(ExpectedConditions.elementToBeClickable(el)).click();
+				return;
+			} catch (StaleElementReferenceException e) {
+				if (attempt == 3) {
+					throw e;
+				}
+				try {
+					Thread.sleep(300);
+				} catch (InterruptedException ie) {
+					Thread.currentThread().interrupt();
+				}
+			}
+		}
+	}
+
+	/**
+	 * Best-effort click for conditional UI such as system permission
+	 * dialogs. Clicks the element if it appears within a short window;
+	 * if it never shows (e.g. permission already granted on a prior run),
+	 * it is skipped instead of failing the test.
+	 */
+	private void clickIfPresent(WebElement el) {
+		try {
+			new WebDriverWait(driver, Duration.ofSeconds(5))
+					.until(ExpectedConditions.elementToBeClickable(el)).click();
+		} catch (TimeoutException e) {
+			System.out.println("[INFO] Optional element not present, skipping.");
+		}
+	}
 
 	public void ThreeDotActionPerformed() 
 	{
@@ -652,8 +715,7 @@ public class PhotoChallangePage extends AndroidActions {
 		wait.until(ExpectedConditions.visibilityOf(threeDot));
 		wait.until(ExpectedConditions.elementToBeClickable(threeDot)).click();
 		
-		wait.until(ExpectedConditions.visibilityOf(messageAction));
-		wait.until(ExpectedConditions.elementToBeClickable(messageAction)).click();
+		clickStaleSafe(messageAction);
 		wait.until(ExpectedConditions.visibilityOf(chatInput));
 		driver.pressKey(new KeyEvent(AndroidKey.BACK));
 		
@@ -672,7 +734,24 @@ public class PhotoChallangePage extends AndroidActions {
 		wait.until(ExpectedConditions.elementToBeClickable(threeDot)).click();
 		wait.until(ExpectedConditions.visibilityOf(reportUserInapproAction));
 		wait.until(ExpectedConditions.elementToBeClickable(reportUserInapproAction)).click();
-		wait.until(ExpectedConditions.elementToBeClickable(onConfirmAction)).click();
+
+		// Enter a reason in the "Type a message" box
+		wait.until(ExpectedConditions.visibilityOf(typeMessageBox));
+		typeMessageBox.click();
+		typeMessageBox.sendKeys("Reporting user for Automatoin Testing");
+
+		// Attach an image: Upload Image -> grant permission -> pick -> Done
+		wait.until(ExpectedConditions.elementToBeClickable(uploadImageOption)).click();
+		clickIfPresent(whileUsingAppBtn);   // system permission dialog (best-effort)
+		clickIfPresent(allowAllBtn);        // system permission dialog (best-effort)
+		wait.until(ExpectedConditions.elementToBeClickable(selectImage)).click();
+		wait.until(ExpectedConditions.elementToBeClickable(doneBtn)).click();
+
+		// Submit the report
+		wait.until(ExpectedConditions.elementToBeClickable(submitReportBtn)).click();
+
+		// onConfirmAction click DISABLED for now:
+		// wait.until(ExpectedConditions.elementToBeClickable(onConfirmAction)).click();
 		wait.until(ExpectedConditions.invisibilityOf(reportMessage));
 		
 		wait.until(ExpectedConditions.visibilityOf(threeDot));
@@ -690,8 +769,8 @@ public class PhotoChallangePage extends AndroidActions {
 	}
 	
 	public void navigatesToResultBoard() {
-		// Step 1: Click on Leaderboard tab using UIAutomator
-		driver.findElement(AppiumBy.androidUIAutomator("new UiSelector().text(\"My Results\")")).click();
+		// Step 1: Click on the "My Results" tab using xpath
+		driver.findElement(AppiumBy.xpath("//android.widget.TextView[@text=\"My Results\"]")).click();
 
 		// Step 2: Wait until any one of the winner elements is visible
 		try {

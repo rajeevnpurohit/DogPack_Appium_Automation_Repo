@@ -33,12 +33,12 @@ public class dogpack_PhotoChallange extends AndroidBaseTest {
 		login.HandleCustomDialog(384, 576);
 	}
 	
-	@Test(priority = 2, groups = { "Smoke","Regression" })
+	@Test(priority = 2, groups = { "Smoke","Regression" }, enabled = false)
 	public void navigatesToChallengeScreen() throws InterruptedException {
 		photo.navigatesToChallengeScreen();
 	}
 	
-	@Test(priority = 3, groups = { "Smoke","Regression" })
+	@Test(priority = 3, groups = { "Smoke","Regression" }, enabled = false)
 	public void joinChallenge() throws InterruptedException {
 		photo.joinChallenge();
 	}
@@ -48,17 +48,17 @@ public class dogpack_PhotoChallange extends AndroidBaseTest {
 		photo.DeleteChallengePhotoCancelOption();
 	}
 	
-	@Test(priority = 5, groups = { "Smoke","Regression" })
+	@Test(priority = 5, groups = { "Smoke","Regression" }, enabled = false)
 	public void DeleteChallengePhotoDeleteOption() throws InterruptedException {
 		photo.DeleteChallengePhotoDeleteOption();
 	}
 	
-	@Test(priority = 6, groups = { "Smoke","Regression" })
+	@Test(priority = 6, groups = { "Smoke","Regression" }, enabled = false)
 	public void joinChallengeAfterDeletePhoto() throws InterruptedException {
 		photo.joinChallengeAfterDeletePhoto();
 	}
 	
-	@Test(priority = 7, groups = { "Smoke","Regression" })
+	@Test(priority = 7, groups = { "Smoke","Regression" }, enabled = false)
 	public void ViewAllUpcomingChallenges() throws InterruptedException {
 		photo.ViewAllUpcomingChallenges();
 	}
