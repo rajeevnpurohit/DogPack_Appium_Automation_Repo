@@ -143,7 +143,7 @@ public class MapPage extends AndroidActions {
 	@AndroidFindBy(accessibility = "CONFIRM")
 	private WebElement businessConfirm;
 
-	@AndroidFindBy(accessibility = "Lodgings")
+	@AndroidFindBy(accessibility = "Booking.com")
 	private WebElement mapLodgings;
 
 	@AndroidFindBy(accessibility = "Dog Business")
@@ -641,14 +641,34 @@ public class MapPage extends AndroidActions {
 	    Thread.sleep(1200);
 	}
 
+	/**
+	 * Click the Booking.com (lodgings) filter chip robustly. The marker ->
+	 * Reserve -> Booking.com flow can leave the app in List View or a detail
+	 * screen where the map filter chips are absent; in that case return to the
+	 * Map tab first, then click the chip.
+	 */
+	private void clickBookingChip() {
+		try {
+			new WebDriverWait(driver, Duration.ofSeconds(3))
+					.until(ExpectedConditions.elementToBeClickable(mapLodgings)).click();
+			return;
+		} catch (Exception notOnMap) {
+			WebDriverWait w = new WebDriverWait(driver, Duration.ofSeconds(15));
+			try { driver.context("NATIVE_APP"); } catch (Exception ignored) {}
+			w.until(ExpectedConditions.elementToBeClickable(mapViewTab)).click();
+			w.until(ExpectedConditions.visibilityOf(mapType));
+			w.until(ExpectedConditions.elementToBeClickable(mapLodgings)).click();
+		}
+	}
+
 	public void clickFirstMarkerOrFallbackToLodgings() throws InterruptedException {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 		List<WebElement> lodgingMarkers = driver
 				.findElements(By.xpath("//android.view.View[@content-desc='Map Marker']"));
 
 		if (lodgingMarkers.isEmpty()) {
-			System.out.println("No lodging markers found. Clicking on Lodgings button instead.");
-			mapLodgings.click();
+			System.out.println("No lodging markers found. Returning to map and clicking Booking.com chip.");
+			clickBookingChip();
 			Thread.sleep(2000); // optional wait
 			return;
 		}
@@ -679,11 +699,11 @@ public class MapPage extends AndroidActions {
 						driver.context("NATIVE_APP");
 
 						wait.until(ExpectedConditions.visibilityOf(lodgingReserveBtn));
-						wait.until(ExpectedConditions.elementToBeClickable(mapLodgings)).click();
+						clickBookingChip();
 					} catch (Exception e) {
 						driver.pressKey(new KeyEvent(AndroidKey.BACK));
 						wait.until(ExpectedConditions.visibilityOf(lodgingReserveBtn));
-						wait.until(ExpectedConditions.elementToBeClickable(mapLodgings)).click();
+						clickBookingChip();
 					}
 					
 					
@@ -695,8 +715,8 @@ public class MapPage extends AndroidActions {
 		}
 
 		// Fallback if none of the markers were clickable
-		System.out.println("No visible lodging marker clickable. Clicking on Lodgings button instead.");
-		mapLodgings.click();
+		System.out.println("No visible lodging marker clickable. Returning to map and clicking Booking.com chip.");
+		clickBookingChip();
 		Thread.sleep(2000); // optional wait
 	}
 
