@@ -47,7 +47,7 @@ public class VideoFeedPage extends AndroidActions {
 	// ================================================================
 
 	// 1 - Video Feed tab (center of the home screen).
-	@AndroidFindBy(xpath = "//android.widget.TextView[@text=\"Video Feed\"]")
+	@AndroidFindBy(xpath = "//android.view.ViewGroup[@content-desc=\"feed-VideoFeed\"]/android.view.ViewGroup/android.view.ViewGroup/android.widget.ImageView")
 	private WebElement videoFeedTab;
 
 	// 2 - Like (action rail child [1]).
@@ -69,7 +69,7 @@ public class VideoFeedPage extends AndroidActions {
 	private WebElement shareButton;
 
 	// 6 - Copy link (share sheet) - real content-desc, robust locator.
-	@AndroidFindBy(xpath = "//android.widget.FrameLayout[@content-desc=\"Copy link\"]/android.widget.ImageView")
+	@AndroidFindBy(xpath = "//android.widget.FrameLayout[@content-desc=\"Copy\"]/android.widget.ImageView")
 	private WebElement copyLink;
 
 	// 7 - Save video (action rail child [5] / ViewGroup).

@@ -169,43 +169,43 @@ public class Dogpack_Settings extends AndroidBaseTest {
     // ================================================================
 
     /** #3 (UI #1) - "Your account" -> Account and info */
-    @Test(priority = 3, groups = { "Smoke", "Regression" })
+    @Test(priority = 3,  groups = { "Smoke", "Regression" })
     public void AccountInfoFunctionality() throws InterruptedException {
         Setting.AccountInfo();
     }
 
     /** #4 (UI #5) - "Your account" -> My Parks */
-    @Test(priority = 4, groups = { "Regression" })
+    @Test(priority = 4,  groups = { "Regression" })
     public void MyParkFunctionality() throws InterruptedException {
         Setting.MyPark();
     }
 
     /** #5 (UI #7) - "Your account" -> Saved media */
-    @Test(priority = 5, groups = { "Regression" })
+    @Test(priority = 5,  groups = { "Regression" })
     public void SaveMediaFunctionality() throws InterruptedException {
         Setting.SaveMedia();
     }
 
     /** #6 (UI #8) - "Your account" -> Businesses I Follow */
-    @Test(priority = 6, groups = { "Regression" })
+    @Test(priority = 6,  groups = { "Regression" })
     public void BusinessIfollowFunctionality() throws InterruptedException {
         Setting.BusinessIfollow();
     }
 
     /** #7 (UI #9) - "Your account" -> My Reviews */
-    @Test(priority = 7, groups = { "Regression" })
+    @Test(priority = 7,  groups = { "Regression" })
     public void myReviews() throws InterruptedException {
         Setting.myReview();
     }
 
     /** #8 (UI #10) - "Your account" -> Love DogPack? Rate us */
-    @Test(priority = 8, groups = { "Regression" })
+    @Test(priority = 8,  groups = { "Regression" })
     public void LoveDogPackRateUsFunctionality() throws InterruptedException {
         Setting.LoveDogPackRateUs();
     }
 
     /** #9 (UI #11) - "Your account" -> Search the Feed by Location */
-    @Test(priority = 9, groups = { "Regression" })
+    @Test(priority = 9,  groups = { "Regression" })
     public void SearchFeedByLocationFunctionality() throws InterruptedException {
         Setting.SearchFeedByLocation();
     }
@@ -223,13 +223,13 @@ public class Dogpack_Settings extends AndroidBaseTest {
      * account causing screen to render in unstable state. Re-enable
      * after debugging Badges screen rendering.
      */
-    @Test(priority = 10, groups = { "Smoke", "Regression" })
+    @Test(priority = 10,  groups = { "Smoke", "Regression" })
     public void BadgesYouCanEarnFunctionality() throws InterruptedException {
         Setting.BadgesYouCanEarn();
     }
 
     /** #11 (UI #13) - "Your account" -> Refer Friends and Earn Treats */
-    @Test(priority = 11, groups = { "Regression" })
+    @Test(priority = 11,  groups = { "Regression" })
     public void ReferAndEarnFunctionality() throws InterruptedException {
         Setting.ReferAndEarn();
     }
@@ -238,13 +238,13 @@ public class Dogpack_Settings extends AndroidBaseTest {
      * #12 (UI #14) - "Your account" -> Change Password.
      * Moved FROM top TO position #14 in new UI build.
      */
-    @Test(priority = 12, groups = { "Regression" })
+    @Test(priority = 12,  groups = { "Regression" })
     public void ChangePassFunctionality() throws InterruptedException {
         Setting.ChangePassword();
     }
 
     /** #13 (UI #15) - "Your account" -> Blocked Users */
-    @Test(priority = 13, groups = { "Smoke", "Regression" })
+    @Test(priority = 13,  groups = { "Smoke", "Regression" })
     public void blockUser() throws InterruptedException {
         Setting.blockUser();
     }
@@ -254,13 +254,13 @@ public class Dogpack_Settings extends AndroidBaseTest {
      * Requires scrollToSettingsItem("Notifications") since the row
      * is below the fold in PREFERENCES section. Independent of #3-9.
      */
-    @Test(priority = 14, groups = { "Smoke", "Regression" })
+    @Test(priority = 14,  groups = { "Smoke", "Regression" })
     public void NotificationSettingDesibledFunctionality() throws InterruptedException {
         Setting.NotificationSettingDesibled();
     }
 
     /** #15 (UI #16) - Preferences -> Notifications (re-enable phase) */
-    @Test(priority = 15, groups = { "Smoke", "Regression" })
+    @Test(priority = 15,  groups = { "Smoke", "Regression" })
     public void NotificationSettingEnabledFunctionality() throws InterruptedException {
         Setting.NotificationSettingEnabled();
     }
@@ -271,39 +271,39 @@ public class Dogpack_Settings extends AndroidBaseTest {
     // ================================================================
 
     /** #16 (UI #17) - Dark Mode ON */
-    @Test(priority = 16, groups = { "Smoke", "Regression" })
+    @Test(priority = 16,  groups = { "Smoke", "Regression" })
     public void DarkModeOnFunctionality() throws InterruptedException {
         Setting.DarkModeOn();
     }
 
     /** #17 (UI #17) - Dark Mode OFF */
-    @Test(priority = 17, groups = { "Smoke", "Regression" })
+    @Test(priority = 17,  groups = { "Smoke", "Regression" })
     public void DarkModeOFFFunctionality() throws InterruptedException {
         Setting.DarkModeOFF();
     }
 
     /** #18 (UI #18) - Auto-Play Videos (flip + restore) */
-    @Test(priority = 18, groups = { "Smoke", "Regression" })
+    @Test(priority = 18,  groups = { "Smoke", "Regression" })
     public void AutoPlayVideoFunctionality() throws InterruptedException {
         Setting.AutoPlayVideo();
         Setting.AutoPlayVideo();
     }
 
     /** #19 (UI #19) - Haptics (double-tap inside method) */
-    @Test(priority = 19, groups = { "Smoke", "Regression" })
+    @Test(priority = 19,  groups = { "Smoke", "Regression" })
     public void HapiticsFunctionality() throws InterruptedException {
         Setting.Hapitics();
     }
 
     /** #20 (UI #20) - Units (Km->Mi then Mi->Km) */
-    @Test(priority = 20, groups = { "Smoke", "Regression" })
+    @Test(priority = 20,  groups = { "Smoke", "Regression" })
     public void UnitsFunctionality() throws InterruptedException {
         Setting.UnitsKmtoMiles();
         Setting.UnitsMilestoKm();
     }
 
     /** #21 (UI #21) - Language (cycles 8 locales) */
-    @Test(priority = 21, groups = { "Smoke", "Regression" })
+    @Test(priority = 21,  groups = { "Smoke", "Regression" })
     public void ChangeLanguage() throws InterruptedException {
         Setting.ChangeLanguage();
     }
@@ -313,79 +313,79 @@ public class Dogpack_Settings extends AndroidBaseTest {
     // ================================================================
 
     /** #22 (UI #22) - Suggest a pin */
-    @Test(priority = 22, groups = { "Regression" })
+    @Test(priority = 22,  groups = { "Regression" })
     public void SuggestPark() throws InterruptedException {
         Setting.SuggestPark();
     }
 
     /** #23 (UI #23) - Shop DogPack Marketplace (WebView) */
-    @Test(priority = 23, groups = { "Regression" })
+    @Test(priority = 23,  groups = { "Regression" })
     public void shopGearFunctionality() throws InterruptedException {
         Setting.shopGearFunctionality();
     }
 
     /** #24 (UI #24) - Lost & Found -> Report A Lost Dog */
-    @Test(priority = 24, groups = { "Regression" })
+    @Test(priority = 24,  groups = { "Regression" })
     public void LostDogFunctionality() throws InterruptedException {
         Setting.LostDog();
     }
 
     /** #25 (UI #25) - Redeem */
-    @Test(priority = 25, enabled = false, groups = { "Regression" })
+    @Test(priority = 25, groups = { "Regression" })
     public void RedeemFunctionality() throws InterruptedException {
         Setting.Redeem();
     }
 
     /** #26 (UI #26) - Blog (WebView) */
-    @Test(priority = 26, enabled = false, groups = { "Regression" })
+    @Test(priority = 26, groups = { "Regression" })
     public void NavigatesToBlog() throws InterruptedException {
         Setting.NavigatesToBlog();
     }
 
     /** #27 (UI #27) - Dog Breeds (WebView) */
-    @Test(priority = 27, enabled = false, groups = { "Regression" })
+    @Test(priority = 27, groups = { "Regression" })
     public void NavigatesToDogBreeds() throws InterruptedException {
         Setting.NavigatesToDogBreeds();
     }
 
     /** #28 (UI #28) - FAQ (WebView) */
-    @Test(priority = 28, enabled = false, groups = { "Regression" })
+    @Test(priority = 28, groups = { "Regression" })
     public void FAQFunctionality() throws InterruptedException {
         Setting.FAQ();
     }
 
     /** #29 (UI #30) - Terms And Conditions (WebView) */
-    @Test(priority = 29, enabled = false, groups = { "Regression" })
+    @Test(priority = 29, groups = { "Regression" })
     public void NavigatesToTermsAndCondition() throws InterruptedException {
         Setting.NavigatesToTermsAndCondition();
     }
 
     /** #30 (UI #31) - Privacy Policy (WebView) */
-    @Test(priority = 30, enabled = false, groups = { "Regression" })
+    @Test(priority = 30, groups = { "Regression" })
     public void NavigatesToPrivacyPolicy() throws InterruptedException {
         Setting.NavigatesToPrivacyPolicy();
     }
 
     /** #31 - Auto-Play info icon (menu-ap_vi). */
-    @Test(priority = 31, enabled = false, groups = { "Regression" })
+    @Test(priority = 31, groups = { "Regression" })
     public void clickOniIcon() throws InterruptedException {
         Setting.clickOniIcon();
     }
 
     /** #32 - Utility: scroll to Language row. */
-    @Test(priority = 32, enabled = false, groups = { "Regression" })
+    @Test(priority = 32, groups = { "Regression" })
     public void scrollToLanguageFunctionality() throws InterruptedException {
         Setting.scrollToLanguage();
     }
 
     /** #33 - Utility: scroll to Logout footer. */
-    @Test(priority = 33, enabled = false, groups = { "Regression" })
+    @Test(priority = 33, groups = { "Regression" })
     public void scrollToLogoutFunctionality() throws InterruptedException {
         Setting.scrollToLogout();
     }
 
     /** #34 - Footer "Add new account" -> add a new dog profile. */
-    @Test(priority = 34, enabled = false, groups = { "Regression" })
+    @Test(priority = 34, groups = { "Regression" })
     public void createNewDogProfile() throws InterruptedException {
         Setting.createNewDogProfile();
     }
