@@ -5806,4 +5806,70 @@ public class SettingsAndActivityPage extends AndroidActions {
         // Intentionally NO ensureOnSettingsScreen() here - we expect to
         // land on the unauthenticated entry screen (Splash/Login).
     }
+
+    /**
+     * Unblock a specific user from Profile -> hamburger -> Blocked Users.
+     * Reuses the existing hamburger / Blocked Users / onConfirm locators.
+     * Targets the given username's row via a relative xpath (the row's
+     * Unblock button is keyed by user_id in the app, so we anchor on the
+     * visible username text instead). Scrolls once if the user is not on
+     * the first screen. NOTE: caller must already be on the Profile screen.
+     */
+    public void unblockUserByUsername(String username) {
+        WebDriverWait w = new WebDriverWait(driver, Duration.ofSeconds(20));
+
+        // (2) open Settings via the hamburger (proven fast-path: click the
+        //     ImageView child of the content-desc node, not the bare node).
+        sleepQuiet(800);
+        dismissProfileTourIfPresent();
+        w.until(ExpectedConditions.elementToBeClickable(AppiumBy.xpath(
+                "//android.view.ViewGroup[@content-desc=\"dog_profile_hamburger_menu\"]"
+                + "/android.widget.ImageView"))).click();
+        System.out.println("[ACTION] Clicked hamburger menu");
+
+        // (3) scroll half way
+        scrollDownSmall();
+
+        // (4) open Blocked Users
+        w.until(ExpectedConditions.elementToBeClickable(blockedUsersBtn)).click();
+        System.out.println("[ACTION] Opened Blocked Users");
+        sleepQuiet(1500);
+
+        // (5)+(6) find the saved user's row; scroll once if not on screen.
+        // NOTE: avoid the 'following::' axis - UiAutomator2's XPath2 engine
+        // throws on positional predicates over axes. Instead match the row
+        // by vertical position: locate the username, then click the Unblock
+        // button whose center Y is closest (i.e. on the same row).
+        By userBy = AppiumBy.xpath(
+                "//android.widget.TextView[@text=\"" + username + "\"]");
+        if (driver.findElements(userBy).isEmpty()) {
+            System.out.println("[INFO] '" + username + "' not visible - scrolling once");
+            scrollDownSmall();
+        }
+        WebElement userEl = w.until(ExpectedConditions.visibilityOfElementLocated(userBy));
+        int userCenterY = userEl.getLocation().getY() + userEl.getSize().getHeight() / 2;
+
+        List<WebElement> unblockBtns = driver.findElements(
+                AppiumBy.xpath("//android.widget.TextView[@text=\"Unblock\"]"));
+        WebElement targetUnblock = null;
+        int bestDist = Integer.MAX_VALUE;
+        for (WebElement ub : unblockBtns) {
+            int ubCenterY = ub.getLocation().getY() + ub.getSize().getHeight() / 2;
+            int dist = Math.abs(ubCenterY - userCenterY);
+            if (dist < bestDist) {
+                bestDist = dist;
+                targetUnblock = ub;
+            }
+        }
+        if (targetUnblock == null) {
+            throw new RuntimeException("No Unblock button found for user " + username);
+        }
+        targetUnblock.click();
+        System.out.println("[ACTION] Clicked Unblock for " + username);
+
+        // (7) confirm the unblock
+        w.until(ExpectedConditions.elementToBeClickable(
+                AppiumBy.accessibilityId("onConfirm"))).click();
+        System.out.println("[ACTION] Clicked Confirm (unblock) for " + username);
+    }
 }

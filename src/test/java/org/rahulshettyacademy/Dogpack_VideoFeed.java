@@ -8,6 +8,8 @@ import java.util.List;
 import org.rahulshettyacademy.TestUtils.AndroidBaseTest;
 import org.rahulshettyacademy.pageObjects.android.LoginPage;
 import org.rahulshettyacademy.pageObjects.android.NotificationsPage;
+import org.rahulshettyacademy.pageObjects.android.ProfilePage;
+import org.rahulshettyacademy.pageObjects.android.SettingsAndActivityPage;
 import org.rahulshettyacademy.pageObjects.android.VideoFeedPage;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
@@ -30,12 +32,16 @@ public class Dogpack_VideoFeed extends AndroidBaseTest {
 	LoginPage login;
 	NotificationsPage notifications; // reused for DismissAllOnboarding()
 	VideoFeedPage videoFeed;
+	ProfilePage profile;
+	SettingsAndActivityPage setting;
 
 	@BeforeClass(alwaysRun = true)
 	public void setUpp() {
 		login = new LoginPage(driver);
 		notifications = new NotificationsPage(driver);
 		videoFeed = new VideoFeedPage(driver);
+		profile = new ProfilePage(driver);
+		setting = new SettingsAndActivityPage(driver);
 	}
 
 	// ================================================================
@@ -120,7 +126,7 @@ public class Dogpack_VideoFeed extends AndroidBaseTest {
 
 	/** #10 - Open the three-dots / more menu. (DISABLED for now) */
 	@Test(priority = 10, dependsOnMethods = { "ClickUnsaveVideo_VideoFeed" },
-			groups = { "Smoke", "Regression" }, enabled = false)
+			groups = { "Smoke", "Regression" })
 	public void ClickThreeDots_VideoFeed() {
 		videoFeed.clickThreeDots();
 	}
@@ -137,6 +143,20 @@ public class Dogpack_VideoFeed extends AndroidBaseTest {
 			groups = { "Smoke", "Regression" })
 	public void ClickUnmute_VideoFeed() {
 		videoFeed.clickUnmute();
+	}
+
+	/** #13 - Unblock the user that was blocked in the three-dots flow. */
+	@Test(priority = 13, dependsOnMethods = { "ClickThreeDots_VideoFeed" },
+			groups = { "Smoke", "Regression" })
+	public void UnblockUser_VideoFeed() throws InterruptedException {
+		String username = VideoFeedPage.getBlockedUsername();
+		if (username == null || username.trim().isEmpty()) {
+			throw new RuntimeException(
+					"No blocked username captured - the block flow in "
+					+ "ClickThreeDots_VideoFeed must run first.");
+		}
+		profile.navigateToProfileScreen();   // (1) Profile icon
+		setting.unblockUserByUsername(username); // (2)-(7) hamburger -> Blocked Users -> Unblock -> Confirm
 	}
 
 	/** tip@yopmail.com credentials from SmokeLoginData.json (index 0). */

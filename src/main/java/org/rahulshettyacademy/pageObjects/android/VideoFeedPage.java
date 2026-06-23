@@ -35,6 +35,9 @@ public class VideoFeedPage extends AndroidActions {
 	AndroidDriver driver;
 	WebDriverWait wait;
 
+	// Username captured from the block-confirmation dialog (for later unblock in Settings).
+	private static String blockedUsername;
+
 	public VideoFeedPage(AndroidDriver driver) {
 		super(driver);
 		this.driver = driver;
@@ -58,6 +61,13 @@ public class VideoFeedPage extends AndroidActions {
 	@AndroidFindBy(xpath = "//android.widget.FrameLayout[@resource-id=\"android:id/content\"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[3]/android.view.ViewGroup[3]/android.widget.ImageView")
 	private WebElement commentIcon;
 
+	// Comment composer (reused content-desc locators - same component as HomePage).
+	@AndroidFindBy(xpath = "//android.widget.EditText[@content-desc=\"comment-reply-TextInput\"]")
+	private WebElement commentTextBox;
+
+	@AndroidFindBy(accessibility = "comment-reply-send")
+	private WebElement commentSendBtn;
+
 	// 4 - Bottom-sheet handle - long-pressed and dragged down to close the
 	// comment box (see closeCommentBox()).
 	@AndroidFindBy(xpath = "//android.widget.SeekBar[@content-desc=\"Bottom sheet handle\"]/android.view.ViewGroup")
@@ -77,8 +87,32 @@ public class VideoFeedPage extends AndroidActions {
 	private WebElement saveVideo;
 
 	// 8 - Three dots / more (action rail child [5] / ImageView).
-	@AndroidFindBy(xpath = "//android.widget.FrameLayout[@resource-id=\"android:id/content\"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[3]/android.view.ViewGroup[5]/android.widget.ImageView")
+	@AndroidFindBy(xpath = "//android.widget.FrameLayout[@resource-id=\"android:id/content\"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[3]/android.view.ViewGroup[6]/android.widget.ImageView")
 	private WebElement threeDots;
+
+	// Three-dots / more menu - report actions.
+	@AndroidFindBy(xpath = "//android.widget.TextView[@text=\"Report Content as inappropriate\"]")
+	private WebElement reportContentInappropriate;
+
+	@AndroidFindBy(xpath = "//android.view.ViewGroup[@content-desc=\"Confirm\"]")
+	private WebElement confirmReport;
+
+	@AndroidFindBy(xpath = "//android.widget.TextView[@text=\"Report User as inappropriate\"]")
+	private WebElement reportUserInappropriate;
+
+	@AndroidFindBy(xpath = "//android.widget.EditText[@text=\"Type a message\"]")
+	private WebElement typeMessageBox;
+
+	@AndroidFindBy(xpath = "//android.view.ViewGroup[@content-desc=\"Submit\"]")
+	private WebElement submitReport;
+
+	// Three-dots / more menu - Block User option.
+	@AndroidFindBy(xpath = "//android.widget.TextView[@text=\"Block User\"]")
+	private WebElement blockUserOption;
+
+	// Block-confirmation dialog text (contains the dynamic @username).
+	@AndroidFindBy(xpath = "//android.widget.TextView[contains(@text, \"Are you sure you want to block\")]")
+	private WebElement blockConfirmText;
 
 	// Mute / unmute toggle - real content-desc (robust locator).
 	@AndroidFindBy(xpath = "//android.view.ViewGroup[@content-desc=\"feed-video-mute\"]/android.widget.ImageView")
@@ -102,11 +136,25 @@ public class VideoFeedPage extends AndroidActions {
 		System.out.println("[ACTION] Clicked Like button");
 	}
 
-	/** 3 - open the comment box. */
+	/** 3 - open the comment box, type a comment, and submit it. */
 	public void clickComment() {
+		// (1) open the comment box
 		wait.until(ExpectedConditions.visibilityOf(commentIcon));
 		wait.until(ExpectedConditions.elementToBeClickable(commentIcon)).click();
 		System.out.println("[ACTION] Clicked Comment icon");
+
+		// (2) focus the text box
+		wait.until(ExpectedConditions.visibilityOf(commentTextBox));
+		wait.until(ExpectedConditions.elementToBeClickable(commentTextBox)).click();
+
+		// (3) enter the comment text
+		commentTextBox.sendKeys("I like it!");
+		System.out.println("[INPUT] Comment text typed: I like it!");
+
+		// (4) submit the comment
+		wait.until(ExpectedConditions.visibilityOf(commentSendBtn));
+		wait.until(ExpectedConditions.elementToBeClickable(commentSendBtn)).click();
+		System.out.println("[ACTION] Comment submitted");
 	}
 
 	/**
@@ -165,11 +213,76 @@ public class VideoFeedPage extends AndroidActions {
 		System.out.println("[ACTION] Clicked Save again (unsave video)");
 	}
 
-	/** 8 - open the three-dots / more menu. */
+	/** 8 - open the three-dots / more menu and run the report actions. */
 	public void clickThreeDots() {
 		wait.until(ExpectedConditions.visibilityOf(threeDots));
 		wait.until(ExpectedConditions.elementToBeClickable(threeDots)).click();
 		System.out.println("[ACTION] Clicked three dots (more)");
+
+		// (1) report content as inappropriate
+		wait.until(ExpectedConditions.visibilityOf(reportContentInappropriate));
+		wait.until(ExpectedConditions.elementToBeClickable(reportContentInappropriate)).click();
+		System.out.println("[ACTION] Clicked 'Report Content as inappropriate'");
+
+		// (2) confirm
+		wait.until(ExpectedConditions.visibilityOf(confirmReport));
+		wait.until(ExpectedConditions.elementToBeClickable(confirmReport)).click();
+		System.out.println("[ACTION] Clicked Confirm");
+
+		// reopen the three-dots menu before the next report action
+		wait.until(ExpectedConditions.visibilityOf(threeDots));
+		wait.until(ExpectedConditions.elementToBeClickable(threeDots)).click();
+		System.out.println("[ACTION] Reopened three dots (more)");
+
+		// (3) report user as inappropriate
+		wait.until(ExpectedConditions.visibilityOf(reportUserInappropriate));
+		wait.until(ExpectedConditions.elementToBeClickable(reportUserInappropriate)).click();
+		System.out.println("[ACTION] Clicked 'Report User as inappropriate'");
+
+		// (4) type a message
+		wait.until(ExpectedConditions.visibilityOf(typeMessageBox));
+		wait.until(ExpectedConditions.elementToBeClickable(typeMessageBox)).click();
+		typeMessageBox.sendKeys("User inappropriate. Only a Test msg");
+		System.out.println("[INPUT] Report message typed");
+
+		// (5) submit
+		wait.until(ExpectedConditions.visibilityOf(submitReport));
+		wait.until(ExpectedConditions.elementToBeClickable(submitReport)).click();
+		System.out.println("[ACTION] Clicked Submit");
+
+		// (8) reopen the three-dots menu for the block flow
+		wait.until(ExpectedConditions.visibilityOf(threeDots));
+		wait.until(ExpectedConditions.elementToBeClickable(threeDots)).click();
+		System.out.println("[ACTION] Reopened three dots (more) for block");
+
+		// (9) click Block User
+		wait.until(ExpectedConditions.visibilityOf(blockUserOption));
+		wait.until(ExpectedConditions.elementToBeClickable(blockUserOption)).click();
+		System.out.println("[ACTION] Clicked Block User");
+
+		// (10) fetch the block-confirmation dialog text
+		String blockText = wait.until(ExpectedConditions.visibilityOf(blockConfirmText)).getText();
+		System.out.println("[INFO] Block dialog text: " + blockText);
+
+		// (11) extract the @username (between '@' and '?') and save it for later unblock
+		int at = blockText.indexOf("@");
+		int q = blockText.indexOf("?");
+		if (at >= 0 && q > at) {
+			blockedUsername = blockText.substring(at + 1, q).trim();
+			System.out.println("[INFO] Extracted blocked username: " + blockedUsername);
+		} else {
+			System.out.println("[WARN] Could not extract username from block dialog text");
+		}
+		// (12) confirm (completes the block, dismisses the dialog)
+		wait.until(ExpectedConditions.visibilityOf(confirmReport));
+		wait.until(ExpectedConditions.elementToBeClickable(confirmReport)).click();
+		System.out.println("[ACTION] Clicked Confirm (block)");
+
+	}
+
+	/** Username captured from the block-confirmation dialog (for later unblock in Settings). */
+	public static String getBlockedUsername() {
+		return blockedUsername;
 	}
 
 	/** 9 - mute the video. */
