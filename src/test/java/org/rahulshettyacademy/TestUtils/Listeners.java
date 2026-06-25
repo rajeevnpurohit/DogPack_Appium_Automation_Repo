@@ -118,6 +118,8 @@ public class Listeners extends AppiumUtils implements ITestListener {
 			if (line == null) {
 				return;
 			}
+			// Feed the modern Nine Hertz report (guards itself on tag/current).
+			NineHertzReport.logEvent(line.trim());
 			ExtentTest t = currentTest.get();
 			if (t == null) {
 				return;
@@ -191,19 +193,25 @@ public class Listeners extends AppiumUtils implements ITestListener {
 		classTestCount.merge(simpleName, 1, Integer::sum);
 		currentTest.set(test);
 		test.info("Test Actions performed");
+		NineHertzReport.startTest(simpleName, result.getMethod().getMethodName());
 	}
 
 	@Override
 	public void onTestSuccess(ITestResult result) {
 		test.log(Status.PASS, "Test Passed");
-		captureAndAttach(result);
+		String shot = captureAndAttach(result);
+		NineHertzReport.endTest(getSimpleClassName(result),
+				result.getMethod().getMethodName(), "pass", null, shot);
 		currentTest.remove();
 	}
 
 	@Override
 	public void onTestFailure(ITestResult result) {
 		test.fail(result.getThrowable());
-		captureAndAttach(result);
+		String shot = captureAndAttach(result);
+		NineHertzReport.endTest(getSimpleClassName(result),
+				result.getMethod().getMethodName(), "fail",
+				NineHertzReport.stackToString(result.getThrowable()), shot);
 		currentTest.remove();
 	}
 
@@ -231,6 +239,8 @@ public class Listeners extends AppiumUtils implements ITestListener {
 		String reason = (t != null && t.getMessage() != null)
 				? t.getMessage().split("\n")[0] : "skipped";
 		test.skip("SKIPPED: " + reason);
+		NineHertzReport.endTest(getSimpleClassName(result),
+				result.getMethod().getMethodName(), "skip", reason, null);
 		currentTest.remove();
 	}
 
@@ -266,6 +276,8 @@ public class Listeners extends AppiumUtils implements ITestListener {
 		appendTestCaseCountsToParentNames();
 		extent.flush();
 		postProcessReportLabels();
+		// Generate the modern Nine Hertz report alongside ExtentReports.
+		NineHertzReport.render();
 	}
 
 	// ====================================================================
@@ -382,7 +394,7 @@ public class Listeners extends AppiumUtils implements ITestListener {
 	 * Catches ALL exceptions (including WebDriverException for crashed sessions).
 	 * If screenshot fails, just logs a warning - never throws.
 	 */
-	private void captureAndAttach(ITestResult result) {
+	private String captureAndAttach(ITestResult result) {
 		try {
 			driver = (AppiumDriver) result.getTestClass().getRealClass()
 					.getField("driver").get(result.getInstance());
@@ -392,7 +404,31 @@ public class Listeners extends AppiumUtils implements ITestListener {
 			if (test != null) {
 				test.log(Status.WARNING, "Screenshot skipped - driver field unavailable");
 			}
-			return;
+			return null;
+		}
+
+		// Capture real device model + Android version from the live session
+		// capabilities (UiAutomator2 returns the actual connected device info,
+		// unlike the requested 'deviceName' which may be a hardcoded value).
+		try {
+			org.openqa.selenium.Capabilities caps = driver.getCapabilities();
+			Object model = caps.getCapability("deviceModel");
+			Object mfr = caps.getCapability("deviceManufacturer");
+			Object pv = caps.getCapability("platformVersion");
+			String dev = null;
+			if (model != null && !model.toString().trim().isEmpty()) {
+				String mm = model.toString().trim();
+				if (mfr != null && !mfr.toString().trim().isEmpty()
+						&& !mm.toLowerCase().startsWith(mfr.toString().trim().toLowerCase())) {
+					mm = mfr.toString().trim() + " " + mm;
+				}
+				dev = mm;
+			}
+			String os = (pv != null && !pv.toString().trim().isEmpty())
+					? "Android " + pv.toString().trim() : null;
+			NineHertzReport.setEnv(null, dev, os);
+		} catch (Exception ignore) {
+			// keep defaults if capabilities are unavailable
 		}
 
 		try {
@@ -401,11 +437,13 @@ public class Listeners extends AppiumUtils implements ITestListener {
 			if (screenshotPath != null) {
 				test.addScreenCaptureFromPath(screenshotPath,
 						result.getMethod().getMethodName());
+				return screenshotPath;
 			} else {
 				// getScreenshotPath returned null - session was dead
 				test.log(Status.WARNING,
 						"Screenshot skipped - driver session unavailable "
 						+ "(probable instrumentation crash)");
+				return null;
 			}
 		} catch (Exception screenshotEx) {
 			// Ye wo cascade exception thi - ab safe catch karte hain
@@ -415,6 +453,7 @@ public class Listeners extends AppiumUtils implements ITestListener {
 							? screenshotEx.getMessage().split("\n")[0] : "no message"));
 			test.log(Status.WARNING,
 					"Screenshot capture failed: " + screenshotEx.getClass().getSimpleName());
+			return null;
 		}
 	}
 }

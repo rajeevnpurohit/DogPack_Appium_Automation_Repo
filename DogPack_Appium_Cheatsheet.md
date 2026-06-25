@@ -17,6 +17,12 @@ Runs the smoke suite (`testng_Boost_AI_Subscription_Smoke.xml`). Tip@yopmail log
 ```cmd
 mvn test -P FullRun
 ```
+
+```cmd
+mvn test -P FullRun -Dtester="Rajeev Purohit"
+```
+
+
 Runs smoke + regression combined (`testng_Full_Run.xml`). **~50-90 min**.
 
 ```cmd

@@ -94,7 +94,7 @@
 <!--                 PHASE 2 - AUTHENTICATION (Login flows)-->
 <!--                 ================================================================ -->
 <!--            <class name="org.rahulshettyacademy.dogpack_Login" />-->
-<!--            <class name="org.rahulshettyacademy.Dogpack_GmailLogin" />-->
+            <class name="org.rahulshettyacademy.Dogpack_GmailLogin" />
 <!--            <class name="org.rahulshettyacademy.Dogpack_FacebookLogin" />-->
 <!--            <class name="org.rahulshettyacademy.DogPack_ForgotPassword" />-->
  
@@ -149,7 +149,7 @@
 <!--            <class name="org.rahulshettyacademy.Dogpack_AccountDeletion_Business" />-->
 
 <!--            <class name="org.rahulshettyacademy.Dogpack_VideoFeed" />-->
-            <class name="org.rahulshettyacademy.Dogpack_SearchAndDiscovery" />
+<!--            <class name="org.rahulshettyacademy.Dogpack_SearchAndDiscovery" />-->
 
  
         </classes>

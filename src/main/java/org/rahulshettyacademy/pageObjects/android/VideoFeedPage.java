@@ -9,12 +9,15 @@ import org.openqa.selenium.interactions.Pause;
 import org.openqa.selenium.interactions.PointerInput;
 import org.openqa.selenium.interactions.Sequence;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import org.rahulshettyacademy.utils.AndroidActions;
+import io.appium.java_client.AppiumBy;
+import java.util.List;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.pagefactory.AndroidFindBy;
@@ -50,7 +53,7 @@ public class VideoFeedPage extends AndroidActions {
 	// ================================================================
 
 	// 1 - Video Feed tab (center of the home screen).
-	@AndroidFindBy(xpath = "//android.view.ViewGroup[@content-desc=\"feed-VideoFeed\"]/android.view.ViewGroup/android.view.ViewGroup/android.widget.ImageView")
+	@AndroidFindBy(xpath = "//android.view.ViewGroup[@content-desc=\"feed-VideoFeed\"]/android.view.ViewGroup")
 	private WebElement videoFeedTab;
 
 	// 2 - Like (action rail child [1]).
@@ -122,11 +125,40 @@ public class VideoFeedPage extends AndroidActions {
 	// =====                     ACTIONS                         ======
 	// ================================================================
 
-	/** 1 - open the Video Feed (center of the home screen). */
+	/**
+	 * 1 - open the Video Feed (center of the home screen).
+	 * The entry is gated by a remote-config flag and can render late, and the
+	 * first tap on the TouchableOpacity sometimes doesn't register - so retry
+	 * the click for up to 30s and confirm we actually landed on the feed
+	 * (the video mute control appears only inside the Video Feed).
+	 */
 	public void clickVideoFeed() {
-		wait.until(ExpectedConditions.visibilityOf(videoFeedTab));
-		wait.until(ExpectedConditions.elementToBeClickable(videoFeedTab)).click();
-		System.out.println("[ACTION] Clicked Video Feed");
+		By navMarker = AppiumBy.accessibilityId("feed-video-mute");
+		long end = System.currentTimeMillis() + 30000;
+		int attempts = 0;
+		while (System.currentTimeMillis() < end) {
+			// already on the Video Feed?
+			if (!driver.findElements(navMarker).isEmpty()) {
+				System.out.println("[ACTION] Video Feed opened after " + attempts + " click attempt(s)");
+				return;
+			}
+			attempts++;
+			try {
+				new WebDriverWait(driver, Duration.ofSeconds(2))
+						.until(ExpectedConditions.elementToBeClickable(videoFeedTab)).click();
+				System.out.println("[ACTION] Clicked Video Feed (attempt " + attempts + ")");
+			} catch (Exception e) {
+				// not rendered / not clickable yet - keep waiting
+			}
+			try { Thread.sleep(1500); } catch (InterruptedException ignored) {}
+		}
+		// final check in case the feed opened right at the deadline
+		if (!driver.findElements(navMarker).isEmpty()) {
+			System.out.println("[ACTION] Video Feed opened (late)");
+			return;
+		}
+		throw new RuntimeException("Video Feed did not open within 30s after "
+				+ attempts + " click attempts (icon may be hidden by the isShowReels remote-config flag).");
 	}
 
 	/** 2 - like the current video. */

@@ -122,6 +122,71 @@ public class Dogpack_SearchAndDiscovery extends AndroidBaseTest {
 		System.out.println("[ASSERT PASS] Park FOLLOWING -> FOLLOW");
 	}
 
+	/** #4 - BUSINESS SEARCH: reset, BUSINESSES tab, search, verify name, follow + unfollow. */
+	@Test(priority = 4, dependsOnMethods = { "ParkSearch" },
+			groups = { "Smoke", "Regression" })
+	public void BusinessSearch() {
+		// (start) clear the previous search
+		search.clickResetSearch();
+		// switch to BUSINESSES and search (query + "business")
+		search.clickBusinessesTab();
+		search.enterSearchText(QUERY + "business");
+		// verify the business name
+		String bizName = search.getBusinessName();
+		Assert.assertEquals(bizName == null ? null : bizName.trim(), QUERY + "business",
+				"Business result name did not match.");
+		System.out.println("[ASSERT PASS] Business found: '" + QUERY + "business'");
+		// follow: Follow -> (LATER) -> Following
+		Assert.assertEquals(search.getBusinessFollowText(), "Follow",
+				"Initial business button text should be 'Follow'.");
+		search.clickBusinessFollow();
+		search.clickParkLater(); // shared LATER prompt
+		Assert.assertEquals(search.getBusinessFollowingText(), "Following",
+				"After Follow, business button should read 'Following'.");
+		System.out.println("[ASSERT PASS] Business Follow -> Following");
+		// unfollow (with confirm): Following -> Follow
+		search.clickBusinessUnfollow();
+		search.clickConfirmUnfollow();
+		Assert.assertEquals(search.getBusinessFollowText(), "Follow",
+				"After Unfollow, business button should read 'Follow'.");
+		System.out.println("[ASSERT PASS] Business Following -> Follow");
+		// (end) clear the search box
+		search.clickResetSearch();
+	}
+
+	/** #5 - HASHTAG SEARCH: HASHTAGS tab, search a tag, open gallery/post, like + comment. */
+	@Test(priority = 5, dependsOnMethods = { "BusinessSearch" },
+			groups = { "Smoke", "Regression" })
+	public void SearchHashtag() {
+		String tag = "#tot";
+		// switch to HASHTAGS and search the tag
+		search.clickHashtagsTab();
+		search.enterSearchText(tag);
+		// open the hashtag, then its gallery and first post
+		search.clickHashtagResult(tag);
+		search.clickHashtagGallery();
+		search.clickFirstHashtagPost();
+		search.clickBack();
+		search.clickHashtagPost();
+		// like + comment on the post
+		search.clickHashtagLike();
+		search.clickHashtagComment();
+		// open & close the image picker (no selection)
+		search.clickCommentAddImage();
+		search.pressDeviceBack();
+		// allow location permission ('While using the app') if it appears
+		search.handleWhileUsingAppIfPresent();
+		// allow record-audio ('While using the app') if it appears
+		search.handleRecordAudioIfPresent();
+		// allow photos/media ('Allow all') if it appears
+		search.handleAllowAllPhotosIfPresent();
+		// open & close the GIF picker (no selection)
+		search.clickCommentAddGif();
+		search.pressDeviceBack();
+		// post a text comment
+		search.postComment("Inside hashtag flow");
+	}
+
 	// ================================================================
 	// ==========    DATA PROVIDER                              =======
 	// ================================================================
