@@ -1,5 +1,6 @@
 package org.rahulshettyacademy.TestUtils;
 
+import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -73,6 +74,85 @@ public class Listeners extends AppiumUtils implements ITestListener {
 	 */
 	private static final Map<String, Integer> classTestCount = new HashMap<>();
 
+	/** Current method's ExtentTest, per thread - used to route console
+	 * action lines into the report's DETAILS area. */
+	private static final ThreadLocal<ExtentTest> currentTest = new ThreadLocal<>();
+
+	private static volatile boolean teeInstalled = false;
+
+	static {
+		installReportTee();
+	}
+
+	/** Install a System.out wrapper (once) that mirrors tagged action lines
+	 * into the current ExtentTest as PASS/FAIL/WARN rows. */
+	private static synchronized void installReportTee() {
+		if (teeInstalled) {
+			return;
+		}
+		System.setOut(new ReportTee(System.out));
+		teeInstalled = true;
+	}
+
+	private static final class ReportTee extends PrintStream {
+		private final PrintStream orig;
+
+		ReportTee(PrintStream orig) {
+			super(orig);
+			this.orig = orig;
+		}
+
+		@Override
+		public void println(String x) {
+			orig.println(x);
+			route(x);
+		}
+
+		@Override
+		public void println(Object x) {
+			orig.println(x);
+			route(String.valueOf(x));
+		}
+
+		private void route(String line) {
+			if (line == null) {
+				return;
+			}
+			ExtentTest t = currentTest.get();
+			if (t == null) {
+				return;
+			}
+			String sLine = line.trim();
+			if (sLine.isEmpty()) {
+				return;
+			}
+			String up = sLine.toUpperCase();
+			Status st;
+			if (up.startsWith("[ASSERT FAIL]") || up.startsWith("[FAIL]")
+					|| up.startsWith("[ERROR]") || up.contains("EXCEPTION")) {
+				st = Status.FAIL;
+			} else if (up.startsWith("[WARN]") || up.startsWith("[WARNING]")) {
+				st = Status.WARNING;
+			} else if (sLine.startsWith("[ACTION]") || sLine.startsWith("[INPUT]")
+					|| sLine.startsWith("[INFO]") || sLine.startsWith("[FLOW]")
+					|| sLine.startsWith("[OK]") || sLine.startsWith("[STEP]")
+					|| sLine.startsWith("[ASSERT")) {
+				st = Status.PASS;
+			} else {
+				return; // untagged lifecycle noise - keep it out of the report
+			}
+			try {
+				t.log(st, escape(sLine));
+			} catch (Exception ignore) {
+				// never let report logging break the run
+			}
+		}
+
+		private String escape(String x) {
+			return x.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+		}
+	}
+
 	/**
 	 * Get the parent ExtentTest for the given simple class name,
 	 * creating it on first request. Synchronized to be safe if
@@ -109,18 +189,22 @@ public class Listeners extends AppiumUtils implements ITestListener {
 		ExtentTest parent = getOrCreateClassParent(simpleName);
 		test = parent.createNode(result.getMethod().getMethodName());
 		classTestCount.merge(simpleName, 1, Integer::sum);
+		currentTest.set(test);
+		test.info("Test Actions performed");
 	}
 
 	@Override
 	public void onTestSuccess(ITestResult result) {
 		test.log(Status.PASS, "Test Passed");
 		captureAndAttach(result);
+		currentTest.remove();
 	}
 
 	@Override
 	public void onTestFailure(ITestResult result) {
 		test.fail(result.getThrowable());
 		captureAndAttach(result);
+		currentTest.remove();
 	}
 
 	@Override
@@ -147,6 +231,7 @@ public class Listeners extends AppiumUtils implements ITestListener {
 		String reason = (t != null && t.getMessage() != null)
 				? t.getMessage().split("\n")[0] : "skipped";
 		test.skip("SKIPPED: " + reason);
+		currentTest.remove();
 	}
 
 	/**

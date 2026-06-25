@@ -1,1 +1,3 @@
 /target/
+src/test/java/org/dogpack/resources/dogpack24june.apk
+testNGSuites/testng_Full_Run.xml
