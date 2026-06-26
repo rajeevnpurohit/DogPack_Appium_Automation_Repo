@@ -974,7 +974,8 @@ public class HomePage extends AndroidActions {
 				System.out.println("[ACTION] Opened comment thread");
 				clicked = true;
 
-				wait.until(ExpectedConditions.visibilityOf(commentHeading));
+				// Gate on the actual input we're about to type into; the old
+				// commentHeading anchor (content-desc="Comments") is no longer present.
 				wait.until(ExpectedConditions.visibilityOf(commentTextBox));
 				commentTextBox.sendKeys("HEY I LIKE YOUR POST");
 				System.out.println("[INPUT] Comment text typed");

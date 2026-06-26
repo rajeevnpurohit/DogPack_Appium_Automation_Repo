@@ -134,10 +134,10 @@ public class MapPage extends AndroidActions {
 	@AndroidFindBy(xpath = "//android.widget.TextView[@text=\"Thank you we are reviewing your suggestion.\"]")
 	private WebElement parkSuggestSuccessMessage;
 
-	@AndroidFindBy(xpath = "//android.widget.TextView[@text=\"What type of business is this? Please check all that apply.\"]")
+	@AndroidFindBy(xpath = "//android.widget.TextView[contains(@text,\"What type of business\")]")
 	private WebElement businessLabel;
 
-	@AndroidFindBy(accessibility = "LATER")
+	@AndroidFindBy(xpath = "//android.widget.TextView[@text=\"LATER\"]")
 	private WebElement businessLater;
 
 	@AndroidFindBy(accessibility = "CONFIRM")
@@ -285,6 +285,7 @@ public class MapPage extends AndroidActions {
 	// Map Functions
 
 	public void ParkMap() throws InterruptedException {
+		dismissDogProfileSheetIfPresent();
 	    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 
 	    wait.until(ExpectedConditions.visibilityOf(mapParkBtn));
@@ -596,6 +597,7 @@ public class MapPage extends AndroidActions {
 	}
 
 	public void DogBusiness() throws InterruptedException {
+		dismissDogProfileSheetIfPresent();
 	    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 
 	    wait.until(ExpectedConditions.visibilityOf(mapBusinessBtn));
@@ -648,6 +650,7 @@ public class MapPage extends AndroidActions {
 	 * Map tab first, then click the chip.
 	 */
 	private void clickBookingChip() {
+		dismissDogProfileSheetIfPresent();
 		try {
 			new WebDriverWait(driver, Duration.ofSeconds(3))
 					.until(ExpectedConditions.elementToBeClickable(mapLodgings)).click();
@@ -659,6 +662,67 @@ public class MapPage extends AndroidActions {
 			w.until(ExpectedConditions.visibilityOf(mapType));
 			w.until(ExpectedConditions.elementToBeClickable(mapLodgings)).click();
 		}
+	}
+
+	/**
+	 * Close the "Dog Profile (10)" selector bottom sheet if it is stuck open over
+	 * the map. Primary gesture: tap the map (confirmed working on device); device
+	 * Back is a verified fallback. Self-verifies after each attempt so it never
+	 * over-acts. Best-effort recovery helper - never throws.
+	 */
+	public void dismissDogProfileSheetIfPresent() {
+		if (!isDogProfileSheetPresent()) {
+			return;
+		}
+		System.out.println("[FLOW] Dog Profile sheet detected over the map - dismissing (tap map)");
+		for (int attempt = 1; attempt <= 2 && isDogProfileSheetPresent(); attempt++) {
+			try { tapMapToDismissSheet(); } catch (Exception ignored) {}
+			sleepQuiet(700);
+		}
+		if (isDogProfileSheetPresent()) {
+			System.out.println("[FLOW] Sheet still open after tap - using device Back fallback");
+			try { driver.pressKey(new KeyEvent(AndroidKey.BACK)); } catch (Exception ignored) {}
+			sleepQuiet(700);
+		}
+		if (isDogProfileSheetPresent()) {
+			System.out.println("[WARN] Dog Profile sheet still present after dismiss attempts");
+		} else {
+			System.out.println("[FLOW] Dog Profile sheet dismissed");
+		}
+	}
+
+	/** True if the Dog Profile selector bottom sheet is currently showing. */
+	private boolean isDogProfileSheetPresent() {
+		try {
+			for (WebElement e : driver.findElements(By.xpath(
+				"//*[contains(@text,\"Add a new dog or business profile\") or contains(@text,\"Dog Profile\")]"))) {
+				try {
+					if (e.isDisplayed()) {
+						return true;
+					}
+				} catch (Exception ignored) {
+				}
+			}
+		} catch (Exception ignored) {
+		}
+		return false;
+	}
+
+	/** Tap the map (scrim above the sheet) to dismiss the bottom sheet. */
+	private void tapMapToDismissSheet() {
+		org.openqa.selenium.Dimension sz = driver.manage().window().getSize();
+		int x = sz.getWidth() / 2;
+		int y = (int) (sz.getHeight() * 0.40);   // map area: below the filter chips, above the sheet
+		PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+		Sequence tap = new Sequence(finger, 1);
+		tap.addAction(finger.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(), x, y));
+		tap.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+		tap.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+		driver.perform(singletonList(tap));
+	}
+
+	private void sleepQuiet(long ms) {
+		try { Thread.sleep(ms); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); }
 	}
 
 	public void clickFirstMarkerOrFallbackToLodgings() throws InterruptedException {
@@ -862,16 +926,38 @@ public class MapPage extends AndroidActions {
 		wait.until(ExpectedConditions.elementToBeClickable(dogBusinessOption)).click();
 		wait.until(ExpectedConditions.elementToBeClickable(suggestSave)).click();
 
-		wait.until(ExpectedConditions.or(ExpectedConditions.visibilityOf(businessLabel),
-				ExpectedConditions.visibilityOf(businessLater), ExpectedConditions.visibilityOf(businessConfirm)));
+		try {
+			wait.until(ExpectedConditions.or(ExpectedConditions.visibilityOf(businessLabel),
+					ExpectedConditions.visibilityOf(businessLater), ExpectedConditions.visibilityOf(businessConfirm)));
 
-		wait.until(ExpectedConditions.elementToBeClickable(businessLater)).click();
+			wait.until(ExpectedConditions.elementToBeClickable(businessLater)).click();
 
-		String expected = "Thank you we are reviewing your suggestion.";
-		String actual = parkSuggestSuccessMessage.getText();
-		Assert.assertEquals(actual, expected, "Success message text doesn't match!");
+			String expected = "Thank you we are reviewing your suggestion.";
+			String actual = parkSuggestSuccessMessage.getText();
+			Assert.assertEquals(actual, expected, "Success message text doesn't match!");
 
-		wait.until(ExpectedConditions.visibilityOf(listView));
+			wait.until(ExpectedConditions.visibilityOf(listView));
+		} finally {
+			// Never leave the "What type of business" modal open - a stray modal
+			// would cover the map and break every subsequent Map test.
+			dismissSuggestBusinessModalIfPresent();
+		}
+	}
+
+	/**
+	 * Best-effort: close the suggest-business "What type of business" modal if
+	 * it is still showing (tap its LATER button), so it cannot block later tests.
+	 */
+	public void dismissSuggestBusinessModalIfPresent() {
+		try {
+			java.util.List<WebElement> later = driver.findElements(
+					org.openqa.selenium.By.xpath("//android.widget.TextView[@text=\"LATER\"]"));
+			if (!later.isEmpty() && later.get(0).isDisplayed()) {
+				later.get(0).click();
+				System.out.println("[FLOW] Closed stray suggest-business modal (LATER)");
+			}
+		} catch (Exception ignored) {
+		}
 	}
 
 	public void SuggestPark() {
@@ -966,6 +1052,7 @@ public class MapPage extends AndroidActions {
 	}
 
 	public void searchByCurrentLocation() {
+		dismissDogProfileSheetIfPresent();
 
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 

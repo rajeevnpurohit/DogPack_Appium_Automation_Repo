@@ -3,6 +3,7 @@ package org.rahulshettyacademy.pageObjects.android;
 import java.time.Duration;
 import java.util.List;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -481,20 +482,38 @@ public class AiPhotoGenerationPage extends AndroidActions {
     public void ClickPurchaseTab() {
         log("===> ClickPurchaseTab");
 
-        log("[STEP 1/2] Tap 'Purchase' tab");
-        WebElement tab = wait.until(ExpectedConditions.elementToBeClickable(
-                AppiumBy.xpath(PURCHASE_TAB_XPATH)));
-        tab.click();
-        log("[OK]       Tapped Purchase tab");
+        By purchaseTab = AppiumBy.xpath(PURCHASE_TAB_XPATH);
+        By tenPack = AppiumBy.xpath(TEN_PACK_CARD_XPATH);
+        WebDriverWait shortWait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
-        log("[STEP 2/2] Wait for '10 Pack' card to appear (40s)");
+        // The paywall opens on the Subscribe tab; the first Purchase tap can be
+        // swallowed if it lands before the sheet settles, leaving the tab unswitched.
+        // Tap, verify the switch (10 Pack card), and re-tap if it did not take.
+        for (int attempt = 1; attempt <= 3; attempt++) {
+            log("[STEP] Tap 'Purchase' tab (attempt " + attempt + ")");
+            try {
+                wait.until(ExpectedConditions.elementToBeClickable(purchaseTab)).click();
+                log("[OK]       Tapped Purchase tab");
+            } catch (Exception e) {
+                log("[WARN] Purchase tab not clickable on attempt " + attempt);
+            }
+            try {
+                shortWait.until(ExpectedConditions.visibilityOfElementLocated(tenPack));
+                log("[PASS]     Purchase tab active (10 Pack card visible)");
+                return;
+            } catch (Exception e) {
+                log("[WARN] 10 Pack not visible after tap attempt " + attempt
+                        + " - tab may not have switched, retrying");
+            }
+        }
+
+        log("[STEP] Final wait for '10 Pack' card (40s)");
         WebDriverWait longWait = new WebDriverWait(driver, Duration.ofSeconds(40));
         try {
-            longWait.until(ExpectedConditions.visibilityOfElementLocated(
-                    AppiumBy.xpath(TEN_PACK_CARD_XPATH)));
+            longWait.until(ExpectedConditions.visibilityOfElementLocated(tenPack));
             log("[PASS]     Purchase tab active (10 Pack card visible)");
         } catch (Exception e) {
-            log("[FAIL]     10 Pack card not visible after 40s.");
+            log("[FAIL]     10 Pack card not visible after retries.");
             dumpVisibleText();
             throw e;
         }

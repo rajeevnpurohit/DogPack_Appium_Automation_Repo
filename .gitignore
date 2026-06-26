@@ -1,3 +1,6 @@
 /target/
 src/test/java/org/dogpack/resources/dogpack24june.apk
 testNGSuites/testng_Full_Run.xml
+/night run 1
+/reports
+Full_Run_Analysis_25June.md

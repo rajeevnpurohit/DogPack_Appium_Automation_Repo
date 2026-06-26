@@ -82,6 +82,32 @@ public class Listeners extends AppiumUtils implements ITestListener {
 
 	static {
 		installReportTee();
+		// Save reports even if the run is interrupted (Ctrl+C): a JVM shutdown
+		// hook flushes ExtentReports and renders the Nine Hertz report on exit.
+		Runtime.getRuntime().addShutdownHook(
+				new Thread(Listeners::finalizeReports, "report-finalizer"));
+	}
+
+	private static final java.util.concurrent.atomic.AtomicBoolean reportsFinalized =
+			new java.util.concurrent.atomic.AtomicBoolean(false);
+
+	/** Flush + render both reports exactly once - called by onFinish and by the
+	 *  shutdown hook, so an interrupted run still saves whatever completed. */
+	static void finalizeReports() {
+		if (!reportsFinalized.compareAndSet(false, true)) {
+			return;
+		}
+		try {
+			if (ExtentReporterNG.extent != null) {
+				ExtentReporterNG.extent.flush();
+			}
+		} catch (Throwable ignored) {
+		}
+		try {
+			NineHertzReport.render();
+		} catch (Throwable ignored) {
+		}
+		System.out.println("[INFO] Reports finalized (flushed to reports/).");
 	}
 
 	/** Install a System.out wrapper (once) that mirrors tagged action lines
@@ -130,11 +156,13 @@ public class Listeners extends AppiumUtils implements ITestListener {
 			}
 			String up = sLine.toUpperCase();
 			Status st;
-			if (up.startsWith("[ASSERT FAIL]") || up.startsWith("[FAIL]")
+			if (up.startsWith("[WARN]") || up.startsWith("[WARNING]")) {
+				// A handled warning stays a warning even if it mentions a
+				// caught exception (e.g. "[WARN] ... NoSuchElementException").
+				st = Status.WARNING;
+			} else if (up.startsWith("[ASSERT FAIL]") || up.startsWith("[FAIL]")
 					|| up.startsWith("[ERROR]") || up.contains("EXCEPTION")) {
 				st = Status.FAIL;
-			} else if (up.startsWith("[WARN]") || up.startsWith("[WARNING]")) {
-				st = Status.WARNING;
 			} else if (sLine.startsWith("[ACTION]") || sLine.startsWith("[INPUT]")
 					|| sLine.startsWith("[INFO]") || sLine.startsWith("[FLOW]")
 					|| sLine.startsWith("[OK]") || sLine.startsWith("[STEP]")
@@ -278,6 +306,7 @@ public class Listeners extends AppiumUtils implements ITestListener {
 		postProcessReportLabels();
 		// Generate the modern Nine Hertz report alongside ExtentReports.
 		NineHertzReport.render();
+		reportsFinalized.set(true);   // clean finish - shutdown hook will skip
 	}
 
 	// ====================================================================

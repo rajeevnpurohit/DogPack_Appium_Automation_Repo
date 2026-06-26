@@ -318,7 +318,24 @@ public class SearchDiscoveryPage extends AndroidActions {
 
 	/** read the park result name (search_park_name). */
 	public String getParkName() {
-		String t = wait.until(ExpectedConditions.visibilityOf(parkName)).getText();
+		// the results list re-renders as it loads, so the cached proxy can go
+		// stale - re-find fresh by locator and retry on staleness.
+		By by = By.xpath("//android.widget.TextView[@content-desc=\"search_park_name\"]");
+		WebDriverWait shortWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+		for (int i = 1; i <= 3; i++) {
+			try {
+				String t = shortWait.until(
+						ExpectedConditions.visibilityOfElementLocated(by)).getText();
+				String out = (t == null) ? "" : t.trim();
+				System.out.println("[INFO] search_park_name: '" + out + "'");
+				return out;
+			} catch (StaleElementReferenceException e) {
+				System.out.println("[INFO] search_park_name stale - retry " + i);
+				try { Thread.sleep(700); } catch (InterruptedException ignored) {}
+			}
+		}
+		String t = shortWait.until(
+				ExpectedConditions.visibilityOfElementLocated(by)).getText();
 		String out = (t == null) ? "" : t.trim();
 		System.out.println("[INFO] search_park_name: '" + out + "'");
 		return out;

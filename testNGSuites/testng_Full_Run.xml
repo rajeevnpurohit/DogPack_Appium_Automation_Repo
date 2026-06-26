@@ -94,7 +94,7 @@
 <!--                 PHASE 2 - AUTHENTICATION (Login flows)-->
 <!--                 ================================================================ -->
 <!--            <class name="org.rahulshettyacademy.dogpack_Login" />-->
-            <class name="org.rahulshettyacademy.Dogpack_GmailLogin" />
+<!--            <class name="org.rahulshettyacademy.Dogpack_GmailLogin" />-->
 <!--            <class name="org.rahulshettyacademy.Dogpack_FacebookLogin" />-->
 <!--            <class name="org.rahulshettyacademy.DogPack_ForgotPassword" />-->
  
@@ -109,7 +109,7 @@
 <!--             ================================================================-->
 <!--                 PHASE 4 - CORE APP FEATURES (Homepage + Profile)-->
 <!--                 ================================================================ -->
-<!--            <class name="org.rahulshettyacademy.Dogpack_Homepage" />-->
+            <class name="org.rahulshettyacademy.Dogpack_Homepage" />
 <!--            <class name="org.rahulshettyacademy.Dogpack_Map" />-->
 <!--            <class name="org.rahulshettyacademy.Dogpack_Profile" />-->
 <!--            <class name="org.rahulshettyacademy.DogPack_BusinessUserEditProfile" />-->

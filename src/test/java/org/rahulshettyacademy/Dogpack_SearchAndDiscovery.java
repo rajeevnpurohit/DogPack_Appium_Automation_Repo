@@ -171,15 +171,15 @@ public class Dogpack_SearchAndDiscovery extends AndroidBaseTest {
 		// like + comment on the post
 		search.clickHashtagLike();
 		search.clickHashtagComment();
-		// open & close the image picker (no selection)
+		// open the image picker - this triggers the photos/media permission dialog
 		search.clickCommentAddImage();
-		search.pressDeviceBack();
-		// allow location permission ('While using the app') if it appears
+		// handle the permission popup(s) BEFORE closing: tap 'Allow all' on the
+		// 'Allow access to photos and videos' dialog if it appears
 		search.handleWhileUsingAppIfPresent();
-		// allow record-audio ('While using the app') if it appears
 		search.handleRecordAudioIfPresent();
-		// allow photos/media ('Allow all') if it appears
 		search.handleAllowAllPhotosIfPresent();
+		// now close the gallery / picker (no selection)
+		search.pressDeviceBack();
 		// open & close the GIF picker (no selection)
 		search.clickCommentAddGif();
 		search.pressDeviceBack();
