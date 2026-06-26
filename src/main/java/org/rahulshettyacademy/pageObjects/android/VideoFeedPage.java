@@ -53,7 +53,7 @@ public class VideoFeedPage extends AndroidActions {
 	// ================================================================
 
 	// 1 - Video Feed tab (center of the home screen).
-	@AndroidFindBy(xpath = "//android.view.ViewGroup[@content-desc=\"feed-VideoFeed\"]/android.view.ViewGroup")
+	@AndroidFindBy(xpath = "//android.view.ViewGroup[@content-desc=\"feed-VideoFeed\"]/android.view.ViewGroup/android.view.ViewGroup/android.widget.ImageView")
 	private WebElement videoFeedTab;
 
 	// 2 - Like (action rail child [1]).
@@ -81,8 +81,8 @@ public class VideoFeedPage extends AndroidActions {
 	@AndroidFindBy(xpath = "//android.widget.FrameLayout[@resource-id=\"android:id/content\"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[3]/android.view.ViewGroup[4]/android.widget.ImageView")
 	private WebElement shareButton;
 
-	// 6 - Copy link (share sheet) - real content-desc, robust locator.
-	@AndroidFindBy(xpath = "//android.widget.FrameLayout[@content-desc=\"Copy\"]/android.widget.ImageView")
+	// 6 - Copy link (Android share sheet "copy" button, by resource-id).
+	@AndroidFindBy(xpath = "//android.widget.ImageView[@resource-id=\"com.android.intentresolver:id/copy_btn\"]")
 	private WebElement copyLink;
 
 	// 7 - Save video (action rail child [5] / ViewGroup).

@@ -223,6 +223,7 @@ public class SubscriptionFlowPage extends AndroidActions {
      * class calls it via the same method name as the business one.
      */
     public void AssertVerificationHeader() {
+        System.out.println("[FLOW] AssertVerificationHeader: verifying the Verification header");
         log("===> AssertVerificationHeader");
         String expected = getBoostHeaderExpectedText();
         WebElement header;
@@ -253,6 +254,7 @@ public class SubscriptionFlowPage extends AndroidActions {
      * compile and pass without modification.
      */
     public void AssertBoostBusinessHeader() {
+        System.out.println("[FLOW] AssertBoostBusinessHeader: verifying the Boost header");
         AssertVerificationHeader();
     }
 
@@ -285,6 +287,7 @@ public class SubscriptionFlowPage extends AndroidActions {
      *      "Unlock more magic credits" (same for both account types).
      */
     public void AssertUnlockAiCreditsHeader() {
+        System.out.println("[FLOW] AssertUnlockAiCreditsHeader: verifying the AI credits header");
         log("===> AssertUnlockAiCreditsHeader");
         WebElement header;
         try {
@@ -333,6 +336,7 @@ public class SubscriptionFlowPage extends AndroidActions {
      *       waiting for its header text to be visible.
      */
     public void AssertOnSettingsScreen() {
+        System.out.println("[FLOW] AssertOnSettingsScreen: verifying we are on Settings");
         log("===> AssertOnSettingsScreen");
         try {
             new WebDriverWait(driver, Duration.ofSeconds(15))

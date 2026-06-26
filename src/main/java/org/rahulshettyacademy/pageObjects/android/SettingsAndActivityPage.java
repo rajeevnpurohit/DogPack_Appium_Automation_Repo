@@ -4346,6 +4346,7 @@ public class SettingsAndActivityPage extends AndroidActions {
     }
 
     public void scrollToLogout() {
+        System.out.println("[FLOW] scrollToLogout: scrolling to the Logout control");
         scrollToSettingsItem("Logout");
     }
 

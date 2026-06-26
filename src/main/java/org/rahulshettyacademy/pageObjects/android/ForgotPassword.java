@@ -166,6 +166,7 @@ public class ForgotPassword extends AndroidActions {
 	// =======================================================================
 
 	public void scrollToLogin() {
+		System.out.println("[FLOW] scrollToLogin: scrolling to the Login entry");
 		try {
 			scrollToText("Log In");
 		} catch (Exception e) {
@@ -177,6 +178,7 @@ public class ForgotPassword extends AndroidActions {
 	 * Clicks "signup_login" button on SignUp Welcome screen to land on Login screen.
 	 */
 	public void NavigateToLogin() {
+		System.out.println("[ACTION] NavigateToLogin: opening the login form");
 		System.out.println("[NAV] Navigating to Login screen via 'signup_login'");
 		wait.until(ExpectedConditions.visibilityOf(loginBtn));
 		wait.until(ExpectedConditions.elementToBeClickable(loginBtn)).click();
@@ -187,6 +189,7 @@ public class ForgotPassword extends AndroidActions {
 	 * Verifies arrival on ForgotPassword screen.
 	 */
 	public void navigateToForgotPasswordScreen() {
+		System.out.println("[FLOW] navigateToForgotPasswordScreen: opening Forgot Password");
 		System.out.println("[NAV] Clicking 'Forgot Password' link on Login screen");
 		try {
 			wait.until(ExpectedConditions.elementToBeClickable(forgetPasswordBtn)).click();
@@ -415,6 +418,7 @@ public class ForgotPassword extends AndroidActions {
 	 * SCENARIO 2: Direct land on home (notification permission already granted at OS level)
 	 */
 	public void completePasswordResetLoginProcess() {
+		System.out.println("[FLOW] completePasswordResetLoginProcess: completing reset + login");
 		System.out.println("\n========== POST-RESET LOGIN COMPLETION ==========");
 
 		// STEP 1: Optional NewNotification screen

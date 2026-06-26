@@ -56,20 +56,24 @@ public class LoginPage extends AndroidActions {
 	private WebElement homePageSubmit;
 
 	public void scrollToLogin() {
+		System.out.println("[FLOW] scrollToLogin: scrolling to the Login entry");
 		scrollToText("Log In");
 	}
 
 	public void NavigateToLogin() {
+		System.out.println("[ACTION] NavigateToLogin: opening the login form");
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 		wait.until(ExpectedConditions.visibilityOf(loginBtn));
 		wait.until(ExpectedConditions.elementToBeClickable(loginBtn)).click();
 	}
 
 	public void pressBackWithKeyEvent() {
+		System.out.println("[FLOW] pressBackWithKeyEvent: pressing device Back");
 		driver.pressKey(new KeyEvent(AndroidKey.BACK));
 	}
 
 	public void setEmailPassword(String name, String password) {
+		System.out.println("[INPUT] setEmailPassword: entering email and password");
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 		wait.until(ExpectedConditions.visibilityOf(usernameField));
 		wait.until(ExpectedConditions.elementToBeClickable(usernameField)).sendKeys(name);
@@ -79,6 +83,7 @@ public class LoginPage extends AndroidActions {
 	}
 
 	public void clickOnLoginSubmit() {
+		System.out.println("[ACTION] clickOnLoginSubmit: submitting the login form");
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 		wait.until(ExpectedConditions.visibilityOf(loginSubmit));
 		wait.until(ExpectedConditions.elementToBeClickable(loginSubmit)).click();
@@ -108,6 +113,7 @@ public class LoginPage extends AndroidActions {
 	 * Distance modal logic: src/screen/Feeds.js (Helper.getData("distancePermission"))
 	 */
 	public void CompleteLoginProccess() {
+		System.out.println("[FLOW] CompleteLoginProccess: handling post-login dialogs");
 		// Short wait for optional elements (conditional screens)
 		WebDriverWait shortWait = new WebDriverWait(driver, Duration.ofSeconds(10));
 		// Very short wait for distance modal (only first-time)
@@ -117,9 +123,9 @@ public class LoginPage extends AndroidActions {
 		// STEP 1: Try to handle "Yes, Notify Me" screen (OPTIONAL)
 		// ========================================
 		try {
-			System.out.println("Checking if 'Yes, Notify Me' screen appears...");
+			System.out.println("[FLOW] Checking if 'Yes, Notify Me' screen appears...");
 			shortWait.until(ExpectedConditions.elementToBeClickable(notifyMe)).click();
-			System.out.println("[Scenario 1] NewNotification screen appeared - clicked 'Yes, Notify Me'");
+			System.out.println("[ACTION] [Scenario 1] NewNotification screen appeared - clicked 'Yes, Notify Me'");
 			
 			// ========================================
 			// STEP 2: Handle Android system permission dialog (OPTIONAL)
@@ -128,23 +134,23 @@ public class LoginPage extends AndroidActions {
 				WebElement notificationPopup = shortWait.until(ExpectedConditions.presenceOfElementLocated(
 						By.xpath("//android.widget.TextView[@resource-id=\"com.android.permissioncontroller:id/permission_message\"]")));
 				String ExpectednotificationPopup = notificationPopup.getText();
-				System.out.println("Permission dialog text: " + ExpectednotificationPopup);
+				System.out.println("[INFO] Permission dialog text: " + ExpectednotificationPopup);
 				
 				if (!ExpectednotificationPopup.toLowerCase().contains("notification")) {
-					System.out.println("WARNING: Permission text mismatch - expected text containing 'notification'");
+					System.out.println("[WARN] WARNING: Permission text mismatch - expected text containing 'notification'");
 				}
 				
 				shortWait.until(ExpectedConditions.visibilityOf(allowPermission));
 				shortWait.until(ExpectedConditions.elementToBeClickable(allowPermission)).click();
-				System.out.println("System permission dialog - clicked Allow");
+				System.out.println("[ACTION] System permission dialog - clicked Allow");
 				
 			} catch (Exception permissionEx) {
-				System.out.println("System permission dialog skipped (may already be granted): " 
+				System.out.println("[INFO] System permission dialog skipped (may already be granted): " 
 						+ permissionEx.getClass().getSimpleName());
 			}
 			
 		} catch (Exception notifyMeEx) {
-			System.out.println("[Scenario 2/3] NewNotification screen SKIPPED - notification already granted at app level");
+			System.out.println("[INFO] [Scenario 2/3] NewNotification screen SKIPPED - notification already granted at app level");
 		}
 		
 		// ========================================
@@ -153,18 +159,19 @@ public class LoginPage extends AndroidActions {
 		// Previously this was REQUIRED with 30s wait, causing test failures for
 		// returning users. Now made truly conditional with 8s timeout.
 		try {
-			System.out.println("Checking for feed-distance-submit modal (first-time only)...");
+			System.out.println("[ACTION] Checking for feed-distance-submit modal (first-time only)...");
 			quickWait.until(ExpectedConditions.visibilityOf(homePageSubmit));
 			quickWait.until(ExpectedConditions.elementToBeClickable(homePageSubmit)).click();
-			System.out.println("[Scenario 1/2] Clicked feed-distance-submit - distance modal dismissed");
+			System.out.println("[ACTION] [Scenario 1/2] Clicked feed-distance-submit - distance modal dismissed");
 		} catch (Exception distanceEx) {
-			System.out.println("[Scenario 3] Distance modal SKIPPED - already configured for this user");
+			System.out.println("[INFO] [Scenario 3] Distance modal SKIPPED - already configured for this user");
 		}
 		
-		System.out.println("Login flow completed!");
+		System.out.println("[OK] Login flow completed!");
 	}
 
 	public void HandleCustomDialog(int xc, int yc) {
+		System.out.println("[FLOW] HandleCustomDialog: dismissing the custom dialog");
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 		Assert.assertTrue(wait
 				.until(ExpectedConditions

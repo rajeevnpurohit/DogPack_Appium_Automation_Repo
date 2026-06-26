@@ -285,6 +285,7 @@ public class MapPage extends AndroidActions {
 	// Map Functions
 
 	public void ParkMap() throws InterruptedException {
+		System.out.println("[FLOW] ParkMap: filtering Dog Park markers");
 		dismissDogProfileSheetIfPresent();
 	    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 
@@ -297,7 +298,7 @@ public class MapPage extends AndroidActions {
 	        driver.findElements(By.xpath("//android.view.View[@content-desc='Map Marker']"));
 
 	    if (parkMarkers.isEmpty()) {
-	        System.out.println("No business markers found. Tapping Dog Business filter again.");
+	        System.out.println("[ACTION] No business markers found. Tapping Dog Business filter again.");
 	        mapParkBtn.click();
 	        Thread.sleep(1200);
 	        return;
@@ -329,7 +330,7 @@ public class MapPage extends AndroidActions {
 	        }
 	    }
 
-	    System.out.println("No safe marker clickable. Re-toggling Dog Business filter.");
+	    System.out.println("[ACTION] No safe marker clickable. Re-toggling Dog Business filter.");
 	    mapParkBtn.click();
 	    Thread.sleep(1200);
 	}
@@ -376,7 +377,7 @@ public class MapPage extends AndroidActions {
 	        Thread.sleep(500);
 
 	    } catch (Exception e) {
-	        System.out.println("⚠️ smartBack failed: " + e.getMessage());
+	        System.out.println("[WARN] ⚠️ smartBack failed: " + e.getMessage());
 	        try { driver.context("NATIVE_APP"); } catch (Exception ignored) {}
 	    }
 	}
@@ -387,7 +388,7 @@ public class MapPage extends AndroidActions {
 	    List<WebElement> els = driver.findElements(businessMessageBtnBy);
 
 	    if (els.isEmpty()) {
-	        System.out.println("Business Message button NOT in DOM. Doing fallback actions...");
+	        System.out.println("[FLOW] Business Message button NOT in DOM. Doing fallback actions...");
 	        safeBack();
 	        return;
 	    }
@@ -400,7 +401,7 @@ public class MapPage extends AndroidActions {
 	    } catch (Exception ignored) { /* stale/invisible */ }
 
 	    if (visible) {
-	        System.out.println("Business Message button is displayed. Performing first set of actions...");
+	        System.out.println("[INFO] Business Message button is displayed. Performing first set of actions...");
 	        navigatesToAllTabsInProfile();
 	        BusinessAddress();
 	        BusinessTabMessageUser();
@@ -410,7 +411,7 @@ public class MapPage extends AndroidActions {
 	        safeBack();
 
 	    } else {
-	        System.out.println("Business Message button present but NOT displayed. Doing fallback...");
+	        System.out.println("[WARN] Business Message button present but NOT displayed. Doing fallback...");
 	        safeBack();
 	    }
 	}
@@ -436,18 +437,18 @@ public class MapPage extends AndroidActions {
 			WebElement laterBtn = wait
 					.until(ExpectedConditions.elementToBeClickable(parkTabRatingLaterBtnBy));
 			laterBtn.click();
-			System.out.println("✅ 'Later' clicked.");
+			System.out.println("[ACTION] ✅ 'Later' clicked.");
 			
 		} catch (Exception e) {
 			// TODO: handle exception
 			if (reviewLike.isDisplayed()) {
 				wait.until(ExpectedConditions.visibilityOf(reviewLike));
 				wait.until(ExpectedConditions.elementToBeClickable(reviewLike)).click();
-				System.out.println("✅ 'Like' clicked.");
+				System.out.println("[ACTION] ✅ 'Like' clicked.");
 			}else {
 				wait.until(ExpectedConditions.visibilityOf(reviewLikeMulti));
 				wait.until(ExpectedConditions.elementToBeClickable(reviewLikeMulti)).click();
-				System.out.println("✅ 'Multi-Like' clicked.");
+				System.out.println("[ACTION] ✅ 'Multi-Like' clicked.");
 			}
 			
 		}
@@ -470,11 +471,11 @@ public class MapPage extends AndroidActions {
 
 		WebElement inapproBtn = wait.until(ExpectedConditions.elementToBeClickable(appropriateOptionBtnBy));
 		inapproBtn.click();
-		System.out.println("✅ 'Inappropriate option' clicked.");
+		System.out.println("[ACTION] ✅ 'Inappropriate option' clicked.");
 		driver.hideKeyboard();
 		WebElement submitBtn = wait.until(ExpectedConditions.elementToBeClickable(approSubmitBtnBy));
 		submitBtn.click();
-		System.out.println("✅ 'Submit' clicked.");
+		System.out.println("[ACTION] ✅ 'Submit' clicked.");
 	}
 
 	public void handleProfilePopup(String action) {
@@ -483,14 +484,14 @@ public class MapPage extends AndroidActions {
 		if (action.equalsIgnoreCase("Confirm")) {
 			wait.until(ExpectedConditions.visibilityOf(profileConfirmBtn));
 			wait.until(ExpectedConditions.elementToBeClickable(profileConfirmBtn)).click();
-			System.out.println("✅ Confirm button clicked.");
+			System.out.println("[ACTION] ✅ Confirm button clicked.");
 		} else if (action.equalsIgnoreCase("Cancel")) {
 			wait.until(ExpectedConditions.visibilityOf(profileCancelBtn));
 			wait.until(ExpectedConditions.elementToBeClickable(profileCancelBtn)).click();
-			System.out.println("✅ Cancel button clicked.");
+			System.out.println("[ACTION] ✅ Cancel button clicked.");
 			driver.pressKey(new KeyEvent(AndroidKey.BACK));
 		} else {
-			System.out.println("❌ Invalid action. Use 'Confirm' or 'Cancel'.");
+			System.out.println("[INFO] ❌ Invalid action. Use 'Confirm' or 'Cancel'.");
 		}
 
 	}
@@ -516,12 +517,12 @@ public class MapPage extends AndroidActions {
 		wait.until(ExpectedConditions.elementToBeClickable(messageEnterbtn)).click();
 		try {
 			if (exceedMessageLimitPopup.isDisplayed()) {
-				System.out.println("⚠️ Message limit reached.");
+				System.out.println("[INFO] ⚠️ Message limit reached.");
 				wait.until(ExpectedConditions.invisibilityOf(exceedMessageLimitPopup));
 				return;
 			}
 		} catch (Exception ignored) {
-			System.out.println("⚠️ Message limit is not reached yet reached.");
+			System.out.println("[INFO] ⚠️ Message limit is not reached yet reached.");
 		}
 		driver.pressKey(new KeyEvent(AndroidKey.BACK));
 
@@ -597,6 +598,7 @@ public class MapPage extends AndroidActions {
 	}
 
 	public void DogBusiness() throws InterruptedException {
+		System.out.println("[FLOW] DogBusiness: filtering Dog Business markers");
 		dismissDogProfileSheetIfPresent();
 	    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 
@@ -609,7 +611,7 @@ public class MapPage extends AndroidActions {
 	        driver.findElements(By.xpath("//android.view.View[@content-desc='Map Marker']"));
 
 	    if (businessMarkers.isEmpty()) {
-	        System.out.println("No business markers found. Tapping Dog Business filter again.");
+	        System.out.println("[ACTION] No business markers found. Tapping Dog Business filter again.");
 	        mapBusinessBtn.click();
 	        Thread.sleep(1200);
 	        return;
@@ -638,7 +640,7 @@ public class MapPage extends AndroidActions {
 	        }
 	    }
 
-	    System.out.println("No safe marker clickable. Re-toggling Dog Business filter.");
+	    System.out.println("[ACTION] No safe marker clickable. Re-toggling Dog Business filter.");
 	    mapBusinessBtn.click();
 	    Thread.sleep(1200);
 	}
@@ -726,12 +728,13 @@ public class MapPage extends AndroidActions {
 	}
 
 	public void clickFirstMarkerOrFallbackToLodgings() throws InterruptedException {
+		System.out.println("[FLOW] clickFirstMarkerOrFallbackToLodgings: tapping a lodging marker / Booking chip");
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 		List<WebElement> lodgingMarkers = driver
 				.findElements(By.xpath("//android.view.View[@content-desc='Map Marker']"));
 
 		if (lodgingMarkers.isEmpty()) {
-			System.out.println("No lodging markers found. Returning to map and clicking Booking.com chip.");
+			System.out.println("[ACTION] No lodging markers found. Returning to map and clicking Booking.com chip.");
 			clickBookingChip();
 			Thread.sleep(2000); // optional wait
 			return;
@@ -741,7 +744,7 @@ public class MapPage extends AndroidActions {
 			try {
 				if (marker.isDisplayed() && marker.isEnabled()) {
 					marker.click();
-					System.out.println("Clicked on first visible lodging marker.");
+					System.out.println("[ACTION] Clicked on first visible lodging marker.");
 					wait.until(ExpectedConditions.visibilityOf(lodgingReserveBtn));
 					wait.until(ExpectedConditions.elementToBeClickable(lodgingReserveBtn)).click();
 					Set<String> contextNames = driver.getContextHandles();
@@ -752,7 +755,7 @@ public class MapPage extends AndroidActions {
 						attempts++;
 					}
 					for (String contextName : contextNames) {
-						System.out.println("Available Context: " + contextName);
+						System.out.println("[INFO] Available Context: " + contextName);
 					}
 					
 					try {
@@ -779,7 +782,7 @@ public class MapPage extends AndroidActions {
 		}
 
 		// Fallback if none of the markers were clickable
-		System.out.println("No visible lodging marker clickable. Returning to map and clicking Booking.com chip.");
+		System.out.println("[ACTION] No visible lodging marker clickable. Returning to map and clicking Booking.com chip.");
 		clickBookingChip();
 		Thread.sleep(2000); // optional wait
 	}
@@ -801,6 +804,7 @@ public class MapPage extends AndroidActions {
 	}
 
 	public void clickOnLodgingsAfterSwipeRight() throws InterruptedException {
+		System.out.println("[FLOW] clickOnLodgingsAfterSwipeRight");
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 		int attempts = 0;
 		boolean found = false;
@@ -845,6 +849,7 @@ public class MapPage extends AndroidActions {
 	}
 
 	public void UnSelectDogFriendlyArea() throws InterruptedException {
+		System.out.println("[FLOW] UnSelectDogFriendlyArea");
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 		int attempts = 0;
 		boolean found = false;
@@ -873,6 +878,7 @@ public class MapPage extends AndroidActions {
 	}
 
 	public void UnSelectLodgings() throws InterruptedException {
+		System.out.println("[FLOW] UnSelectLodgings");
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 		wait.until(ExpectedConditions.visibilityOf(mapLodgings));
 		wait.until(ExpectedConditions.elementToBeClickable(mapLodgings)).click();
@@ -880,6 +886,7 @@ public class MapPage extends AndroidActions {
 	}
 
 	public void UnSelectBusiness() throws InterruptedException {
+		System.out.println("[FLOW] UnSelectBusiness");
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 		wait.until(ExpectedConditions.visibilityOf(mapBusinessBtn));
 		wait.until(ExpectedConditions.elementToBeClickable(mapBusinessBtn)).click();
@@ -887,6 +894,7 @@ public class MapPage extends AndroidActions {
 	}
 
 	public void UnSelectPark() throws InterruptedException {
+		System.out.println("[FLOW] UnSelectPark");
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 		wait.until(ExpectedConditions.visibilityOf(mapParkBtn));
 		wait.until(ExpectedConditions.elementToBeClickable(mapParkBtn)).click();
@@ -894,6 +902,7 @@ public class MapPage extends AndroidActions {
 	}
 
 	public void SuggestBusiness() {
+		System.out.println("[FLOW] SuggestBusiness: suggesting a business pin");
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 
 		wait.until(ExpectedConditions.visibilityOf(SuggestBtn));
@@ -905,7 +914,7 @@ public class MapPage extends AndroidActions {
 				Assert.assertEquals(locationPermissionMsg.getText(), "Allow DogPack to access this device’s location?");
 			}
 		} catch (Exception ignored) {
-			System.out.println("permission message not displayed");
+			System.out.println("[WARN] permission message not displayed");
 		}
 
 		try {
@@ -913,7 +922,7 @@ public class MapPage extends AndroidActions {
 				wait.until(ExpectedConditions.elementToBeClickable(whileUsingAppPermission)).click();
 			}
 		} catch (Exception ignored) {
-			System.out.println("while using app button not displayed");
+			System.out.println("[WARN] while using app button not displayed");
 		}
 
 		wait.until(ExpectedConditions.visibilityOf(suggestPinMarker));
@@ -961,6 +970,7 @@ public class MapPage extends AndroidActions {
 	}
 
 	public void SuggestPark() {
+		System.out.println("[FLOW] SuggestPark: suggesting a park pin");
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 
 		wait.until(ExpectedConditions.visibilityOf(SuggestBtn));
@@ -972,7 +982,7 @@ public class MapPage extends AndroidActions {
 				Assert.assertEquals(locationPermissionMsg.getText(), "Allow DogPack to access this device’s location?");
 			}
 		} catch (Exception ignored) {
-			System.out.println("permission message not displayed");
+			System.out.println("[WARN] permission message not displayed");
 		}
 
 		try {
@@ -980,7 +990,7 @@ public class MapPage extends AndroidActions {
 				wait.until(ExpectedConditions.elementToBeClickable(whileUsingAppPermission)).click();
 			}
 		} catch (Exception ignored) {
-			System.out.println("while using app button not displayed");
+			System.out.println("[WARN] while using app button not displayed");
 		}
 
 		wait.until(ExpectedConditions.visibilityOf(suggestPinMarker));
@@ -1009,6 +1019,7 @@ public class MapPage extends AndroidActions {
 	}
 
 	public void ListYourBusiness() {
+		System.out.println("[FLOW] ListYourBusiness: opening the List Your Business flow");
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 
 		wait.until(ExpectedConditions.visibilityOf(listBusinessBtn));
@@ -1023,6 +1034,7 @@ public class MapPage extends AndroidActions {
 	}
 
 	public void NavigtesToMap() {
+		System.out.println("[FLOW] NavigtesToMap: opening the Map screen");
 
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 
@@ -1035,7 +1047,7 @@ public class MapPage extends AndroidActions {
 				Assert.assertEquals(locationPermissionMsg.getText(), "Allow DogPack to access this device’s location?");
 			}
 		} catch (Exception ignored) {
-			System.out.println("permission message not displayed");
+			System.out.println("[WARN] permission message not displayed");
 		}
 
 		try {
@@ -1043,7 +1055,7 @@ public class MapPage extends AndroidActions {
 				wait.until(ExpectedConditions.elementToBeClickable(whileUsingAppPermission)).click();
 			}
 		} catch (Exception ignored) {
-			System.out.println("while using app button not displayed");
+			System.out.println("[WARN] while using app button not displayed");
 		}
 
 	//	driver.pressKey(new KeyEvent(AndroidKey.BACK));
@@ -1052,6 +1064,7 @@ public class MapPage extends AndroidActions {
 	}
 
 	public void searchByCurrentLocation() {
+		System.out.println("[FLOW] searchByCurrentLocation: searching by current location");
 		dismissDogProfileSheetIfPresent();
 
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
@@ -1066,6 +1079,7 @@ public class MapPage extends AndroidActions {
 	}
 
 	public void searchByDynamicLocation() {
+		System.out.println("[FLOW] searchByDynamicLocation: searching by a typed location");
 
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 
@@ -1081,6 +1095,7 @@ public class MapPage extends AndroidActions {
 	}
 
 	public void changeMapTypeToTraffic() {
+		System.out.println("[FLOW] changeMapTypeToTraffic");
 
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 
@@ -1094,6 +1109,7 @@ public class MapPage extends AndroidActions {
 	}
 
 	public void changeMapTypeToTerrain() {
+		System.out.println("[FLOW] changeMapTypeToTerrain");
 
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 
@@ -1107,6 +1123,7 @@ public class MapPage extends AndroidActions {
 	}
 
 	public void changeMapTypeToSatellite() {
+		System.out.println("[FLOW] changeMapTypeToSatellite");
 
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 
@@ -1120,6 +1137,7 @@ public class MapPage extends AndroidActions {
 	}
 
 	public void changeMapTypeToDefault() {
+		System.out.println("[FLOW] changeMapTypeToDefault");
 
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 

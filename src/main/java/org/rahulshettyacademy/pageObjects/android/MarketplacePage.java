@@ -440,6 +440,7 @@ public class MarketplacePage extends AndroidActions {
      *      the location change.
      */
     public void AssertShopTextVisible() {
+        log("[FLOW] AssertShopTextVisible: verifying Shop text");
         log("===> AssertShopTextVisible");
         WebElement shop;
         try {
@@ -927,6 +928,7 @@ public class MarketplacePage extends AndroidActions {
      * same to avoid re-wiring the test class.
      */
     public void AssertThankYouMessageVisible() {
+        log("[FLOW] AssertThankYouMessageVisible: verifying Thank You message");
         AssertSuccessOrderMessage();
     }
 
