@@ -53,7 +53,7 @@ public class VideoFeedPage extends AndroidActions {
 	// ================================================================
 
 	// 1 - Video Feed tab (center of the home screen).
-	@AndroidFindBy(xpath = "//android.view.ViewGroup[@content-desc=\"feed-VideoFeed\"]/android.view.ViewGroup/android.view.ViewGroup/android.widget.ImageView")
+	@AndroidFindBy(xpath = "//android.widget.TextView[@text=\"Video Feed\"]")
 	private WebElement videoFeedTab;
 
 	// 2 - Like (action rail child [1]).
@@ -81,8 +81,8 @@ public class VideoFeedPage extends AndroidActions {
 	@AndroidFindBy(xpath = "//android.widget.FrameLayout[@resource-id=\"android:id/content\"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[3]/android.view.ViewGroup[4]/android.widget.ImageView")
 	private WebElement shareButton;
 
-	// 6 - Copy link (Android share sheet "copy" button, by resource-id).
-	@AndroidFindBy(xpath = "//android.widget.ImageView[@resource-id=\"com.android.intentresolver:id/copy_btn\"]")
+	// 6 - Copy link (share sheet "Copy link" button, by content-desc).
+	@AndroidFindBy(xpath = "//android.widget.FrameLayout[@content-desc=\"Copy link\"]")
 	private WebElement copyLink;
 
 	// 7 - Save video (action rail child [5] / ViewGroup).
@@ -134,31 +134,48 @@ public class VideoFeedPage extends AndroidActions {
 	 */
 	public void clickVideoFeed() {
 		By navMarker = AppiumBy.accessibilityId("feed-video-mute");
-		long end = System.currentTimeMillis() + 30000;
-		int attempts = 0;
-		while (System.currentTimeMillis() < end) {
-			// already on the Video Feed?
+		// The homepage stacks several dismiss-on-tap accessibility overlays
+		// ("Customize your Feed", "See likes, comments...") on top of the feature
+		// icons. Each tap on the "Video Feed" label clears one overlay; once they
+		// are all gone, the tap finally opens the Video Feed. So we click
+		// repeatedly until the in-feed marker (feed-video-mute) appears.
+		//
+		// Implicit wait is dropped to 0 for the duration so the negative
+		// findElements(navMarker) checks return instantly instead of each blocking
+		// the global 10s implicit wait (which previously capped us at ~2 attempts
+		// in the 15s window - not enough to clear the overlays). Restored in finally.
+		Duration originalImplicit = Duration.ofSeconds(10);
+		driver.manage().timeouts().implicitlyWait(Duration.ZERO);
+		try {
+			long end = System.currentTimeMillis() + 15000;
+			int attempts = 0;
+			while (System.currentTimeMillis() < end && attempts < 15) {
+				// already on the Video Feed?
+				if (!driver.findElements(navMarker).isEmpty()) {
+					System.out.println("[ACTION] Video Feed opened after " + attempts + " click attempt(s)");
+					return;
+				}
+				attempts++;
+				try {
+					new WebDriverWait(driver, Duration.ofSeconds(1))
+							.until(ExpectedConditions.elementToBeClickable(videoFeedTab)).click();
+					System.out.println("[ACTION] Clicked Video Feed / cleared overlay (attempt " + attempts + ")");
+				} catch (Exception e) {
+					// label not clickable yet - keep waiting
+				}
+				try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
+			}
+			// final check in case the feed opened right at the deadline
 			if (!driver.findElements(navMarker).isEmpty()) {
-				System.out.println("[ACTION] Video Feed opened after " + attempts + " click attempt(s)");
+				System.out.println("[ACTION] Video Feed opened (late)");
 				return;
 			}
-			attempts++;
-			try {
-				new WebDriverWait(driver, Duration.ofSeconds(2))
-						.until(ExpectedConditions.elementToBeClickable(videoFeedTab)).click();
-				System.out.println("[ACTION] Clicked Video Feed (attempt " + attempts + ")");
-			} catch (Exception e) {
-				// not rendered / not clickable yet - keep waiting
-			}
-			try { Thread.sleep(1500); } catch (InterruptedException ignored) {}
+			throw new RuntimeException("Video Feed did not open within 15s after "
+					+ attempts + " click attempts (overlay coach-marks may not have cleared, "
+					+ "or the icon is hidden by the isShowReels remote-config flag).");
+		} finally {
+			driver.manage().timeouts().implicitlyWait(originalImplicit);
 		}
-		// final check in case the feed opened right at the deadline
-		if (!driver.findElements(navMarker).isEmpty()) {
-			System.out.println("[ACTION] Video Feed opened (late)");
-			return;
-		}
-		throw new RuntimeException("Video Feed did not open within 30s after "
-				+ attempts + " click attempts (icon may be hidden by the isShowReels remote-config flag).");
 	}
 
 	/** 2 - like the current video. */
@@ -281,6 +298,54 @@ public class VideoFeedPage extends AndroidActions {
 		wait.until(ExpectedConditions.visibilityOf(submitReport));
 		wait.until(ExpectedConditions.elementToBeClickable(submitReport)).click();
 		System.out.println("[ACTION] Clicked Submit");
+
+		// (6) After Submit the app shows a toast. Two outcomes:
+		//   - "User reported successfully"            -> report accepted
+		//   - "You have already reported this user."  -> nothing submitted and the
+		//     report dialog stays open (stuck), so we must tap Cancel to recover.
+		// Toasts are transient, so poll briefly with the implicit wait at 0
+		// (otherwise each negative check blocks the 10s implicit wait and we miss
+		// the toast). Restored in finally.
+		boolean reportSuccess = false, alreadyReported = false;
+		Duration prevImplicit = Duration.ofSeconds(10);
+		driver.manage().timeouts().implicitlyWait(Duration.ZERO);
+		try {
+			long deadline = System.currentTimeMillis() + 4000;
+			while (System.currentTimeMillis() < deadline) {
+				if (!driver.findElements(AppiumBy.accessibilityId("User reported successfully")).isEmpty()) {
+					reportSuccess = true;
+					break;
+				}
+				if (!driver.findElements(AppiumBy.xpath(
+						"//android.widget.TextView[@text=\"You have already reported this user.\"]")).isEmpty()) {
+					alreadyReported = true;
+					break;
+				}
+				try { Thread.sleep(250); } catch (InterruptedException ignored) {}
+			}
+			if (reportSuccess) {
+				System.out.println("[ACTION] Report submitted - 'User reported successfully'");
+			} else {
+				if (alreadyReported) {
+					System.out.println("[WARN] User already reported - submit did not go through; cancelling dialog");
+				} else {
+					System.out.println("[INFO] No success toast detected; checking for a stuck report dialog");
+				}
+				// Recover the stuck dialog (handles already-reported even if the toast was missed).
+				List<WebElement> cancel = driver.findElements(AppiumBy.accessibilityId("Cancel"));
+				if (cancel.isEmpty()) {
+					cancel = driver.findElements(AppiumBy.xpath("//android.view.ViewGroup[@content-desc=\"Cancel\"]"));
+				}
+				if (!cancel.isEmpty()) {
+					cancel.get(0).click();
+					System.out.println("[ACTION] Clicked Cancel to dismiss the report dialog");
+				} else {
+					System.out.println("[INFO] No Cancel button present - dialog likely already dismissed");
+				}
+			}
+		} finally {
+		driver.manage().timeouts().implicitlyWait(prevImplicit);
+		}
 
 		// (8) reopen the three-dots menu for the block flow
 		wait.until(ExpectedConditions.visibilityOf(threeDots));

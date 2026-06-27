@@ -33,7 +33,7 @@
          13. Dogpack_PostingExperience             (Photo/video post)
          14. Dogpack_PostingExperienceTextPost     (Text-only post)
  
-       PHASE 6 - SETTINGS & ACTIVITY
+       PHASE 6 - SETTINGS and ACTIVITY
          15. Dogpack_Settings                      (Settings + activity)
  
        PHASE 7 - PREMIUM / MONETIZATION FEATURES (11 classes)
@@ -92,7 +92,7 @@
  
 <!--             ================================================================-->
 <!--                 PHASE 2 - AUTHENTICATION (Login flows)-->
-<!--                 ================================================================ -->
+<!--             ================================================================ -->
             <class name="org.rahulshettyacademy.dogpack_Login" />
             <class name="org.rahulshettyacademy.Dogpack_GmailLogin" />
             <class name="org.rahulshettyacademy.Dogpack_FacebookLogin" />
@@ -100,7 +100,7 @@
  
 <!--             ================================================================-->
 <!--                 PHASE 3 - SIGNUP (All cases - user + business)-->
-<!--                 ================================================================ -->
+<!--             ================================================================ -->
             <class name="org.rahulshettyacademy.DogPack_ManualSignup" />
             <class name="org.rahulshettyacademy.DogPack_ManualSignupSkipCase" />
             <class name="org.rahulshettyacademy.DogPack_ManualBusinessSignup" />
@@ -108,7 +108,7 @@
  
 <!--             ================================================================-->
 <!--                 PHASE 4 - CORE APP FEATURES (Homepage + Profile)-->
-<!--                 ================================================================ -->
+<!--             ================================================================ -->
             <class name="org.rahulshettyacademy.Dogpack_Homepage" />
             <class name="org.rahulshettyacademy.Dogpack_Map" />
             <class name="org.rahulshettyacademy.Dogpack_Profile" />
@@ -116,19 +116,19 @@
  
 <!--             ================================================================-->
 <!--                 PHASE 5 - POSTING EXPERIENCE (Photo/Video + Text)-->
-<!--                 ================================================================ -->
+<!--             ================================================================ -->
             <class name="org.rahulshettyacademy.Dogpack_PostingExperience" />
             <class name="org.rahulshettyacademy.Dogpack_PostingExperienceTextPost" />
             <class name="org.rahulshettyacademy.dogpack_PhotoChallange" />
- 
-<!--             ================================================================-->
-<!--                 PHASE 6 - SETTINGS & ACTIVITY-->
-<!--                 ================================================================ -->
-<!--            <class name="org.rahulshettyacademy.Dogpack_Settings" />-->
+
+<!--             ================================================================ -->
+<!--                 PHASE 6 - SETTINGS and ACTIVITY-->
+<!--             ================================================================ -->
+            <class name="org.rahulshettyacademy.Dogpack_Settings" />
  
 <!--             ================================================================-->
 <!--                 PHASE 7 - PREMIUM / MONETIZATION FEATURES-->
-<!--                 ================================================================ -->
+<!--             ================================================================ -->
             <class name="org.rahulshettyacademy.Dogpack_BoostAccount" />
             <class name="org.rahulshettyacademy.Dogpack_AiPhotoGeneration" />
             <class name="org.rahulshettyacademy.Dogpack_BusinessLogin" />
@@ -144,7 +144,7 @@
 <!--             ================================================================-->
 <!--                 PHASE 8 - ACCOUNT LIFECYCLE (Runs LAST - destructive!)-->
 <!--                 These delete accounts so they must run at the very end.-->
-<!--                 ================================================================ -->
+<!--             ================================================================ -->
             <class name="org.rahulshettyacademy.Dogpack_AccountDeletion" />
             <class name="org.rahulshettyacademy.Dogpack_AccountDeletion_Business" />
 

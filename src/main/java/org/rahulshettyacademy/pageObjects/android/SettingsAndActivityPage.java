@@ -5828,8 +5828,31 @@ public class SettingsAndActivityPage extends AndroidActions {
                 + "/android.widget.ImageView"))).click();
         System.out.println("[ACTION] Clicked hamburger menu");
 
-        // (3) scroll half way
-        scrollDownSmall();
+        // (3) "Blocked Users" sits below the fold, and Android virtualizes the
+        //     menu (off-screen rows are not in the view tree), so a single small
+        //     scroll is not enough. Scroll repeatedly until it is in view, then
+        //     open it. Implicit wait is dropped to 0 so the negative presence
+        //     checks return instantly instead of each blocking the 10s implicit
+        //     wait; restored in finally.
+        Duration origImplicitForBlocked = Duration.ofSeconds(10);
+        driver.manage().timeouts().implicitlyWait(Duration.ZERO);
+        try {
+            boolean found = false;
+            for (int i = 0; i < 8; i++) {
+                if (!driver.findElements(AppiumBy.accessibilityId("Blocked Users")).isEmpty()) {
+                    found = true;
+                    System.out.println("[ACTION] 'Blocked Users' in view after " + i + " scroll(s)");
+                    break;
+                }
+                scrollDownSmall();
+                sleepQuiet(400);
+            }
+            if (!found) {
+                throw new RuntimeException("'Blocked Users' not found after scrolling the settings menu");
+            }
+        } finally {
+            driver.manage().timeouts().implicitlyWait(origImplicitForBlocked);
+        }
 
         // (4) open Blocked Users
         w.until(ExpectedConditions.elementToBeClickable(blockedUsersBtn)).click();

@@ -322,7 +322,7 @@ public final class NineHertzReport {
                     if (tc.shotB64 != null) {
                         h.append("<div class=\"shot\"><img src=\"").append(tc.shotB64)
                          .append("\" alt=\"\" onclick=\"openLb(this.src)\"/><div class=\"cap\">").append(esc(tc.name))
-                         .append(".png</div></div>");
+                         .append(tc.shotB64.startsWith("data:image/jpeg") ? ".jpg" : ".png").append("</div></div>");
                     } else {
                         h.append("<div class=\"shot\"><div class=\"ph\">no screenshot</div></div>");
                     }
@@ -388,7 +388,9 @@ public final class NineHertzReport {
     private static String encodeImg(String path) {
         try {
             byte[] b = Files.readAllBytes(Paths.get(path));
-            return "data:image/png;base64," + Base64.getEncoder().encodeToString(b);
+            String lp = path.toLowerCase();
+            String mime = (lp.endsWith(".jpg") || lp.endsWith(".jpeg")) ? "image/jpeg" : "image/png";
+            return "data:" + mime + ";base64," + Base64.getEncoder().encodeToString(b);
         } catch (Exception e) {
             return null;
         }

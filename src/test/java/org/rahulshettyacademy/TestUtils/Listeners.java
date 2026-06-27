@@ -463,6 +463,7 @@ public class Listeners extends AppiumUtils implements ITestListener {
 		try {
 			String screenshotPath = getScreenshotPath(
 					result.getMethod().getMethodName(), driver);
+			screenshotPath = compressShot(screenshotPath);
 			if (screenshotPath != null) {
 				test.addScreenCaptureFromPath(screenshotPath,
 						result.getMethod().getMethodName());
@@ -483,6 +484,57 @@ public class Listeners extends AppiumUtils implements ITestListener {
 			test.log(Status.WARNING,
 					"Screenshot capture failed: " + screenshotEx.getClass().getSimpleName());
 			return null;
+		}
+	}
+
+	/** Max width (px) for report screenshots; taller images keep aspect ratio. */
+	private static final int SHOT_MAX_WIDTH = 720;
+	/** JPEG quality (0..1) for report screenshots. */
+	private static final float SHOT_JPEG_QUALITY = 0.75f;
+
+	/**
+	 * Re-encode a captured PNG screenshot as a downscaled JPEG to keep the HTML
+	 * report small. Returns the new .jpg path, or the original path if anything
+	 * goes wrong, so reporting never breaks over a screenshot. Deletes the PNG
+	 * once the JPEG is written.
+	 */
+	private String compressShot(String pngPath) {
+		if (pngPath == null) return null;
+		try {
+			java.io.File src = new java.io.File(pngPath);
+			java.awt.image.BufferedImage img = javax.imageio.ImageIO.read(src);
+			if (img == null) return pngPath; // not a readable image - leave as-is
+			int w = img.getWidth(), h = img.getHeight();
+			int tw = Math.min(w, SHOT_MAX_WIDTH);
+			int th = (int) Math.round(h * (tw / (double) w));
+			java.awt.image.BufferedImage out =
+				new java.awt.image.BufferedImage(tw, th, java.awt.image.BufferedImage.TYPE_INT_RGB);
+			java.awt.Graphics2D g = out.createGraphics();
+			g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION,
+				java.awt.RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+			g.setRenderingHint(java.awt.RenderingHints.KEY_RENDERING,
+				java.awt.RenderingHints.VALUE_RENDER_QUALITY);
+			g.drawImage(img, 0, 0, tw, th, null);
+			g.dispose();
+			String jpgPath = pngPath.substring(0, pngPath.length() - 4) + ".jpg";
+			javax.imageio.ImageWriter writer =
+				javax.imageio.ImageIO.getImageWritersByFormatName("jpg").next();
+			javax.imageio.ImageWriteParam wp = writer.getDefaultWriteParam();
+			wp.setCompressionMode(javax.imageio.ImageWriteParam.MODE_EXPLICIT);
+			wp.setCompressionQuality(SHOT_JPEG_QUALITY);
+			try (javax.imageio.stream.ImageOutputStream ios =
+					new javax.imageio.stream.FileImageOutputStream(new java.io.File(jpgPath))) {
+				writer.setOutput(ios);
+				writer.write(null, new javax.imageio.IIOImage(out, null, null), wp);
+			} finally {
+				writer.dispose();
+			}
+			if (!src.delete()) src.deleteOnExit(); // drop the bulky PNG
+			return jpgPath;
+		} catch (Exception e) {
+			System.out.println("[WARN] Screenshot compression failed - keeping PNG: "
+				+ e.getClass().getSimpleName());
+			return pngPath;
 		}
 	}
 }
