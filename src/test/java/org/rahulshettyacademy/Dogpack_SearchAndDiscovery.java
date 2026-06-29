@@ -171,6 +171,8 @@ public class Dogpack_SearchAndDiscovery extends AndroidBaseTest {
 		// like + comment on the post
 		search.clickHashtagLike();
 		search.clickHashtagComment();
+		// focus the input so the composer toolbar (image/GIF icons) renders
+		search.focusCommentInput();
 		// open the image picker - this triggers the photos/media permission dialog
 		search.clickCommentAddImage();
 		// handle the permission popup(s) BEFORE closing: tap 'Allow all' on the

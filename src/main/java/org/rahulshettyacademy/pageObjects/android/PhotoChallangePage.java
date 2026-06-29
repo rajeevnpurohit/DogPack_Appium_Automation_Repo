@@ -17,7 +17,9 @@ import io.appium.java_client.android.nativekey.KeyEvent;
 import io.appium.java_client.pagefactory.AndroidFindBy;
 import io.appium.java_client.pagefactory.AppiumFieldDecorator;
 import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.TimeoutException;
+import java.util.Collections;
+import org.openqa.selenium.interactions.PointerInput;
+import org.openqa.selenium.interactions.Sequence;
 
 public class PhotoChallangePage extends AndroidActions {
 
@@ -29,13 +31,13 @@ public class PhotoChallangePage extends AndroidActions {
 		PageFactory.initElements(new AppiumFieldDecorator(driver, Duration.ofSeconds(10)), this);
 	}
 
-	@AndroidFindBy(xpath = "//android.view.ViewGroup[@content-desc=\"feed-challenge\"]/android.view.ViewGroup/android.widget.ImageView")
+	@AndroidFindBy(accessibility = "feed-challenge")
 	private WebElement feedChallengeBtn;
 
-	@AndroidFindBy(xpath = "//android.widget.TextView[@text=\"Vote on yesterday’s challenge:\"]")
+	@AndroidFindBy(xpath = "//android.widget.TextView[@text=\"Vote on yesterday's challenge:\"]")
 	private WebElement yesterdayChallengeLabel;
 
-	@AndroidFindBy(xpath = "//android.widget.TextView[@text=\"Today’s challenge:\"]")
+	@AndroidFindBy(xpath = "//android.widget.TextView[@text=\"Today's challenge:\"]")
 	private WebElement todayChallengeLabel;
 
 	@AndroidFindBy(xpath = "//android.widget.TextView[@text=\"Vote\"]")
@@ -118,7 +120,7 @@ public class PhotoChallangePage extends AndroidActions {
 			driver.findElement(AppiumBy.androidUIAutomator("new UiScrollable(new UiSelector().scrollable(true))"
 					+ ".setAsVerticalList()" + ".scrollTextIntoView(\"Enter\")"));
 		} catch (Exception e) {
-			// fallback (kuch UIs me yeh better kaam karta hai)
+			// fallback
 			driver.findElement(AppiumBy.androidUIAutomator("new UiScrollable(new UiSelector().scrollable(true))"
 					+ ".scrollIntoView(new UiSelector().text(\"Enter\"))"));
 		}
@@ -167,9 +169,6 @@ public class PhotoChallangePage extends AndroidActions {
 		System.out.println("[FLOW] DeleteChallengePhotoCancelOption: opening delete dialog then Cancel");
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 		try {
-			// wait.until(ExpectedConditions.visibilityOf(Change_deleteBtn));
-			// wait.until(ExpectedConditions.elementToBeClickable(Change_deleteBtn)).click();
-			// Open change/delete sheet
 			wait.ignoring(org.openqa.selenium.StaleElementReferenceException.class)
 					.until(ExpectedConditions.elementToBeClickable(Change_deleteBtn)).click();
 
@@ -193,6 +192,12 @@ public class PhotoChallangePage extends AndroidActions {
 		wait.until(ExpectedConditions.visibilityOf(deleteThisPhotoLabel));
 		wait.until(ExpectedConditions.visibilityOf(deletePhoto));
 		wait.until(ExpectedConditions.elementToBeClickable(deletePhoto)).click();
+
+		// After deleting, return to the challenge/join screen via device Back.
+		// (Robust + locale-independent; the in-app back arrow's content-desc embeds
+		// the date-dependent challenge title, so we avoid matching on it.)
+		driver.pressKey(new KeyEvent(AndroidKey.BACK));
+		System.out.println("[ACTION] Pressed device Back to return to the join screen");
 
 		wait.until(ExpectedConditions.visibilityOf(joinTheChallenge)); // back to join screen
 	}
@@ -233,38 +238,54 @@ public class PhotoChallangePage extends AndroidActions {
 
 	}
 
+	/**
+	 * Scrolls the challenge screen down until "Previous challenges and winners"
+	 * enters the view tree, then returns. Uses a PointerInput swipe loop so the
+	 * list is physically rendered (UiScrollable.scrollTextIntoView fails silently
+	 * when the target is in a virtualized/lazy list and not yet inflated).
+	 * Implicit wait is dropped to 0 during checks so each negative findElements
+	 * returns instantly. Restored in finally.
+	 */
 	public void scrollToPreviousChallenges() {
+		By prevLabel = AppiumBy.xpath("//android.widget.TextView[@text='Previous challenges and winners']");
+		Duration origImplicit = Duration.ofSeconds(10);
+		driver.manage().timeouts().implicitlyWait(Duration.ZERO);
 		try {
-			driver.findElement(AppiumBy.androidUIAutomator("new UiScrollable(new UiSelector().scrollable(true))"
-					+ ".setAsVerticalList()" + ".scrollTextIntoView(\"Previous challenges and winners\")"));
-		} catch (Exception e) {
-			// fallback (kuch UIs me yeh better kaam karta hai)
-			driver.findElement(AppiumBy.androidUIAutomator("new UiScrollable(new UiSelector().scrollable(true))"
-					+ ".scrollIntoView(new UiSelector().text(\"Previous challenges and winners\"))"));
+			for (int i = 0; i < 15; i++) {
+				if (!driver.findElements(prevLabel).isEmpty()) {
+					System.out.println("[ACTION] 'Previous challenges and winners' in view after " + i + " scroll(s)");
+					return;
+				}
+				scrollDownSmall();
+				try { Thread.sleep(400); } catch (InterruptedException ignored) {}
+			}
+			// Final check after last scroll
+			if (!driver.findElements(prevLabel).isEmpty()) {
+				System.out.println("[ACTION] 'Previous challenges and winners' in view after 15 scroll(s)");
+				return;
+			}
+			throw new RuntimeException("'Previous challenges and winners' not found after 15 scrolls");
+		} finally {
+			driver.manage().timeouts().implicitlyWait(origImplicit);
 		}
 	}
 
 	public void clickViewAllFirstOption() {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
-		// Count how many "View all" dikh rahe hain
 		int count = driver.findElements(AppiumBy.xpath("//android.widget.TextView[@text='View all']")).size();
 
 		if (count == 1) {
-			// Sirf ek button hai -> single wala click
 			wait.until(ExpectedConditions.elementToBeClickable(viewAllSingle)).click();
 		} else if (count > 1) {
-			// Multiple buttons hain -> pehla wala click
 			wait.until(ExpectedConditions.elementToBeClickable(viewAllMultipleOption1)).click();
 		} else {
-			// Screen par abhi dikh hi nahi raha -> scroll karke retry
 			try {
 				driver.findElement(AppiumBy.androidUIAutomator(
 						"new UiScrollable(new UiSelector().scrollable(true))" + ".scrollTextIntoView(\"View all\")"));
 			} catch (Exception ignore) {
 			}
 
-			// Retry after scroll
 			count = driver.findElements(AppiumBy.xpath("//android.widget.TextView[@text='View all']")).size();
 
 			if (count == 0) {
@@ -290,7 +311,6 @@ public class PhotoChallangePage extends AndroidActions {
 		try {
 			wait.until(ExpectedConditions.visibilityOfElementLocated(upcomingChallengesLabelBy));
 		} catch (Exception e) {
-			// off-screen hua toh scroll karke dubara try
 			driver.findElement(AppiumBy.androidUIAutomator("new UiScrollable(new UiSelector().scrollable(true))"
 					+ ".scrollTextIntoView(\"Upcoming challenges\")"));
 			wait.until(ExpectedConditions.visibilityOfElementLocated(upcomingChallengesLabelBy));
@@ -306,7 +326,6 @@ public class PhotoChallangePage extends AndroidActions {
 
 		int count = driver.findElements(allViewAll).size();
 
-		// agar screen par na mile to ek scroll try
 		if (count == 0) {
 			try {
 				driver.findElement(AppiumBy.androidUIAutomator(
@@ -319,15 +338,12 @@ public class PhotoChallangePage extends AndroidActions {
 		}
 
 		if (count >= 2) {
-			// multiple hain -> specifically SECOND pe click
 			try {
 				wait.until(ExpectedConditions.elementToBeClickable(viewAllMultipleOption2)).click();
 			} catch (StaleElementReferenceException | TimeoutException e) {
-				// fallback: By se dubara locate karke click
 				wait.until(ExpectedConditions.elementToBeClickable(secondViewAll)).click();
 			}
 		} else {
-			// sirf ek hai -> single pe click
 			wait.until(ExpectedConditions.elementToBeClickable(viewAllSingle)).click();
 		}
 	}
@@ -345,7 +361,6 @@ public class PhotoChallangePage extends AndroidActions {
 		try {
 			wait.until(ExpectedConditions.visibilityOfElementLocated(PreviousChallengesLabelBy));
 		} catch (Exception e) {
-			// off-screen hua toh scroll karke dubara try
 			driver.findElement(AppiumBy.androidUIAutomator("new UiScrollable(new UiSelector().scrollable(true))"
 					+ ".scrollTextIntoView(\"Previous challenges and winners\")"));
 			wait.until(ExpectedConditions.visibilityOfElementLocated(PreviousChallengesLabelBy));
@@ -373,12 +388,10 @@ public class PhotoChallangePage extends AndroidActions {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
 		try {
-			// ✅ Case 1: Check if upComingOption1 exists and click
 			if (upComingOption1.isDisplayed()) {
 				wait.until(ExpectedConditions.elementToBeClickable(upComingOption1)).click();
 				System.out.println("[ACTION] Clicked on Upcoming Option");
 
-				// ✅ Case 2: Handle popup after clicking
 				try {
 					if (driver.findElements(By.xpath("//android.widget.TextView[@text='Go to settings']")).size() > 0) {
 						wait.until(ExpectedConditions.elementToBeClickable(goToSettings)).click();
@@ -434,34 +447,27 @@ public class PhotoChallangePage extends AndroidActions {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
 		try {
-			// ✅ Step 1: Check if previous0 is visible and click
 			if (previous0.isDisplayed()) {
 				wait.until(ExpectedConditions.elementToBeClickable(previous0)).click();
 				System.out.println("[ACTION] Clicked on Previous Challenge Option");
 
-				// ✅ Step 2: Wait for "View winners" button and click
 				wait.until(ExpectedConditions.visibilityOf(viewWinners));
 				wait.until(ExpectedConditions.elementToBeClickable(viewWinners)).click();
 				System.out.println("[ACTION] Clicked on 'View winners'");
 
-				// ✅ Step 3: Wait for winner profile and click
 				wait.until(ExpectedConditions.visibilityOf(winnerOne));
 				wait.until(ExpectedConditions.elementToBeClickable(winnerOne)).click();
 				System.out.println("[ACTION] Clicked on Winner Profile");
 
-				// ✅ Step 4: Press back to close modal window
 				driver.pressKey(new KeyEvent(AndroidKey.BACK));
 				System.out.println("[FLOW] Closed modal window");
 
-				// ✅ Step 5: Wait for winner profile to reappear
 				wait.until(ExpectedConditions.visibilityOf(winnerOne));
 				System.out.println("[INFO] Winner profile visible again");
 
-				// ✅ Step 6: Press back to return to challenge screen
 				driver.pressKey(new KeyEvent(AndroidKey.BACK));
 				System.out.println("[FLOW] Navigated back to challenge screen");
 
-				// ✅ Step 7: Wait for PreviousChallengesLabelBy to confirm screen
 				wait.until(ExpectedConditions.visibilityOfElementLocated(PreviousChallengesLabelBy));
 				System.out.println("[INFO] Challenge screen loaded");
 
@@ -488,10 +494,8 @@ public class PhotoChallangePage extends AndroidActions {
 
 	public void navigatesToLeaderShipBoard() {
 		System.out.println("[FLOW] navigatesToLeaderShipBoard: opening the Leaderboard");
-		// Step 1: Click on Leaderboard tab using UIAutomator
 		driver.findElement(AppiumBy.androidUIAutomator("new UiSelector().text(\"Leaderboard\")")).click();
 
-		// Step 2: Wait until any one of the winner elements is visible
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 		wait.until(ExpectedConditions.or(ExpectedConditions.visibilityOf(current),
 				ExpectedConditions.visibilityOf(Last7Days), ExpectedConditions.visibilityOf(Last30Days),
@@ -505,30 +509,24 @@ public class PhotoChallangePage extends AndroidActions {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
 		try {
-			// Wait for visibility and clickability of Last7Days tab
 			wait.until(ExpectedConditions.visibilityOf(Last7Days));
 			wait.until(ExpectedConditions.elementToBeClickable(Last7Days)).click();
 			System.out.println("[ACTION] Clicked on 'Last 7 Days' tab");
 
-			// Wait for winnerOne to be visible as confirmation
 			wait.until(ExpectedConditions.visibilityOf(winnerOne));
 			System.out.println("[FLOW] 'winnerOne' element is visible. Navigation successful.");
 
-			// Wait for visibility and clickability of Last30Days tab
 			wait.until(ExpectedConditions.visibilityOf(Last30Days));
 			wait.until(ExpectedConditions.elementToBeClickable(Last30Days)).click();
 			System.out.println("[ACTION] Clicked on 'Last 30 Days' tab");
 
-			// Wait for winnerOne to be visible as confirmation
 			wait.until(ExpectedConditions.visibilityOf(winnerOne));
 			System.out.println("[FLOW] 'winnerOne' element is visible. Navigation successful.");
-			
-			// Wait for visibility and clickability of AllTime tab
+
 			wait.until(ExpectedConditions.visibilityOf(allTime));
 			wait.until(ExpectedConditions.elementToBeClickable(allTime)).click();
 			System.out.println("[ACTION] Clicked on 'AllTime' tab");
-			
-			// Wait for winnerOne to be visible as confirmation
+
 			wait.until(ExpectedConditions.visibilityOf(winnerOne));
 			System.out.println("[FLOW] 'winnerOne' element is visible. Navigation successful.");
 
@@ -539,7 +537,6 @@ public class PhotoChallangePage extends AndroidActions {
 		}
 	}
 
-	
 	@AndroidFindBy(xpath = "//android.view.ViewGroup[@content-desc=\"other_messag\"]")
 	private WebElement winnerMessageBtn;
 
@@ -548,18 +545,15 @@ public class PhotoChallangePage extends AndroidActions {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
 		try {
-			// Step 1: Wait for winnerOne to be visible and clickable
 			wait.until(ExpectedConditions.visibilityOf(winnerOne));
 			wait.until(ExpectedConditions.elementToBeClickable(winnerOne)).click();
 			System.out.println("[ACTION] Clicked on winner profile");
 
-			// Step 2: Wait for winnerMessageBtn to confirm navigation
 			wait.until(ExpectedConditions.visibilityOf(winnerMessageBtn));
 			System.out.println("[FLOW] Winner message button is visible. Navigation successful.");
 
 		} catch (TimeoutException e) {
 			System.out.println("[WARN] Timeout while navigating to winner profile: " + e.getMessage());
-			// Optionally take screenshot or log to report
 		} catch (Exception e) {
 			System.out.println("[WARN] Unexpected error during winner profile navigation: " + e.getMessage());
 		}
@@ -621,45 +615,35 @@ public class PhotoChallangePage extends AndroidActions {
 			System.out.println("[WARN] photo Permission Popup not displayed.");
 		}
 
-//		// Hide Recoding feature using back button
-//		driver.pressKey(new KeyEvent(AndroidKey.BACK));
-//		try {
-//			Thread.sleep(3000);
-//		} catch (Exception e) {
-//			// TODO: handle exception
-//		}
 		driver.pressKey(new KeyEvent(AndroidKey.BACK));
 		wait.until(ExpectedConditions.visibilityOf(winnerMessageBtn));
 
 	}
+
 	@AndroidFindBy(xpath = "//android.view.ViewGroup[@content-desc=\"go_to_chat\"]/android.widget.ImageView")
-	private WebElement threeDot;	
+	private WebElement threeDot;
 
 	@AndroidFindBy(xpath = "//android.widget.TextView[@text=\"Message\"]")
 	private WebElement messageAction;
-	
-	
+
 	@AndroidFindBy(xpath = "//android.widget.TextView[@text=\"Copy Profile URL\"]")
 	private WebElement copyURLAction;
-	
-	
+
 	@AndroidFindBy(xpath = "//android.widget.TextView[@text=\"Report this user as inappropriate\"]")
 	private WebElement reportUserInapproAction;
-	
 
 	@AndroidFindBy(xpath = "//android.widget.TextView[@text=\"Block user\"]")
 	private WebElement blockUser;
-	
-	
+
 	@AndroidFindBy(xpath = "//android.widget.TextView[@text=\"Cancel\"]")
 	private WebElement cancelAction;
-	
+
 	@AndroidFindBy(accessibility = "onConfirm")
 	private WebElement onConfirmAction;
-	
+
 	@AndroidFindBy(accessibility = "onCancel")
 	private WebElement onCancelAction;
-	
+
 	@AndroidFindBy(xpath = "//android.widget.TextView[@text=\"User reported successfully.\"]")
 	private WebElement reportMessage;
 
@@ -686,9 +670,7 @@ public class PhotoChallangePage extends AndroidActions {
 	private WebElement submitReportBtn;
 
 	/**
-	 * Click that tolerates StaleElementReferenceException: the action menu
-	 * re-renders between locate and click, which can stale the reference.
-	 * Re-locates and retries up to 3 times before giving up.
+	 * Click that tolerates StaleElementReferenceException.
 	 */
 	private void clickStaleSafe(WebElement el) {
 		WebDriverWait w = new WebDriverWait(driver, Duration.ofSeconds(10));
@@ -711,10 +693,7 @@ public class PhotoChallangePage extends AndroidActions {
 	}
 
 	/**
-	 * Best-effort click for conditional UI such as system permission
-	 * dialogs. Clicks the element if it appears within a short window;
-	 * if it never shows (e.g. permission already granted on a prior run),
-	 * it is skipped instead of failing the test.
+	 * Best-effort click for conditional UI such as system permission dialogs.
 	 */
 	private void clickIfPresent(WebElement el) {
 		try {
@@ -725,17 +704,17 @@ public class PhotoChallangePage extends AndroidActions {
 		}
 	}
 
-	public void ThreeDotActionPerformed() 
+	public void ThreeDotActionPerformed()
 	{
 		System.out.println("[FLOW] ThreeDotActionPerformed: winner 3-dot menu (message/copy URL/report/block)");
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 		wait.until(ExpectedConditions.visibilityOf(threeDot));
 		wait.until(ExpectedConditions.elementToBeClickable(threeDot)).click();
-		
+
 		clickStaleSafe(messageAction);
 		wait.until(ExpectedConditions.visibilityOf(chatInput));
 		driver.pressKey(new KeyEvent(AndroidKey.BACK));
-		
+
 		wait.until(ExpectedConditions.visibilityOf(threeDot));
 		wait.until(ExpectedConditions.elementToBeClickable(threeDot)).click();
 		wait.until(ExpectedConditions.visibilityOf(copyURLAction));
@@ -743,40 +722,34 @@ public class PhotoChallangePage extends AndroidActions {
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		wait.until(ExpectedConditions.visibilityOf(threeDot));
 		wait.until(ExpectedConditions.elementToBeClickable(threeDot)).click();
 		wait.until(ExpectedConditions.visibilityOf(reportUserInapproAction));
 		wait.until(ExpectedConditions.elementToBeClickable(reportUserInapproAction)).click();
 
-		// Enter a reason in the "Type a message" box
 		wait.until(ExpectedConditions.visibilityOf(typeMessageBox));
 		typeMessageBox.click();
 		typeMessageBox.sendKeys("Reporting user for Automatoin Testing");
 
-		// Attach an image: Upload Image -> grant permission -> pick -> Done
 		wait.until(ExpectedConditions.elementToBeClickable(uploadImageOption)).click();
-		clickIfPresent(whileUsingAppBtn);   // system permission dialog (best-effort)
-		clickIfPresent(allowAllBtn);        // system permission dialog (best-effort)
+		clickIfPresent(whileUsingAppBtn);
+		clickIfPresent(allowAllBtn);
 		wait.until(ExpectedConditions.elementToBeClickable(selectImage)).click();
 		wait.until(ExpectedConditions.elementToBeClickable(doneBtn)).click();
 
-		// Submit the report
 		wait.until(ExpectedConditions.elementToBeClickable(submitReportBtn)).click();
 
-		// onConfirmAction click DISABLED for now:
-		// wait.until(ExpectedConditions.elementToBeClickable(onConfirmAction)).click();
 		wait.until(ExpectedConditions.invisibilityOf(reportMessage));
-		
+
 		wait.until(ExpectedConditions.visibilityOf(threeDot));
 		wait.until(ExpectedConditions.elementToBeClickable(threeDot)).click();
 		wait.until(ExpectedConditions.visibilityOf(blockUser));
 		wait.until(ExpectedConditions.elementToBeClickable(blockUser)).click();
 		wait.until(ExpectedConditions.elementToBeClickable(onCancelAction)).click();
-		
+
 		wait.until(ExpectedConditions.visibilityOf(threeDot));
 		wait.until(ExpectedConditions.elementToBeClickable(threeDot)).click();
 		wait.until(ExpectedConditions.visibilityOf(cancelAction));
@@ -784,17 +757,14 @@ public class PhotoChallangePage extends AndroidActions {
 		driver.pressKey(new KeyEvent(AndroidKey.BACK));
 		wait.until(ExpectedConditions.visibilityOf(winnerOne));
 	}
-	
+
 	public void navigatesToResultBoard() {
 		System.out.println("[FLOW] navigatesToResultBoard: opening My Results");
-		// Step 1: Click on the "My Results" tab using xpath
 		driver.findElement(AppiumBy.xpath("//android.widget.TextView[@text=\"My Results\"]")).click();
 
-		// Step 2: Wait until any one of the winner elements is visible
 		try {
 			Thread.sleep(5000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -807,6 +777,32 @@ public class PhotoChallangePage extends AndroidActions {
 		wait.until(ExpectedConditions.visibilityOf(voteBtnChallenge));
 		wait.until(ExpectedConditions.elementToBeClickable(voteBtnChallenge)).click();
 
+	}
+
+	/**
+	 * Half-screen PointerInput swipe downward (~65% -> 35% of screen height).
+	 * Defined locally because AndroidActions does not expose this granularity;
+	 * scrollDownTwice() uses a tiny mobile:scrollGesture which is insufficient
+	 * to reach 'Previous challenges and winners' on the challenge screen.
+	 */
+	private void scrollDownSmall() {
+		try {
+			org.openqa.selenium.Dimension size = driver.manage().window().getSize();
+			int startX = size.width / 2;
+			int startY = (int) (size.height * 0.65);
+			int endY   = (int) (size.height * 0.35);
+			PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+			Sequence swipe = new Sequence(finger, 1);
+			swipe.addAction(finger.createPointerMove(Duration.ZERO,
+					PointerInput.Origin.viewport(), startX, startY));
+			swipe.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+			swipe.addAction(finger.createPointerMove(Duration.ofMillis(500),
+					PointerInput.Origin.viewport(), startX, endY));
+			swipe.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+			driver.perform(Collections.singletonList(swipe));
+		} catch (Exception e) {
+			System.out.println("[WARN] scrollDownSmall failed: " + e.getMessage());
+		}
 	}
 
 }

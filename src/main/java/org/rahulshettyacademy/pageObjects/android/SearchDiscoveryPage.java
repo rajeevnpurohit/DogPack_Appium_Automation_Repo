@@ -509,6 +509,19 @@ public class SearchDiscoveryPage extends AndroidActions {
 		System.out.println("[ACTION] Clicked Comment (hashtag post)");
 	}
 
+	/**
+	 * Taps the comment reply input to focus it and raise the keyboard.
+	 * This causes the comment composer toolbar (image / GIF icons) to
+	 * render into the view tree - they are absent until the input is focused.
+	 */
+	public void focusCommentInput() {
+		wait.until(ExpectedConditions.elementToBeClickable(commentReplyInput)).click();
+		// Wait for the keyboard animation to complete and the composer toolbar
+		// (image / GIF icons) to fully render into the view tree before returning.
+		try { Thread.sleep(1200); } catch (InterruptedException ignored) {}
+		System.out.println("[ACTION] Focused comment input (toolbar now visible)");
+	}
+
 	/** click the header back button. */
 	public void clickBack() {
 		wait.until(ExpectedConditions.elementToBeClickable(backBtn)).click();

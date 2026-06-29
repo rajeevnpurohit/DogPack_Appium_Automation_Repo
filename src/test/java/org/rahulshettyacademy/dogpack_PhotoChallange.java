@@ -8,6 +8,12 @@ import org.rahulshettyacademy.TestUtils.AndroidBaseTest;
 import org.rahulshettyacademy.pageObjects.android.LoginPage;
 import org.rahulshettyacademy.pageObjects.android.PhotoChallangePage;
 import org.testng.annotations.BeforeClass;
+import java.time.Duration;
+import io.appium.java_client.AppiumBy;
+import io.appium.java_client.android.nativekey.AndroidKey;
+import io.appium.java_client.android.nativekey.KeyEvent;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -118,4 +124,105 @@ public class dogpack_PhotoChallange extends AndroidBaseTest {
 	}
 
 	
+
+	/**
+	 * Cleanup: re-login to get a guaranteed clean home screen, then check if a
+	 * challenge photo was submitted during this TC run and delete it.
+	 * This ensures joinChallenge always sees the 'Enter' button on the next run
+	 * (which only appears when no photo has been submitted today).
+	 *
+	 * Flow: terminateApp + activateApp (clean slate) → re-login → open Photo
+	 * Challenge → scroll to Today's Challenge → if 'View entry' present → delete.
+	 * Every action is best-effort (try/catch) so cleanup NEVER fails the suite.
+	 */
+	@Test(priority = 99, alwaysRun = true)
+	public void cleanupChallengeEntry() {
+		System.out.println("[FLOW] cleanupChallengeEntry: re-login + checking for leftover challenge photo");
+		try {
+			// --- Step 1: terminate + relaunch app for a guaranteed clean state ---
+			try {
+				driver.terminateApp("com.dogpack");
+				Thread.sleep(1500);
+				driver.activateApp("com.dogpack");
+				Thread.sleep(2000);
+				System.out.println("[ACTION] cleanup: app relaunched");
+			} catch (Exception e) {
+				System.out.println("[WARN] cleanup: app relaunch failed: " + e.getMessage());
+				return;
+			}
+			// --- Step 2: re-login with credentials from LoginData.json ---
+			try {
+				java.util.List<java.util.HashMap<String, String>> data = getJsonData(
+					System.getProperty("user.dir")
+					+ "//src//test//java//org//rahulshettyacademy//testData//LoginData.json");
+				String email    = data.get(0).get("email");
+				String password = data.get(0).get("password");
+				login.scrollToLogin();
+				login.NavigateToLogin();
+				login.setEmailPassword(email, password);
+				login.clickOnLoginSubmit();
+				login.CompleteLoginProccess();
+				System.out.println("[ACTION] cleanup: re-login complete");
+			} catch (Exception e) {
+				System.out.println("[WARN] cleanup: re-login failed: " + e.getMessage());
+				return;
+			}
+			Thread.sleep(1500); // let home feed settle
+			// --- Step 3: open Photo Challenge ---
+			try {
+				new WebDriverWait(driver, Duration.ofSeconds(10))
+					.until(ExpectedConditions.elementToBeClickable(
+						AppiumBy.accessibilityId("feed-challenge"))).click();
+				System.out.println("[ACTION] cleanup: opened Photo Challenge screen");
+			} catch (Exception e) {
+				System.out.println("[INFO] cleanup: could not open Photo Challenge - skipping: " + e.getMessage());
+				return;
+			}
+			Thread.sleep(1500); // let challenge screen settle
+			// --- Step 4: scroll to find 'View entry' (today's submitted photo) ---
+			boolean viewEntryFound = false;
+			driver.manage().timeouts().implicitlyWait(Duration.ZERO);
+			try {
+				for (int i = 0; i < 6; i++) {
+					if (!driver.findElements(AppiumBy.xpath(
+							"//android.widget.TextView[@text='View entry']")).isEmpty()) {
+						viewEntryFound = true; break;
+					}
+					photo.scrollDownTwice();
+					Thread.sleep(400);
+				}
+			} catch (Exception ignore) {
+			} finally {
+				driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+			}
+			if (!viewEntryFound) {
+				System.out.println("[INFO] cleanup: no 'View entry' found - nothing to delete");
+				return;
+			}
+			System.out.println("[ACTION] cleanup: 'View entry' found - deleting submitted photo");
+			// --- Step 5: open the delete sheet ---
+			try {
+				new WebDriverWait(driver, Duration.ofSeconds(8))
+					.until(ExpectedConditions.elementToBeClickable(AppiumBy.xpath(
+						"//android.widget.ScrollView/android.view.ViewGroup"
+						+ "/android.view.ViewGroup/android.view.ViewGroup[3]/android.widget.ImageView"))).click();
+				System.out.println("[ACTION] cleanup: opened delete sheet");
+			} catch (Exception e) {
+				System.out.println("[WARN] cleanup: could not open delete sheet: " + e.getMessage());
+				return;
+			}
+			// --- Step 6: tap Delete on the confirmation dialog ---
+			try {
+				new WebDriverWait(driver, Duration.ofSeconds(8))
+					.until(ExpectedConditions.elementToBeClickable(
+						AppiumBy.xpath("//android.widget.TextView[@text='Delete']"))).click();
+				System.out.println("[ACTION] cleanup: photo deleted - TC is clean for next run");
+			} catch (Exception e) {
+				System.out.println("[WARN] cleanup: Delete confirm failed: " + e.getMessage());
+			}
+		} catch (Exception e) {
+			System.out.println("[WARN] cleanupChallengeEntry unexpected error: " + e.getMessage());
+		}
+	}
+
 }
