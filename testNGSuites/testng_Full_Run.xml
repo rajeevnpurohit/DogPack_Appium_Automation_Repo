@@ -119,12 +119,12 @@
 <!--             ================================================================ -->
             <class name="org.rahulshettyacademy.Dogpack_PostingExperience" />
             <class name="org.rahulshettyacademy.Dogpack_PostingExperienceTextPost" />
-            <class name="org.rahulshettyacademy.dogpack_PhotoChallange" />
+<!--            <class name="org.rahulshettyacademy.dogpack_PhotoChallange" />-->
 
 <!--             ================================================================ -->
 <!--                 PHASE 6 - SETTINGS and ACTIVITY-->
 <!--             ================================================================ -->
-            <class name="org.rahulshettyacademy.Dogpack_Settings" />
+<!--            <class name="org.rahulshettyacademy.Dogpack_Settings" />-->
  
 <!--             ================================================================-->
 <!--                 PHASE 7 - PREMIUM / MONETIZATION FEATURES-->

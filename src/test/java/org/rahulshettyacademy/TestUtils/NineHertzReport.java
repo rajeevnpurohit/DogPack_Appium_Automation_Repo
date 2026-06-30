@@ -225,6 +225,8 @@ public final class NineHertzReport {
 
             // ---- summary strip
             h.append("<section class=\"summary\">");
+            String dogpackLogo = encodeDogPackLogo();
+            h.append("<div class=\"scard dogpackcard\"><img class=\"dp-logo\" src=\"").append(dogpackLogo != null ? dogpackLogo : "").append("\" alt=\"\"><div><div class=\"dp-name\">DogPack</div><div class=\"dp-sub\">Automation test report</div></div></div>");
             h.append("<div class=\"scard donutcard\"><div class=\"donut\" style=\"")
              .append("background:conic-gradient(var(--pass) 0 ").append(passPct).append("%, ")
              .append("var(--fail) ").append(passPct).append("% ").append(passPct + failPct).append("%, ")
@@ -396,6 +398,24 @@ public final class NineHertzReport {
         }
     }
 
+    private static String encodeDogPackLogo() {
+        String[] candidates = {
+            Paths.get(System.getProperty("user.dir"), "src", "test", "resources", "dogpack_logo.png").toString(),
+            Paths.get(System.getProperty("user.dir"), "reports", "dogpack_logo.png").toString(),
+            Paths.get(System.getProperty("user.dir"), "dogpack_logo.png").toString()
+        };
+        for (String c : candidates) {
+            try {
+                Path p = Paths.get(c);
+                if (Files.exists(p)) {
+                    return "data:image/png;base64,"
+                            + Base64.getEncoder().encodeToString(Files.readAllBytes(p));
+                }
+            } catch (Exception ignore) { }
+        }
+        return null;
+    }
+
     private static String encodeLogo() {
         String[] candidates = {
             Paths.get(System.getProperty("user.dir"), "src", "test", "resources", "ninehertz_logo.png").toString(),
@@ -462,11 +482,15 @@ public final class NineHertzReport {
         + ".pill{padding:6px 12px;border-radius:999px;font-size:12.5px;font-weight:600}"
         + ".pill.run{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.3)}"
         + ".pill.ts{background:rgba(255,255,255,.06);color:#bcd2d8;border:1px solid var(--sidebar-line)}"
-        + ".summary{display:grid;grid-template-columns:auto repeat(4,1fr);gap:5px;padding:6px 10px;flex:none}"
+        + ".summary{display:grid;grid-template-columns:auto auto repeat(4,1fr);gap:5px;padding:6px 10px;flex:none}"
         + ".scard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:10px 13px;box-shadow:var(--shadow)}"
         + ".scard .label{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);font-weight:600}"
         + ".scard .big{font-family:'Space Grotesk';font-weight:700;font-size:18px;margin-top:2px;word-break:break-word}"
         + ".scard .sub{font-size:11.5px;color:var(--ink-2);margin-top:1px}"
+        + ".dogpackcard{display:flex;align-items:center;gap:10px;min-width:160px;border:1.5px solid var(--brand);background:var(--brand-soft)}"
+        + ".dogpackcard .dp-logo{width:44px;height:44px;border-radius:10px;object-fit:cover;flex-shrink:0}"
+        + ".dogpackcard .dp-name{font-family:'Space Grotesk';font-weight:700;font-size:15px;color:var(--brand);line-height:1.15}"
+        + ".dogpackcard .dp-sub{font-size:11px;color:var(--ink-2);margin-top:2px}"
         + ".donutcard{display:flex;align-items:center;gap:12px;min-width:188px}"
         + ".donut{width:60px;height:60px;border-radius:50%;flex:none;display:grid;place-items:center;position:relative}"
         + ".donut::after{content:\"\";position:absolute;inset:8px;background:var(--card);border-radius:50%}"
