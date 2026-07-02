@@ -110,8 +110,14 @@ public class PhotoChallangePage extends AndroidActions {
 		wait.until(ExpectedConditions.visibilityOf(feedChallengeBtn));
 		wait.until(ExpectedConditions.elementToBeClickable(feedChallengeBtn)).click();
 
-		wait.until(ExpectedConditions.or(ExpectedConditions.visibilityOf(yesterdayChallengeLabel),
-				ExpectedConditions.visibilityOf(todayChallengeLabel)));
+		// Confirm the challenge screen opened by any challenge-action button being
+		// present. This covers every daily/entry state (not-entered -> Enter,
+		// already-entered -> View entry, yesterday votable -> Vote) and avoids the
+		// date-dependent "Today's/Yesterday's challenge" text labels, which can be
+		// absent at midnight rollover.
+		wait.until(ExpectedConditions.or(ExpectedConditions.visibilityOf(enterBtnChallenge),
+				ExpectedConditions.visibilityOf(viewEntry),
+				ExpectedConditions.visibilityOf(voteBtnChallenge)));
 
 	}
 
@@ -196,8 +202,8 @@ public class PhotoChallangePage extends AndroidActions {
 		// After deleting, return to the challenge/join screen via device Back.
 		// (Robust + locale-independent; the in-app back arrow's content-desc embeds
 		// the date-dependent challenge title, so we avoid matching on it.)
-		driver.pressKey(new KeyEvent(AndroidKey.BACK));
-		System.out.println("[ACTION] Pressed device Back to return to the join screen");
+		// driver.pressKey(new KeyEvent(AndroidKey.BACK));
+		// System.out.println("[ACTION] Pressed device Back to return to the join screen");
 
 		wait.until(ExpectedConditions.visibilityOf(joinTheChallenge)); // back to join screen
 	}
