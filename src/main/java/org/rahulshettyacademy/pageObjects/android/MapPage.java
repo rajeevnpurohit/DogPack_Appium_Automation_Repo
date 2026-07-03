@@ -287,6 +287,7 @@ public class MapPage extends AndroidActions {
 	public void ParkMap() throws InterruptedException {
 		System.out.println("[FLOW] ParkMap: filtering Dog Park markers");
 		dismissDogProfileSheetIfPresent();
+		ensureOnMapScreen();
 	    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 
 	    wait.until(ExpectedConditions.visibilityOf(mapParkBtn));
@@ -298,8 +299,12 @@ public class MapPage extends AndroidActions {
 	        driver.findElements(By.xpath("//android.view.View[@content-desc='Map Marker']"));
 
 	    if (parkMarkers.isEmpty()) {
-	        System.out.println("[ACTION] No business markers found. Tapping Dog Business filter again.");
-	        mapParkBtn.click();
+	        System.out.println("[ACTION] No park markers found. Tapping Dog Park filter again.");
+	        if (!driver.findElements(AppiumBy.accessibilityId("Dog Park")).isEmpty()) {
+	            mapParkBtn.click();
+	        } else {
+	            System.out.println("[WARN] Dog Park filter not present for re-toggle - skipping");
+	        }
 	        Thread.sleep(1200);
 	        return;
 	    }
@@ -600,6 +605,7 @@ public class MapPage extends AndroidActions {
 	public void DogBusiness() throws InterruptedException {
 		System.out.println("[FLOW] DogBusiness: filtering Dog Business markers");
 		dismissDogProfileSheetIfPresent();
+		ensureOnMapScreen();
 	    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 
 	    wait.until(ExpectedConditions.visibilityOf(mapBusinessBtn));
@@ -612,7 +618,11 @@ public class MapPage extends AndroidActions {
 
 	    if (businessMarkers.isEmpty()) {
 	        System.out.println("[ACTION] No business markers found. Tapping Dog Business filter again.");
-	        mapBusinessBtn.click();
+	        if (!driver.findElements(AppiumBy.accessibilityId("Dog Business")).isEmpty()) {
+	            mapBusinessBtn.click();
+	        } else {
+	            System.out.println("[WARN] Dog Business filter not present for re-toggle - skipping");
+	        }
 	        Thread.sleep(1200);
 	        return;
 	    }
@@ -672,6 +682,45 @@ public class MapPage extends AndroidActions {
 	 * Back is a verified fallback. Self-verifies after each attempt so it never
 	 * over-acts. Best-effort recovery helper - never throws.
 	 */
+	/**
+	 * Guarantees the app is back on the native map screen before map-filter
+	 * actions run. After the lodging/Booking.com detour the app can be left in
+	 * a WebView, list view, or detail screen where the search bar and filter
+	 * chips (Dog Business / Dog Park) are absent. Switches back to native
+	 * context if needed, then presses device Back (up to 4 times) until the map
+	 * search bar (mapSearchLocation) is visible. Best-effort: never throws.
+	 */
+	public void ensureOnMapScreen() {
+		try {
+			if (!"NATIVE_APP".equals(driver.getContext())) {
+				driver.context("NATIVE_APP");
+				System.out.println("[FLOW] ensureOnMapScreen: switched back to NATIVE_APP context");
+			}
+		} catch (Exception ignored) { }
+
+		By searchBar = AppiumBy.accessibilityId("mapSearchLocation");
+		driver.manage().timeouts().implicitlyWait(Duration.ZERO);
+		try {
+			for (int attempt = 0; attempt <= 4; attempt++) {
+				if (!driver.findElements(searchBar).isEmpty()) {
+					if (attempt > 0) {
+						System.out.println("[FLOW] ensureOnMapScreen: map visible after " + attempt + " Back press(es)");
+					}
+					return;
+				}
+				try { driver.pressKey(new KeyEvent(AndroidKey.BACK)); } catch (Exception ignored) { }
+				sleepQuiet(700);
+			}
+			if (driver.findElements(searchBar).isEmpty()) {
+				System.out.println("[WARN] ensureOnMapScreen: map search bar still not visible after 4 Back presses");
+			}
+		} catch (Exception e) {
+			System.out.println("[WARN] ensureOnMapScreen error: " + e.getMessage());
+		} finally {
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+		}
+	}
+
 	public void dismissDogProfileSheetIfPresent() {
 		if (!isDogProfileSheetPresent()) {
 			return;
@@ -1066,6 +1115,7 @@ public class MapPage extends AndroidActions {
 	public void searchByCurrentLocation() {
 		System.out.println("[FLOW] searchByCurrentLocation: searching by current location");
 		dismissDogProfileSheetIfPresent();
+		ensureOnMapScreen();
 
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 

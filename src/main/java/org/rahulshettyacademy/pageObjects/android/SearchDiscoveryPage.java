@@ -2,7 +2,11 @@ package org.rahulshettyacademy.pageObjects.android;
 
 import java.time.Duration;
 
+import java.util.Collections;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.interactions.PointerInput;
+import org.openqa.selenium.interactions.Sequence;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
@@ -499,8 +503,64 @@ public class SearchDiscoveryPage extends AndroidActions {
 
 	/** like the hashtag post. */
 	public void clickHashtagLike() {
+		// The like button on an opened hashtag post is often below the fold, so
+		// elementToBeClickable can resolve an off-screen element and the click
+		// misses/throws. Scroll it into view first (RN-safe PointerInput swipe
+		// loop), then assert it is actually visible before clicking.
+		final By likeBy = By.xpath(
+			"//android.view.ViewGroup[@content-desc=\"feed-like-Unlike-0\"]/android.widget.ImageView");
+		scrollLikeButtonIntoView(likeBy);
+		wait.until(ExpectedConditions.visibilityOfElementLocated(likeBy));
 		wait.until(ExpectedConditions.elementToBeClickable(hashtagLike)).click();
 		System.out.println("[ACTION] Clicked Like (hashtag post)");
+	}
+
+	/**
+	 * Scrolls the hashtag-post like button (feed-like-Unlike-0) into the
+	 * viewport. React Native ScrollViews are frequently not marked
+	 * scrollable(true), so UiScrollable is unreliable here; a coordinate
+	 * PointerInput swipe-up loop works regardless. Up to 6 swipes, checking
+	 * visibility after each; stops as soon as the element is on screen.
+	 * Best-effort: never throws (the caller asserts visibility afterwards).
+	 */
+	private void scrollLikeButtonIntoView(By likeBy) {
+		driver.manage().timeouts().implicitlyWait(Duration.ZERO);
+		try {
+			for (int attempt = 0; attempt < 6; attempt++) {
+				if (!driver.findElements(likeBy).isEmpty()
+					&& driver.findElements(likeBy).get(0).isDisplayed()) {
+					if (attempt > 0) {
+						System.out.println("[FLOW] Like button visible after " + attempt + " swipe(s)");
+					}
+					return;
+				}
+				swipeUpSmall();
+				try { Thread.sleep(400); } catch (InterruptedException ignored) {}
+			}
+			System.out.println("[INFO] Like button not confirmed visible after 6 swipes - "
+				+ "caller will assert visibility");
+		} catch (Exception e) {
+			System.out.println("[WARN] scrollLikeButtonIntoView error: " + e.getMessage());
+		} finally {
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+		}
+	}
+
+	/** Half-screen upward swipe (RN-safe) to reveal content below the fold. */
+	private void swipeUpSmall() {
+		Dimension size = driver.manage().window().getSize();
+		int centerX = size.getWidth() / 2;
+		int startY = (int) (size.getHeight() * 0.65);
+		int endY = (int) (size.getHeight() * 0.35);
+		PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+		Sequence swipe = new Sequence(finger, 1);
+		swipe.addAction(finger.createPointerMove(Duration.ZERO,
+			PointerInput.Origin.viewport(), centerX, startY));
+		swipe.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+		swipe.addAction(finger.createPointerMove(Duration.ofMillis(300),
+			PointerInput.Origin.viewport(), centerX, endY));
+		swipe.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+		driver.perform(Collections.singletonList(swipe));
 	}
 
 	/** open comments on the hashtag post. */

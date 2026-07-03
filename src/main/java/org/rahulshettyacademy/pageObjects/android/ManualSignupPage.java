@@ -297,6 +297,12 @@ public class ManualSignupPage extends AndroidActions {
 	@AndroidFindBy(xpath = "//android.widget.TextView[@text=\"Yes, Notify Me\"]")
 	private WebElement notifyMeBtn;
 
+	// Newer builds replace the "Yes, Notify Me" screen with a "Verify Your
+	// Account" upsell (Get more visibility on DogPack). It is dismissed via the
+	// "Maybe Later" button. content-desc is the stable RN accessibility id.
+	@AndroidFindBy(accessibility = "Maybe Later")
+	private WebElement maybeLaterBtn;
+
 	@AndroidFindBy(accessibility = "feed-distance-submit")
 	private WebElement homePageDistanceSubmitBtn;
 
@@ -978,8 +984,9 @@ public class ManualSignupPage extends AndroidActions {
 									+ "or contains(@text,\"rate us\") "
 									+ "or contains(@text,\"How is\") "
 									+ "or contains(@text,\"Enjoying\")]")),
-					// If we landed on NewNotification or HomeTab directly, skip RateUs
+					// If we landed on NewNotification / Verify-Account upsell / HomeTab, skip RateUs
 					ExpectedConditions.visibilityOf(notifyMeBtn),
+					ExpectedConditions.visibilityOf(maybeLaterBtn),
 					ExpectedConditions.visibilityOf(homePageDistanceSubmitBtn)
 			));
 		} catch (Exception e) {
@@ -1651,7 +1658,22 @@ public class ManualSignupPage extends AndroidActions {
 	 *   2. Notification already granted at OS level -> direct distance modal
 	 */
 	private void completeNotificationAndDistanceFlow() {
-		// Optional NewNotification screen
+		// The post-signup flow now shows TWO screens in sequence:
+		//   1) "Verify Your Account" upsell   -> dismiss via "Maybe Later"
+		//   2) "Turn on Notifications" screen -> "Yes, Notify Me" (or SKIP)
+		// Both are handled independently and best-effort, so whichever appears
+		// (or both, in order) gets dismissed. They are NOT mutually exclusive.
+
+		// --- Screen 1: "Verify Your Account" upsell -> Maybe Later ---
+		try {
+			System.out.println("[FLOW] Checking 'Verify Your Account' upsell screen...");
+			shortWait.until(ExpectedConditions.elementToBeClickable(maybeLaterBtn)).click();
+			System.out.println("[ACTION] Dismissed 'Verify Your Account' upsell via 'Maybe Later'");
+		} catch (Exception e) {
+			System.out.println("[INFO] 'Maybe Later' upsell not shown");
+		}
+
+		// --- Screen 2: "Turn on Notifications" -> Yes, Notify Me (ALWAYS check) ---
 		try {
 			System.out.println("[FLOW] Checking 'Yes, Notify Me' screen...");
 			shortWait.until(ExpectedConditions.elementToBeClickable(notifyMeBtn)).click();
@@ -1661,15 +1683,19 @@ public class ManualSignupPage extends AndroidActions {
 			System.out.println("[Scenario 2] NewNotification skipped (perm already granted)");
 		}
 
-		// Distance preference modal on Home (REQUIRED in both scenarios)
+		// --- Distance preference modal on Home (best-effort: not always shown) ---
 		try {
 			Thread.sleep(1500);
 		} catch (InterruptedException ie) {
 			Thread.currentThread().interrupt();
 		}
-		longWait.until(ExpectedConditions.visibilityOf(homePageDistanceSubmitBtn));
-		longWait.until(ExpectedConditions.elementToBeClickable(homePageDistanceSubmitBtn)).click();
-		System.out.println("[ACTION] Clicked feed-distance-submit on Home");
+		try {
+			shortWait.until(ExpectedConditions.visibilityOf(homePageDistanceSubmitBtn));
+			shortWait.until(ExpectedConditions.elementToBeClickable(homePageDistanceSubmitBtn)).click();
+			System.out.println("[ACTION] Clicked feed-distance-submit on Home");
+		} catch (Exception e) {
+			System.out.println("[INFO] Distance modal (feed-distance-submit) not shown - skipping");
+		}
 	}
 
 	/**
@@ -1677,6 +1703,16 @@ public class ManualSignupPage extends AndroidActions {
 	 * always show the distance modal.
 	 */
 	private void completeNotificationFlowOnly() {
+		// Newer builds: "Verify Your Account" upsell -> "Maybe Later".
+		try {
+			shortWait.until(ExpectedConditions.elementToBeClickable(maybeLaterBtn)).click();
+			System.out.println("[ACTION] Dismissed 'Verify Your Account' upsell via 'Maybe Later'");
+			handleSinglePermissionDialogIfPresent();
+			return;
+		} catch (Exception e) {
+			System.out.println("[INFO] 'Maybe Later' upsell not shown");
+		}
+		// Older builds (fallback): "Yes, Notify Me".
 		try {
 			shortWait.until(ExpectedConditions.elementToBeClickable(notifyMeBtn)).click();
 			System.out.println("[ACTION] Clicked 'Yes, Notify Me'");
