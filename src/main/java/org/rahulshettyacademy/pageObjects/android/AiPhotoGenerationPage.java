@@ -726,19 +726,52 @@ public class AiPhotoGenerationPage extends AndroidActions {
         WebElement card = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(THOUSAND_PACK_CARD_XPATH)));
         card.click();
-        log("[OK]       Tapped 1000 Pack card");
+        log("[OK]       Tapped 1000 Pack card (TextView)");
 
-        log("[STEP 3/3] Wait for 'Purchase 1000 Pack for <RUPEE>5,900.00' "
-                + "button (40s)");
-        WebDriverWait longWait = new WebDriverWait(driver, Duration.ofSeconds(40));
+        // The "1000 Pack" TextView tap sometimes does NOT register on the card
+        // (the clickable node is the parent card container, and after the lazy
+        // scroll the label can be at the very bottom / not yet interactable). The
+        // .click() succeeds without error but selection never takes, so the
+        // Purchase button never appears. Verify selection with a SHORT wait; if it
+        // did not take, re-tap the clickable ANCESTOR card container and retry.
+        log("[STEP 3/3] Confirm selection via Purchase button (short check + retry)");
+        By purchaseBtn = AppiumBy.xpath(PURCHASE_1000_PACK_BTN_XPATH);
+        WebDriverWait shortCheck = new WebDriverWait(driver, Duration.ofSeconds(8));
+        boolean selected = false;
         try {
-            longWait.until(ExpectedConditions.visibilityOfElementLocated(
-                    AppiumBy.xpath(PURCHASE_1000_PACK_BTN_XPATH)));
+            shortCheck.until(ExpectedConditions.visibilityOfElementLocated(purchaseBtn));
+            selected = true;
+        } catch (Exception ignore) {
+            log("[WARN]     Purchase button not shown after first tap - re-tapping "
+                    + "the card's clickable parent container");
+            try {
+                WebElement parentCard = wait.until(ExpectedConditions.elementToBeClickable(
+                        AppiumBy.xpath("//android.widget.TextView[@text=\"1000 Pack\"]"
+                                + "/ancestor::android.view.ViewGroup[@clickable=\"true\"][1]")));
+                parentCard.click();
+                log("[OK]       Re-tapped 1000 Pack card (parent container)");
+            } catch (Exception e2) {
+                log("[WARN]     Parent-container re-tap failed - retrying TextView tap: "
+                        + e2.getMessage().split("\n")[0]);
+                try {
+                    wait.until(ExpectedConditions.elementToBeClickable(
+                            AppiumBy.xpath(THOUSAND_PACK_CARD_XPATH))).click();
+                } catch (Exception ignore2) { }
+            }
+        }
+
+        if (!selected) {
+            WebDriverWait longWait = new WebDriverWait(driver, Duration.ofSeconds(40));
+            try {
+                longWait.until(ExpectedConditions.visibilityOfElementLocated(purchaseBtn));
+                log("[PASS]     1000 Pack selected after re-tap (Purchase button visible)");
+            } catch (Exception e) {
+                log("[FAIL]     Purchase 1000 Pack button not visible after retry.");
+                dumpVisibleText();
+                throw e;
+            }
+        } else {
             log("[PASS]     1000 Pack selected (Purchase button reflects price)");
-        } catch (Exception e) {
-            log("[FAIL]     Purchase 1000 Pack button not visible after 40s.");
-            dumpVisibleText();
-            throw e;
         }
     }
 

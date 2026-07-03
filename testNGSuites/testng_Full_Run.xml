@@ -133,7 +133,7 @@
 <!--            <class name="org.rahulshettyacademy.Dogpack_AiPhotoGeneration" />-->
 <!--            <class name="org.rahulshettyacademy.Dogpack_BusinessLogin" />-->
 <!--            <class name="org.rahulshettyacademy.Dogpack_BoostAccount_Business" />-->
-<!--            <class name="org.rahulshettyacademy.Dogpack_AiPhotoGeneration_Business" />-->
+            <class name="org.rahulshettyacademy.Dogpack_AiPhotoGeneration_Business" />
 <!--            <class name="org.rahulshettyacademy.Dogpack_Subscription_Business" />-->
 <!--            <class name="org.rahulshettyacademy.Dogpack_Subscription_Dog" />-->
 <!--            <class name="org.rahulshettyacademy.Dogpack_Notifications" />-->
@@ -149,7 +149,7 @@
 <!--            <class name="org.rahulshettyacademy.Dogpack_AccountDeletion_Business" />-->
 
 <!--            <class name="org.rahulshettyacademy.Dogpack_VideoFeed" />-->
-            <class name="org.rahulshettyacademy.Dogpack_SearchAndDiscovery" />
+<!--            <class name="org.rahulshettyacademy.Dogpack_SearchAndDiscovery" />-->
 
  
         </classes>
