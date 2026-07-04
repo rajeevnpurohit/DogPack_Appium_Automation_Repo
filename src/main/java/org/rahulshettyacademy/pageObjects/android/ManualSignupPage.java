@@ -5,6 +5,8 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -1112,26 +1114,66 @@ public class ManualSignupPage extends AndroidActions {
 
 	private void enterUsernameWithRetry(String username) {
 		System.out.println("[FLOW] Entering username: " + username);
-		WebElement field = wait.until(ExpectedConditions.elementToBeClickable(userNameField));
+		typeUsernameAndContinue(username);
+
+		// OPTION C: handle REPEATED "Username taken" modals.
+		// 1. Try up to 2 fresh COMPACT unique names ("Try another" = onCancel).
+		//    Compact names avoid the app username length limit that longer
+		//    run-scoped tokens can trip (surfacing as "Username taken").
+		// 2. If still rejected, click "Confirm" (onConfirm) so the APP
+		//    auto-generates a valid, unique username - immune to length AND
+		//    collision, whatever the rejection cause.
+		final int maxTryAnother = 2;
+		for (int attempt = 1; attempt <= maxTryAnother; attempt++) {
+			if (!isUsernameTakenModalShown()) {
+				return; // name accepted - moved past the username screen
+			}
+			System.out.println("[INFO] Username taken (attempt " + attempt
+					+ ") - retrying with a fresh compact name");
+			wait.until(ExpectedConditions.elementToBeClickable(modalCancelBtn)).click();
+			String retryName = compactUsernameToken();
+			typeUsernameAndContinue(retryName);
+			System.out.println("[ACTION] Retried with username: " + retryName);
+		}
+
+		// Still stuck on the modal after retries -> let the app create one.
+		if (isUsernameTakenModalShown()) {
+			System.out.println("[FALLBACK] Username still rejected after "
+					+ maxTryAnother + " retries - clicking Confirm to let the "
+					+ "app auto-generate a username");
+			wait.until(ExpectedConditions.elementToBeClickable(modalConfirmBtn)).click();
+		}
+	}
+
+	/** Type a username into the field and tap Continue. */
+	private void typeUsernameAndContinue(String username) {
+		WebElement field = wait.until(
+				ExpectedConditions.elementToBeClickable(userNameField));
 		field.clear();
 		field.sendKeys(username);
 		wait.until(ExpectedConditions.elementToBeClickable(userNameContinueBtn)).click();
+	}
 
-		// "Username taken" modal -> append suffix and retry once
+	/** True if the "Username taken" modal is visible within shortWait. */
+	private boolean isUsernameTakenModalShown() {
 		try {
 			shortWait.until(ExpectedConditions.visibilityOf(usernameTakenTitle));
-			System.out.println("[INFO] Username taken - retrying with suffix");
-			wait.until(ExpectedConditions.elementToBeClickable(modalCancelBtn)).click();
-
-			String retryName = username + "x" + uniqueSuffix();
-			WebElement field2 = wait.until(ExpectedConditions.elementToBeClickable(userNameField));
-			field2.clear();
-			field2.sendKeys(retryName);
-			wait.until(ExpectedConditions.elementToBeClickable(userNameContinueBtn)).click();
-			System.out.println("[ACTION] Retried with username: " + retryName);
-		} catch (Exception ignore) {
-			// no popup -> moved past
+			return true;
+		} catch (Exception e) {
+			return false;
 		}
+	}
+
+	/**
+	 * Compact (~10 char) high-entropy username that stays well under the
+	 * app username length limit. Format: "tu" + 2 base36 time chars (rough
+	 * ordering) + 6 random base36 chars (36^6 ~= 2.1B combinations). Used
+	 * only for retries, where the long run-scoped token would be too long.
+	 */
+	private String compactUsernameToken() {
+		String millis36 = Long.toString(System.currentTimeMillis(), 36);
+		String timeTail = millis36.substring(Math.max(0, millis36.length() - 2));
+		return "tu" + timeTail + randomAlnum(6);
 	}
 
 	private void fillDogProfileForm(String dogName) {
@@ -1796,8 +1838,34 @@ public class ManualSignupPage extends AndroidActions {
 		driver.pressKey(new KeyEvent(AndroidKey.BACK));
 	}
 
+	// Run-scoped unique-token generator (collision-resistant across runs).
+	// RUN_ID is computed once per JVM/test-run and shared by all instances;
+	// SEQ guarantees per-call uniqueness even within the same millisecond.
+	private static final String RUN_ID = newRunId();
+	private static final AtomicInteger SEQ = new AtomicInteger(0);
+
+	private static String newRunId() {
+		String time = Long.toString(System.currentTimeMillis(), 36); // full precision
+		return time + randomAlnum(4);                                 // + cross-run entropy
+	}
+
+	private static String randomAlnum(int n) {
+		final String ALPHABET = "abcdefghijklmnopqrstuvwxyz0123456789";
+		StringBuilder sb = new StringBuilder(n);
+		for (int i = 0; i < n; i++) {
+			sb.append(ALPHABET.charAt(ThreadLocalRandom.current().nextInt(ALPHABET.length())));
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * Collision-resistant unique token: unique per call, per run, and across
+	 * runs. Format: <base36 millis><4 random base36 chars><base36 seq>.
+	 * Replaces the old (millis % 1_000_000) which truncated to 6 digits and
+	 * wrapped every ~16.7 min, causing occasional duplicate account names.
+	 */
 	private String uniqueSuffix() {
-		return String.valueOf(System.currentTimeMillis() % 1_000_000);
+		return RUN_ID + Integer.toString(SEQ.getAndIncrement(), 36);
 	}
 
 	// =======================================================================

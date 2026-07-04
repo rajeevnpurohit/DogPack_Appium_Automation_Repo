@@ -20,6 +20,7 @@ mvn test -P FullRun
 
 ```cmd
 mvn test -P FullRun -Dtester="Rajeev Purohit"
+mvn test -P FullRun -Dtester="Shubham Mathur"
 ```
 
 
