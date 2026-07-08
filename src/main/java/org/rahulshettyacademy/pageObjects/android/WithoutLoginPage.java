@@ -336,6 +336,11 @@ public class WithoutLoginPage extends AndroidActions {
 	 * Best-effort element find. Returns null if not found - no exception.
 	 */
 	private WebElement tryFindElement(By locator) {
+		// SPEED FIX (#2): lower implicit wait so a locator matching ZERO nodes
+		// returns in ~500ms instead of burning the global 10s implicit wait.
+		// Present elements are still returned instantly by findElements.
+		Duration originalImplicit = driver.manage().timeouts().getImplicitWaitTimeout();
+		driver.manage().timeouts().implicitlyWait(Duration.ofMillis(500));
 		try {
 			List<WebElement> els = driver.findElements(locator);
 			for (WebElement el : els) {
@@ -344,6 +349,9 @@ public class WithoutLoginPage extends AndroidActions {
 				} catch (Exception ignore) { /* */ }
 			}
 		} catch (Exception ignore) { /* */ }
+		finally {
+			driver.manage().timeouts().implicitlyWait(originalImplicit);
+		}
 		return null;
 	}
 
@@ -401,46 +409,55 @@ public class WithoutLoginPage extends AndroidActions {
 	}
 
 	private boolean handlePermissionDialogIfPresent() {
+		// SPEED FIX (#1): detect the dialog and probe buttons under a lowered
+		// implicit wait so ABSENT elements fail in ~500ms instead of burning the
+		// 10s implicit / 20s PageFactory-decorator timeout on every permission
+		// button that is not on screen (previously ~20s x several missing buttons).
+		Duration originalImplicit = driver.manage().timeouts().getImplicitWaitTimeout();
+		driver.manage().timeouts().implicitlyWait(Duration.ofMillis(500));
 		try {
-			WebElement msg = shortWait.until(
-					ExpectedConditions.visibilityOf(permissionDialogMsg));
-			String text = msg.getText();
-			System.out.println("[PERMISSION] Dialog: " + text);
-
-			String lowerText = text.toLowerCase();
-			if (!lowerText.contains("location") && !lowerText.contains("notification")
-					&& !lowerText.contains("photo") && !lowerText.contains("media")
-					&& !lowerText.contains("file") && !lowerText.contains("picture")
-					&& !lowerText.contains("camera") && !lowerText.contains("video")
-					&& !lowerText.contains("record")) {
-				System.out.println("[WARNING] Unexpected permission text: " + text);
+			List<WebElement> msgs = driver.findElements(
+					By.id("com.android.permissioncontroller:id/permission_message"));
+			if (msgs.isEmpty()) {
+				return false; // no dialog present -> fast exit (no 10s burn)
 			}
-		} catch (Exception e) {
+			try {
+				System.out.println("[PERMISSION] Dialog: " + msgs.get(0).getText());
+			} catch (Exception ignore) { /* text optional */ }
+
+			// Try buttons in safe order. Android 13+ photo picker shows
+			// "Allow all" / "Allow limited access" / "Don't allow" text-based buttons
+			// (per screenshot evidence) - we prefer "Allow all" for full media access.
+			if (clickByIfPresent(By.id("com.android.permissioncontroller:id/permission_allow_foreground_only_button"), "While Using App")) return true;
+			if (clickByIfPresent(By.id("com.android.permissioncontroller:id/permission_allow_one_time_button"), "Allow Once")) return true;
+			if (clickByIfPresent(By.id("com.android.permissioncontroller:id/permission_allow_button"), "Allow")) return true;
+			if (clickByIfPresent(By.id("com.android.permissioncontroller:id/permission_allow_all_button"), "Allow All (id-based)")) return true;
+			// Android 13+ photo picker text-based buttons
+			if (clickByIfPresent(By.xpath("//android.widget.Button[@text=\"Allow all\"]"), "Allow all (text)")) return true;
+			if (clickByIfPresent(By.xpath("//android.widget.Button[@text=\"Allow limited access\"]"), "Allow limited access (text)")) return true;
+			// Last-resort: any button with allow-related text
+			if (clickByIfPresent(By.xpath("//android.widget.Button[contains(@text,\"Allow\") or contains(@text,\"allow\")]"), "generic Allow xpath")) return true;
+
+			System.out.println("[WARNING] Permission dialog visible but no known button found");
 			return false;
+		} finally {
+			driver.manage().timeouts().implicitlyWait(originalImplicit);
 		}
+	}
 
-		// Try buttons in safe order. Android 13+ photo picker shows
-		// "Allow all" / "Allow limited access" / "Don't allow" text-based buttons
-		// (per screenshot evidence) - we prefer "Allow all" for full media access.
-		if (clickIfDisplayed(permissionWhileUsingAppBtn, "While Using App")) return true;
-		if (clickIfDisplayed(permissionAllowOneTimeBtn, "Allow Once")) return true;
-		if (clickIfDisplayed(permissionAllowBtn, "Allow")) return true;
-		if (clickIfDisplayed(permissionAllowAllBtn, "Allow All (id-based)")) return true;
-		// Android 13+ photo picker text-based buttons
-		if (clickIfDisplayed(permissionAllowAllTextBtn, "Allow all (text)")) return true;
-		if (clickIfDisplayed(permissionAllowLimitedTextBtn, "Allow limited access (text)")) return true;
-
-		// Last-resort: try to find any button with allow-related text
-		try {
-			WebElement allowBtn = driver.findElement(
-					By.xpath("//android.widget.Button[contains(@text,\"Allow\") "
-							+ "or contains(@text,\"allow\")]"));
-			allowBtn.click();
-			System.out.println("[CLICKED] Permission button: generic Allow xpath");
-			return true;
-		} catch (Exception ignore) { /* */ }
-
-		System.out.println("[WARNING] Permission dialog visible but no known button found");
+	/** Fast permission-button probe: findElements (respects the lowered implicit
+	 *  wait set by the caller) + click first displayed match. Bypasses the 20s
+	 *  PageFactory decorator that the old proxy-based clickIfDisplayed incurred. */
+	private boolean clickByIfPresent(By locator, String name) {
+		for (WebElement el : driver.findElements(locator)) {
+			try {
+				if (el.isDisplayed()) {
+					el.click();
+					System.out.println("[CLICKED] Permission button: " + name);
+					return true;
+				}
+			} catch (Exception ignore) { /* not interactable - try next */ }
+		}
 		return false;
 	}
 
@@ -494,6 +511,22 @@ public class WithoutLoginPage extends AndroidActions {
 			return el.isDisplayed();
 		} catch (Exception e) {
 			return false;
+		}
+	}
+
+	/** Fast menu-option presence check via findElements under a lowered implicit
+	 *  wait, bypassing the 20s PageFactory decorator that isDisplayedSafe()
+	 *  incurred on ABSENT options (was ~20s x each missing option = 45-66s). */
+	private boolean isMenuOptionPresent(By locator) {
+		Duration originalImplicit = driver.manage().timeouts().getImplicitWaitTimeout();
+		driver.manage().timeouts().implicitlyWait(Duration.ofMillis(500));
+		try {
+			for (WebElement el : driver.findElements(locator)) {
+				try { if (el.isDisplayed()) return true; } catch (Exception ignore) { /* */ }
+			}
+			return false;
+		} finally {
+			driver.manage().timeouts().implicitlyWait(originalImplicit);
 		}
 	}
 
@@ -1133,15 +1166,15 @@ public class WithoutLoginPage extends AndroidActions {
 		// Single attribute fetch per element, with small pauses between
 		// to avoid hammering UiAutomator2 with 5 rapid queries which
 		// can crash instrumentation under modal animation pressure.
-		boolean hasReportFound = isDisplayedSafe(reportFoundOption);
+		boolean hasReportFound = isMenuOptionPresent(By.xpath("//android.widget.TextView[@text=\"Report that this dog has been found\"]"));
 		try { Thread.sleep(200); } catch (InterruptedException ignore) { /* */ }
-		boolean hasDelete = isDisplayedSafe(deletePostOption);
+		boolean hasDelete = isMenuOptionPresent(By.xpath("//android.widget.TextView[@text=\"Delete post\"]"));
 		try { Thread.sleep(200); } catch (InterruptedException ignore) { /* */ }
-		boolean hasReportInappropriate = isDisplayedSafe(reportInappropriateOption);
+		boolean hasReportInappropriate = isMenuOptionPresent(By.xpath("//android.widget.TextView[@text=\"Report as inappropriate\"]"));
 		try { Thread.sleep(200); } catch (InterruptedException ignore) { /* */ }
-		boolean hasCopyUrl = isDisplayedSafe(copyUrlOption);
+		boolean hasCopyUrl = isMenuOptionPresent(By.xpath("//android.widget.TextView[@text=\"Copy URL\"]"));
 		try { Thread.sleep(200); } catch (InterruptedException ignore) { /* */ }
-		boolean hasClose = isDisplayedSafe(closeOption);
+		boolean hasClose = isMenuOptionPresent(By.xpath("//android.widget.TextView[@text=\"Close\"]"));
 
 		System.out.println("[MENU-STATE] ReportFound=" + hasReportFound
 				+ " | Delete=" + hasDelete
@@ -1178,8 +1211,8 @@ public class WithoutLoginPage extends AndroidActions {
 	}
 
 	public void handleReportOrDelete() {
-		boolean hasDelete = isDisplayedSafe(deletePostOption);
-		boolean hasReport = isDisplayedSafe(reportInappropriateOption);
+		boolean hasDelete = isMenuOptionPresent(By.xpath("//android.widget.TextView[@text=\"Delete post\"]"));
+		boolean hasReport = isMenuOptionPresent(By.xpath("//android.widget.TextView[@text=\"Report as inappropriate\"]"));
 
 		if (hasDelete) {
 			System.out.println("[FLOW] First row is OWN device's post -> Delete");
@@ -1249,7 +1282,7 @@ public class WithoutLoginPage extends AndroidActions {
 
 	private void closeModalGracefully() {
 		try {
-			if (isDisplayedSafe(closeOption)) {
+			if (isMenuOptionPresent(By.xpath("//android.widget.TextView[@text=\"Close\"]"))) {
 				wait.until(ExpectedConditions.elementToBeClickable(closeOption)).click();
 				System.out.println("[ACTION] Closed modal via Close button");
 				try { Thread.sleep(1000); } catch (InterruptedException ignore) { /* */ }
