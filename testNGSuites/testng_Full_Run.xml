@@ -149,7 +149,8 @@
 <!--            <class name="org.rahulshettyacademy.Dogpack_AccountDeletion_Business" />-->
 
 <!--            <class name="org.rahulshettyacademy.Dogpack_VideoFeed" />-->
-            <class name="org.rahulshettyacademy.Dogpack_SearchAndDiscovery" />
+<!--            <class name="org.rahulshettyacademy.Dogpack_SearchAndDiscovery" />-->
+            <class name="org.rahulshettyacademy.Dogpack_AddTextPost_native" />
 
  
         </classes>
