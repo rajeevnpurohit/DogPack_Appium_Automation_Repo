@@ -88,7 +88,7 @@
             <!-- ================================================================
                  PHASE 1 - PRE-LOGIN / ENTRY POINTS
                  ================================================================ -->
-            <class name="org.rahulshettyacademy.Dogpack_WithoutLogin" />
+<!--            <class name="org.rahulshettyacademy.Dogpack_WithoutLogin" />-->
  
 <!--             ================================================================-->
 <!--                 PHASE 2 - AUTHENTICATION (Login flows)-->
@@ -150,7 +150,7 @@
 
 <!--            <class name="org.rahulshettyacademy.Dogpack_VideoFeed" />-->
 <!--            <class name="org.rahulshettyacademy.Dogpack_SearchAndDiscovery" />-->
-<!--            <class name="org.rahulshettyacademy.Dogpack_AddTextPost_native" />-->
+            <class name="org.rahulshettyacademy.Dogpack_AddTextPost_native" />
 
  
         </classes>
