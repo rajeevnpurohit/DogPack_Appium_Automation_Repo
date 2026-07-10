@@ -1,13 +1,13 @@
 @echo off
 REM ============================================================
-REM  DogPack Full Run - 5 iterations
+REM  DogPack Full Run - Multi iterations
 REM  Run from the PROJECT ROOT (the folder containing pom.xml).
 REM  Produces reports\NineHertzReport_1.html ... _5.html
 REM ============================================================
 
-for /L %%i in (1,1,2) do (
+for /L %%i in (1,1,1) do (
   echo(
-  echo ===== Iteration %%i of 5 =====
+  echo ===== Iteration %%i =====
   if exist reports\NineHertzReport.html del /Q reports\NineHertzReport.html
   call mvn test -P FullRun -Dtester="Shubham Mathur"
   if exist reports\NineHertzReport.html (
@@ -18,4 +18,4 @@ for /L %%i in (1,1,2) do (
 )
 
 echo(
-echo ===== All 5 iterations complete. See reports\NineHertzReport_1..5.html =====
+echo ===== All iterations complete. See reports\NineHertzReport_1..5.html =====

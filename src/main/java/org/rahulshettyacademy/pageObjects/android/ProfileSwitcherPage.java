@@ -207,6 +207,14 @@ public class ProfileSwitcherPage extends AndroidActions {
 
         // ---- STEP 6 ----
         log("[STEP 6/7] Tap Profile tab again (re-render with new entity)");
+
+        // Fresh-app-data runs (data cleared each @BeforeClass) show first-run
+        // onboarding overlays (units popup, profile coach-mark tooltips) that sit
+        // on top of the UI and intercept taps - which is why the navigation tap
+        // was landing on an overlay and bouncing back to Feed instead of opening
+        // the profile. Clear them first, then do the single Profile-tab tap.
+        dismissOnboardingCoachMarks(4);
+
         WebElement profileTabAgain = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(PROFILE_TAB_XPATH)));
         profileTabAgain.click();
@@ -216,16 +224,43 @@ public class ProfileSwitcherPage extends AndroidActions {
         // ---- STEP 7 ----
         log("[STEP 7/7] Assert title text equals \""
                 + expectedBusinessName + "\"");
+
+        // Settle pause: let the profile-screen transition begin to render before
+        // we start polling. The profile-view container (React Native) can mount a
+        // beat after the tab tap, especially under full-suite load.
+        sleepQuiet(1500);
+
+        // The profile screen itself shows first-run coach-marks ("hold down the
+        // profile icon...", "access your settings...") on a fresh-data run; clear
+        // them so they don't cover profile-view or intercept the read.
+        dismissOnboardingCoachMarks(4);
+
+        // Bounded polling on PRESENCE (not visibility). A React Native container
+        // View often reports displayed=false to Selenium's visibility algorithm
+        // even when it is on screen (its pixels are drawn by a child), which makes
+        // visibilityOfElementLocated time out on exactly the element that Appium
+        // Inspector - which taps by coordinate - can see and act on. Polling on
+        // presenceOfElementLocated only requires the node to exist in the UI tree,
+        // matching what Inspector sees. WebDriverWait polls every 500ms and returns
+        // the instant the node appears, so this is fast when profile-view loads
+        // quickly and patient (up to 30s) when it is slow - not a flat sleep.
         WebElement titleEl;
         try {
-            titleEl = wait.until(ExpectedConditions.visibilityOfElementLocated(
+            WebDriverWait presenceWait =
+                    new WebDriverWait(driver, Duration.ofSeconds(30));
+            titleEl = presenceWait.until(ExpectedConditions.presenceOfElementLocated(
                     AppiumBy.xpath(PROFILE_TITLE_TEXT_XPATH)));
         } catch (Exception e) {
-            log("[FAIL]     Step 7 - profile_title_text not visible after 20s.");
+            log("[FAIL]     Step 7 - profile_title_text not present in UI tree after 30s.");
             log("           Locator: " + PROFILE_TITLE_TEXT_XPATH);
             dumpVisibleText();
             throw e;
         }
+
+        // Post-presence settle: if the parent View appeared first, give RN a
+        // moment to finish mounting its children before we read from it.
+        sleepQuiet(500);
+
         String actualTitle = titleEl.getAttribute("text");
         log("           Actual title text:   \"" + actualTitle + "\"");
         log("           Expected title text: \"" + expectedBusinessName + "\"");
@@ -235,6 +270,72 @@ public class ProfileSwitcherPage extends AndroidActions {
                 + "profile.");
         log("[PASS]     Title matches - switched to "
                 + expectedBusinessName + " successfully");
+    }
+
+    // ================================================================
+    // ==========    ONBOARDING / COACH-MARK DISMISSAL          ======
+    // ================================================================
+
+    /**
+     * Best-effort dismissal of first-run onboarding overlays that appear on a
+     * fresh-app-data run (app data is cleared each @BeforeClass in this suite).
+     * These overlays sit on top of the real UI and intercept taps, which is why
+     * the post-switch navigation tap was landing on an overlay and bouncing back
+     * to Feed instead of opening the profile screen.
+     *
+     * Overlays observed on a device recording (2026-07-10):
+     *   - "Set your preferred units of measurement" popup   -> "Submit"
+     *   - Profile coach-mark tooltips ("hold down the profile
+     *     icon...", "access your settings...") + feed
+     *     customization coach-mark                           -> "Skip" / "Done"
+     *   - "Turn on Notifications" screen                     -> "SKIP"
+     *
+     * Uses raw findElements (no PageFactory proxy / implicit-wait burn) so a
+     * missing overlay costs about half a second, not a full wait timeout. Loops
+     * a few rounds because several overlays can be queued back-to-back, and
+     * stops early as soon as a round finds nothing to dismiss.
+     *
+     * NOTE: these are TEXT-based best-effort locators taken from the recording,
+     * not Inspector-verified resource-ids. "Skip"/"Done"/"Submit" dismiss an
+     * overlay outright; "Next" (which only advances a coach-mark) is deliberately
+     * NOT tapped, to avoid advancing-without-dismissing loops - the round loop
+     * plus a present "Done"/"Skip" handles multi-step tooltips. If a future build
+     * changes the button copy, update the text list here.
+     */
+    private void dismissOnboardingCoachMarks(int maxRounds) {
+        String[] dismissTexts = { "Skip", "SKIP", "Done", "Submit" };
+        for (int round = 0; round < maxRounds; round++) {
+            boolean dismissedSomething = false;
+            for (String t : dismissTexts) {
+                if (clickRawByExactText(t)) {
+                    dismissedSomething = true;
+                    sleepQuiet(500);
+                }
+            }
+            if (!dismissedSomething) {
+                break; // nothing left to dismiss this round
+            }
+        }
+    }
+
+    /**
+     * Raw exact-text tap helper. Returns false instantly if no visible element
+     * with that exact text is present - no implicit-wait timeout is incurred.
+     */
+    private boolean clickRawByExactText(String text) {
+        try {
+            java.util.List<WebElement> found = driver.findElements(
+                    AppiumBy.androidUIAutomator(
+                            "new UiSelector().text(\"" + text + "\")"));
+            if (!found.isEmpty() && found.get(0).isDisplayed()) {
+                found.get(0).click();
+                log("[COACHMARK] Dismissed overlay via text: \"" + text + "\"");
+                return true;
+            }
+        } catch (Exception ignore) {
+            // overlay not present / already gone - nothing to do
+        }
+        return false;
     }
 
     // ================================================================
