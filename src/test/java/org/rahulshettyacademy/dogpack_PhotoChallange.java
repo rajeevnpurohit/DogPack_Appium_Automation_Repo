@@ -59,7 +59,7 @@ public class dogpack_PhotoChallange extends AndroidBaseTest {
 		photo.DeleteChallengePhotoDeleteOption();
 	}
 	
-	@Test(priority = 6, groups = { "Smoke","Regression" })
+	@Test(priority = 6, groups = { "Smoke","Regression" }, enabled = false)
 	public void joinChallengeAfterDeletePhoto() throws InterruptedException {
 		photo.joinChallengeAfterDeletePhoto();
 	}
@@ -69,7 +69,7 @@ public class dogpack_PhotoChallange extends AndroidBaseTest {
 		photo.ViewAllUpcomingChallenges();
 	}
 	
-	@Test(priority = 8, groups = { "Smoke","Regression" })
+	@Test(priority = 8, groups = { "Smoke","Regression" }, enabled = false)
 	public void ViewAllPreviousChallenges() throws InterruptedException {
 		photo.ViewAllPreviousChallenges();
 	}

@@ -63,10 +63,16 @@ public class Dogpack_AddTextPost_native extends AndroidBaseTest {
 
     @DataProvider
     public Object[][] getDataSuccessfullLogin() throws IOException {
+        // Log in as the shared account tip@yopmail.com, which lives at
+        // SmokeLoginData.json index 0 (same source the other tip@yopmail.com
+        // TCs use - e.g. Dogpack_VideoFeed, Dogpack_Notifications, and the
+        // native Dogpack_AddPhotoPost_native). Deliberately NOT LoginData.json,
+        // whose index 0 is a different account (iamkiara02) shared by ~29 other
+        // TCs - changing that file would switch every one of them.
         List<HashMap<String, String>> data = getJsonData(
                 System.getProperty("user.dir")
                         + "//src//test//java//org//rahulshettyacademy"
-                        + "//testData//LoginData.json");
+                        + "//testData//SmokeLoginData.json");
         return new Object[][] { { data.get(0) } };
     }
 }

@@ -206,6 +206,10 @@ public class PhotoChallangePage extends AndroidActions {
 		// System.out.println("[ACTION] Pressed device Back to return to the join screen");
 
 		wait.until(ExpectedConditions.visibilityOf(joinTheChallenge)); // back to join screen
+
+		// Device Back navigation (added at the end of the flow).
+		driver.pressKey(new KeyEvent(AndroidKey.BACK));
+		System.out.println("[ACTION] Pressed device Back");
 	}
 
 	public void joinChallengeAfterDeletePhoto() {
@@ -313,6 +317,7 @@ public class PhotoChallangePage extends AndroidActions {
 		clickViewAllFirstOption();
 		scrollDownTwice();
 		driver.pressKey(new KeyEvent(AndroidKey.BACK));
+		System.out.println("[ACTION] Pressed device Back (1st)");
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 		try {
 			wait.until(ExpectedConditions.visibilityOfElementLocated(upcomingChallengesLabelBy));
@@ -321,6 +326,12 @@ public class PhotoChallangePage extends AndroidActions {
 					+ ".scrollTextIntoView(\"Upcoming challenges\")"));
 			wait.until(ExpectedConditions.visibilityOfElementLocated(upcomingChallengesLabelBy));
 		}
+
+		// Device Back navigation - leave the upcoming-challenges screen so the
+		// next step (ViewAllPreviousChallenges) starts from the photo challenge
+		// screen.
+		driver.pressKey(new KeyEvent(AndroidKey.BACK));
+		System.out.println("[ACTION] Pressed device Back (2nd)");
 
 	}
 
@@ -362,6 +373,7 @@ public class PhotoChallangePage extends AndroidActions {
 		scrollToPreviousChallenges();
 		clickViewAllSecondOption();
 		scrollDownTwice();
+		scrollToTop();
 		driver.pressKey(new KeyEvent(AndroidKey.BACK));
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 		try {
@@ -465,8 +477,12 @@ public class PhotoChallangePage extends AndroidActions {
 				wait.until(ExpectedConditions.elementToBeClickable(winnerOne)).click();
 				System.out.println("[ACTION] Clicked on Winner Profile");
 
-				driver.pressKey(new KeyEvent(AndroidKey.BACK));
-				System.out.println("[FLOW] Closed modal window");
+				wait.until(ExpectedConditions.elementToBeClickable(AppiumBy.xpath(
+						"//android.widget.FrameLayout[@resource-id=\"android:id/content\"]"
+						+ "/android.widget.FrameLayout/android.view.ViewGroup"
+						+ "/android.view.ViewGroup/android.view.ViewGroup[5]"
+						+ "/android.widget.ImageView"))).click();
+				System.out.println("[ACTION] Tapping the Close button");
 
 				wait.until(ExpectedConditions.visibilityOf(winnerOne));
 				System.out.println("[INFO] Winner profile visible again");
@@ -486,21 +502,21 @@ public class PhotoChallangePage extends AndroidActions {
 		}
 	}
 
-	@AndroidFindBy(xpath = "//android.view.ViewGroup[@content-desc=\"Winner0\"]")
+	@AndroidFindBy(xpath = "//android.widget.TextView[@text=\"Current\"]")
 	private WebElement current;
 
-	@AndroidFindBy(xpath = "//android.view.ViewGroup[@content-desc=\"Winner1\"]")
+	@AndroidFindBy(xpath = "//android.widget.TextView[@text=\"Last 7 days\"]")
 	private WebElement Last7Days;
 
-	@AndroidFindBy(xpath = "//android.view.ViewGroup[@content-desc=\"Winner2\"]")
+	@AndroidFindBy(xpath = "//android.widget.TextView[@text=\"Last 30 days\"]")
 	private WebElement Last30Days;
 
-	@AndroidFindBy(xpath = "//android.view.ViewGroup[@content-desc=\"Winner3\"]")
+	@AndroidFindBy(xpath = "//android.widget.TextView[@text=\"All time\"]")
 	private WebElement allTime;
 
 	public void navigatesToLeaderShipBoard() {
 		System.out.println("[FLOW] navigatesToLeaderShipBoard: opening the Leaderboard");
-		driver.findElement(AppiumBy.androidUIAutomator("new UiSelector().text(\"Leaderboard\")")).click();
+		driver.findElement(AppiumBy.xpath("//android.widget.TextView[@text=\"Leaderboard\"]")).click();
 
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 		wait.until(ExpectedConditions.or(ExpectedConditions.visibilityOf(current),
@@ -519,22 +535,22 @@ public class PhotoChallangePage extends AndroidActions {
 			wait.until(ExpectedConditions.elementToBeClickable(Last7Days)).click();
 			System.out.println("[ACTION] Clicked on 'Last 7 Days' tab");
 
-			wait.until(ExpectedConditions.visibilityOf(winnerOne));
-			System.out.println("[FLOW] 'winnerOne' element is visible. Navigation successful.");
+			// wait.until(ExpectedConditions.visibilityOf(winnerOne));  // DISABLED (slow ~30s) per request
+			// System.out.println("[FLOW] 'winnerOne' element is visible. Navigation successful.");
 
 			wait.until(ExpectedConditions.visibilityOf(Last30Days));
 			wait.until(ExpectedConditions.elementToBeClickable(Last30Days)).click();
 			System.out.println("[ACTION] Clicked on 'Last 30 Days' tab");
 
-			wait.until(ExpectedConditions.visibilityOf(winnerOne));
-			System.out.println("[FLOW] 'winnerOne' element is visible. Navigation successful.");
+			// wait.until(ExpectedConditions.visibilityOf(winnerOne));  // DISABLED (slow ~30s) per request
+			// System.out.println("[FLOW] 'winnerOne' element is visible. Navigation successful.");
 
 			wait.until(ExpectedConditions.visibilityOf(allTime));
 			wait.until(ExpectedConditions.elementToBeClickable(allTime)).click();
 			System.out.println("[ACTION] Clicked on 'AllTime' tab");
 
-			wait.until(ExpectedConditions.visibilityOf(winnerOne));
-			System.out.println("[FLOW] 'winnerOne' element is visible. Navigation successful.");
+			// wait.until(ExpectedConditions.visibilityOf(winnerOne));  // DISABLED (slow ~30s) per request
+			// System.out.println("[FLOW] 'winnerOne' element is visible. Navigation successful.");
 
 		} catch (TimeoutException e) {
 			System.out.println("[WARN] Timeout while navigating to 'Last 7 Days' tab: " + e.getMessage());
@@ -716,15 +732,21 @@ public class PhotoChallangePage extends AndroidActions {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 		wait.until(ExpectedConditions.visibilityOf(threeDot));
 		wait.until(ExpectedConditions.elementToBeClickable(threeDot)).click();
+		System.out.println("[ACTION] Opened 3-dot menu (1/5)");
 
 		clickStaleSafe(messageAction);
+		System.out.println("[ACTION] Tapped 'Message'");
 		wait.until(ExpectedConditions.visibilityOf(chatInput));
+		System.out.println("[INFO] Chat input opened");
 		driver.pressKey(new KeyEvent(AndroidKey.BACK));
+		System.out.println("[ACTION] Back from chat");
 
 		wait.until(ExpectedConditions.visibilityOf(threeDot));
 		wait.until(ExpectedConditions.elementToBeClickable(threeDot)).click();
+		System.out.println("[ACTION] Opened 3-dot menu (2/5)");
 		wait.until(ExpectedConditions.visibilityOf(copyURLAction));
 		wait.until(ExpectedConditions.elementToBeClickable(copyURLAction)).click();
+		System.out.println("[ACTION] Tapped 'Copy URL'");
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
@@ -733,35 +755,58 @@ public class PhotoChallangePage extends AndroidActions {
 
 		wait.until(ExpectedConditions.visibilityOf(threeDot));
 		wait.until(ExpectedConditions.elementToBeClickable(threeDot)).click();
+		System.out.println("[ACTION] Opened 3-dot menu (3/5)");
 		wait.until(ExpectedConditions.visibilityOf(reportUserInapproAction));
 		wait.until(ExpectedConditions.elementToBeClickable(reportUserInapproAction)).click();
+		System.out.println("[ACTION] Tapped 'Report user'");
 
 		wait.until(ExpectedConditions.visibilityOf(typeMessageBox));
 		typeMessageBox.click();
 		typeMessageBox.sendKeys("Reporting user for Automatoin Testing");
+		System.out.println("[ACTION] Entered report reason");
 
 		wait.until(ExpectedConditions.elementToBeClickable(uploadImageOption)).click();
+		System.out.println("[ACTION] Tapped upload image");
 		clickIfPresent(whileUsingAppBtn);
 		clickIfPresent(allowAllBtn);
 		wait.until(ExpectedConditions.elementToBeClickable(selectImage)).click();
+		System.out.println("[ACTION] Selected image");
 		wait.until(ExpectedConditions.elementToBeClickable(doneBtn)).click();
+		System.out.println("[ACTION] Tapped Done");
 
 		wait.until(ExpectedConditions.elementToBeClickable(submitReportBtn)).click();
+		System.out.println("[ACTION] Submitted report");
 
 		wait.until(ExpectedConditions.invisibilityOf(reportMessage));
+		System.out.println("[INFO] Report dialog dismissed");
+
+		wait.until(ExpectedConditions.elementToBeClickable(cancelAction)).click();
+		System.out.println("[ACTION] Tapped Cancel");
 
 		wait.until(ExpectedConditions.visibilityOf(threeDot));
 		wait.until(ExpectedConditions.elementToBeClickable(threeDot)).click();
+		System.out.println("[ACTION] Opened 3-dot menu (4/5)");
 		wait.until(ExpectedConditions.visibilityOf(blockUser));
 		wait.until(ExpectedConditions.elementToBeClickable(blockUser)).click();
+		System.out.println("[ACTION] Tapped 'Block user'");
 		wait.until(ExpectedConditions.elementToBeClickable(onCancelAction)).click();
+		System.out.println("[ACTION] Cancelled block");
 
 		wait.until(ExpectedConditions.visibilityOf(threeDot));
 		wait.until(ExpectedConditions.elementToBeClickable(threeDot)).click();
+		System.out.println("[ACTION] Opened 3-dot menu (5/5)");
 		wait.until(ExpectedConditions.visibilityOf(cancelAction));
 		wait.until(ExpectedConditions.elementToBeClickable(cancelAction)).click();
+		System.out.println("[ACTION] Tapped 'Cancel'");
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		driver.pressKey(new KeyEvent(AndroidKey.BACK));
+		System.out.println("[ACTION] Back to winners");
 		wait.until(ExpectedConditions.visibilityOf(winnerOne));
+		System.out.println("[INFO] Winner profile visible again");
 	}
 
 	public void navigatesToResultBoard() {
@@ -783,6 +828,35 @@ public class PhotoChallangePage extends AndroidActions {
 		wait.until(ExpectedConditions.visibilityOf(voteBtnChallenge));
 		wait.until(ExpectedConditions.elementToBeClickable(voteBtnChallenge)).click();
 
+	}
+
+	/**
+	 * Scrolls back to the top of the screen with a series of upward PointerInput
+	 * swipes (~35% -> 80% of screen height), mirroring scrollDownSmall() in the
+	 * opposite direction. Repeated a few times to reliably reach the top of a
+	 * long list; best-effort, so a gesture failure is logged and ignored.
+	 */
+	private void scrollToTop() {
+		try {
+			org.openqa.selenium.Dimension size = driver.manage().window().getSize();
+			int startX = size.width / 2;
+			int startY = (int) (size.height * 0.35);
+			int endY   = (int) (size.height * 0.80);
+			for (int i = 0; i < 4; i++) {
+				PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+				Sequence swipe = new Sequence(finger, 1);
+				swipe.addAction(finger.createPointerMove(Duration.ZERO,
+						PointerInput.Origin.viewport(), startX, startY));
+				swipe.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+				swipe.addAction(finger.createPointerMove(Duration.ofMillis(500),
+						PointerInput.Origin.viewport(), startX, endY));
+				swipe.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+				driver.perform(Collections.singletonList(swipe));
+			}
+			System.out.println("[ACTION] Scrolled back to top");
+		} catch (Exception e) {
+			System.out.println("[WARN] scrollToTop failed: " + e.getMessage());
+		}
 	}
 
 	/**
