@@ -1102,6 +1102,13 @@ public class AddPhotoPostPage extends AndroidActions {
     // Post, dismiss the intermittent onboarding tour, then fast-retry for the
     // "Posted!" upload stage (primary, robust signal) with the success banner as
     // a secondary confirmation.
+    //
+    // Photo upload stages (uploadStageTitle cycles through, 5 states):
+    //   Preparing -> Getting Ready -> Uploading -> Publishing -> Posted!
+    // (Text posting has 4 - no "Preparing".) The logic is state-list-agnostic:
+    // it logs every transition and only anchors on "Publishing" (hand off to the
+    // tight Posted! retry) and "Posted!" (success), so the extra leading state
+    // needs no special handling.
 
     private static final String STAGE_XPATH =
             "//android.widget.TextView[@resource-id=\"com.dogpack:id/uploadStageTitle\"]";
