@@ -329,6 +329,273 @@ public class AddPostPage extends AndroidActions {
         System.out.println("[ASSERT PASS] Post uploaded successfully toast confirmed");
     }
 
+    /** Tap any element by a raw xpath (used for the GIF/background sub-flow). */
+    public void clickByXpath(String xpath, String label) {
+        wait.until(ExpectedConditions.elementToBeClickable(
+                AppiumBy.xpath(xpath))).click();
+        System.out.println("[ACTION] Tapped: " + label);
+    }
+
+    /**
+     * Hard-asserts the in-app "Post uploaded successfully." confirmation banner
+     * (a real TextView in the app hierarchy, reliably catchable - distinct from
+     * the older, flaky successToast wrapper). Fails the test if it never appears.
+     */
+    public void verifyPostUploadedBanner() {
+        WebElement banner = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                AppiumBy.xpath("//android.widget.TextView[@text=\"Post uploaded successfully.\"]")));
+        System.out.println("[INFO] Banner text: '" + banner.getText() + "'");
+        Assert.assertTrue(banner.isDisplayed(),
+                "Expected 'Post uploaded successfully.' banner to be visible after posting");
+        System.out.println("[ASSERT PASS] 'Post uploaded successfully.' banner confirmed");
+    }
+
+    /**
+     * Robust end-of-post verification, run immediately after the final Post tap.
+     *
+     * Two phases:
+     *   Phase 1 - track the upload stage TextView (com.dogpack:id/uploadStageTitle),
+     *             which cycles through: "Getting Ready" -> "Uploading" ->
+     *             "Publishing" -> "Posted!". We poll (moderate interval) and log
+     *             each distinct stage seen, until it reads "Posted!" OR the element
+     *             disappears (either = upload finished), capped by a runaway guard.
+     *   Phase 2 - the instant the stage completes, fast-poll for the in-app banner
+     *             //TextView[@text="Post uploaded successfully."] over a short
+     *             window (the banner is transient, so we look for it right when it
+     *             is due).
+     *
+     * Failure policy (per request): every check is best-effort - a failure is
+     * FETCHED and logged as [FAIL] but does NOT abort or skip the remaining
+     * actions in this flow. Any failures are aggregated and surfaced ONCE at the
+     * very end so the test still goes red, without skipping steps.
+     *
+     * NOTE: this method never throws mid-flow; only the final aggregate check
+     * (called separately by the flow) decides pass/fail.
+     */
+    private static final String STAGE_XPATH =
+            "//android.widget.TextView[@resource-id=\"com.dogpack:id/uploadStageTitle\"]";
+    private static final String BANNER_XPATH =
+            "//android.widget.TextView[@text=\"Post uploaded successfully.\"]";
+    /** Lightweight, punctuation/whitespace-tolerant probe for the "Posted!" state. */
+    private static final String POSTED_XPATH =
+            "//android.widget.TextView[@resource-id=\"com.dogpack:id/uploadStageTitle\""
+            + " and contains(@text,\"Posted\")]";
+
+    /** Single fast presence probe by xpath (one findElements, no getText). */
+    private boolean elementPresent(String xpath) {
+        try {
+            java.util.List<WebElement> els = driver.findElements(AppiumBy.xpath(xpath));
+            return !els.isEmpty() && els.get(0).isDisplayed();
+        } catch (Exception ignore) {
+            return false;
+        }
+    }
+
+    /** Reads the current upload-stage text, or null if the element isn't present. */
+    private String readStageText() {
+        try {
+            java.util.List<WebElement> els = driver.findElements(AppiumBy.xpath(STAGE_XPATH));
+            if (!els.isEmpty()) {
+                return els.get(0).getText();
+            }
+        } catch (Exception ignore) { /* transient - treat as not-present */ }
+        return null;
+    }
+
+    /**
+     * Phase 1: poll the stage title until "Posted!" or the element disappears.
+     * @return true if a terminal state ("Posted!" or element-gone after progress)
+     *         was observed; false if the runaway guard elapsed first.
+     */
+    /**
+     * Best-effort dismissal of the intermittent 5-step "Customize your Feed"
+     * onboarding tour that can appear after posting and overlay the screen.
+     *
+     * One Skip tap dismisses the entire tour. The tour is RN-rendered (its text
+     * is not in the native app source), so we anchor on the Skip control:
+     * accessibility-id "Skip" (primary) with content-desc xpath as fallback.
+     *
+     * Non-fatal: never throws. Returns true only if a Skip was tapped. Because
+     * the tour is intermittent and optional, its absence is NOT a failure.
+     */
+    private boolean dismissOnboardingTourIfPresent() {
+        try {
+            java.util.List<WebElement> skip = driver.findElements(AppiumBy.accessibilityId("Skip"));
+            if (skip.isEmpty()) {
+                skip = driver.findElements(
+                        AppiumBy.xpath("//android.view.ViewGroup[@content-desc=\"Skip\"]"));
+            }
+            if (!skip.isEmpty() && skip.get(0).isDisplayed()) {
+                skip.get(0).click();
+                System.out.println("[FLOW] Onboarding tour detected -> tapped Skip "
+                        + "(dismisses whole 5-step tour)");
+                sleepQuiet(800);
+                return true;
+            }
+        } catch (Exception e) {
+            System.out.println("[WARN] Onboarding-tour dismiss attempt threw (ignored): "
+                    + e.getMessage());
+        }
+        return false;
+    }
+
+    /**
+     * Explicit onboarding-tour dismissal, run right after the final Post tap and
+     * before stage tracking. The 5-step "Customize your Feed" tour appears
+     * intermittently just after posting; one Skip clears all of it.
+     *
+     * To avoid delaying tour-free runs, this polls briefly for EITHER the Skip
+     * control (tour present -> tap it, done) OR the first upload stage (tour
+     * absent -> upload already progressing, return immediately). Best-effort;
+     * never throws.
+     */
+    public void dismissOnboardingTourAfterPost() {
+        System.out.println("[FLOW] Checking for onboarding tour after final Post ...");
+        long windowMs = 6000;
+        long pollMs   = 300;
+        long deadline = System.currentTimeMillis() + windowMs;
+        while (System.currentTimeMillis() < deadline) {
+            if (dismissOnboardingTourIfPresent()) {
+                return;  // tour found and skipped
+            }
+            // If an upload stage is already visible, no tour is blocking - stop waiting.
+            if (readStageText() != null) {
+                System.out.println("[FLOW] Upload stage visible - no onboarding tour, proceeding");
+                return;
+            }
+            sleepQuiet(pollMs);
+        }
+        System.out.println("[FLOW] No onboarding tour appeared within "
+                + (windowMs / 1000) + "s - proceeding");
+    }
+
+    /** Single-shot check: is the success banner currently displayed? */
+    private boolean isBannerPresent() {
+        try {
+            java.util.List<WebElement> els = driver.findElements(AppiumBy.xpath(BANNER_XPATH));
+            return !els.isEmpty() && els.get(0).isDisplayed();
+        } catch (Exception ignore) {
+            return false;
+        }
+    }
+
+    /**
+     * Unified upload verification, run after the final Post tap (and after the
+     * onboarding-tour Skip step). Tracks the upload stage AND watches for the
+     * Two phases:
+     *   Phase 1 - track stages at a moderate poll, logging transitions, until we
+     *             reach "Publishing" (the stage right before completion).
+     *   Phase 2 - at "Publishing", run a TIGHT fast-retry loop that prioritises
+     *             catching the brief "Posted!" state: a single lightweight probe
+     *             (one findElements, no getText, contains(@text,"Posted")) checked
+     *             every iteration at high frequency. The banner and the
+     *             stage-disappearance check run less often so "Posted!" gets the
+     *             highest sampling rate. "Posted!" is the robust primary signal;
+     *             the banner is the secondary confirmation.
+     *
+     * Success policy: PASS if EITHER "Posted!" is observed OR the banner is seen.
+     * FAIL only if neither positive signal is seen.
+     *
+     * @return 0 on pass, 1 on failure (so the caller can surface one aggregate
+     *         assertion without aborting/skipping).
+     */
+    public int verifyPostUploadEndFlow() {
+        System.out.println("[FLOW] Verifying upload: tracking stages, fast-retrying for Posted! ...");
+        long guardMs = 90000;   // runaway guard only
+        long deadline = System.currentTimeMillis() + guardMs;
+
+        String last = null;
+        boolean sawAnyStage = false;
+        boolean sawPosted = false;
+        boolean bannerSeen = false;
+        boolean reachedPublishing = false;
+
+        try {
+            // --- Phase 1: track stages (moderate poll) until Publishing ---------
+            long stagePollMs = 400;
+            while (System.currentTimeMillis() < deadline) {
+                String cur = readStageText();
+                if (cur != null && !cur.equals(last)) {
+                    System.out.println("[STAGE] " + cur);
+                    last = cur;
+                    sawAnyStage = true;
+                }
+                if (cur != null) {
+                    String c = cur.trim();
+                    if (c.equalsIgnoreCase("Posted!")) {   // caught it already
+                        sawPosted = true;
+                        System.out.println("[FLOW] Upload reached terminal stage: Posted!");
+                        break;
+                    }
+                    if (c.equalsIgnoreCase("Publishing")) {
+                        reachedPublishing = true;
+                        break;   // hand off to the tight Posted! retry loop
+                    }
+                }
+                if (cur == null && sawAnyStage) {
+                    // Stage vanished before we ever saw Publishing/Posted! - go
+                    // straight to a banner grace-watch below.
+                    System.out.println("[FLOW] uploadStageTitle disappeared after progress "
+                            + "(last seen: '" + last + "') before Publishing");
+                    break;
+                }
+                sleepQuiet(stagePollMs);
+            }
+
+            // --- Phase 2: tight fast-retry for Posted! (prioritised) ------------
+            if (!sawPosted) {
+                if (reachedPublishing) {
+                    System.out.println("[FLOW] At Publishing - fast-retrying for 'Posted!' ...");
+                }
+                long tightMs = 60;      // very fast retries
+                long graceMs = 8000;    // banner grace after stage completes
+                long completedAt = 0;
+                int iter = 0;
+                while (System.currentTimeMillis() < deadline) {
+                    // Priority 1 (every iteration): the brief "Posted!" state.
+                    if (elementPresent(POSTED_XPATH)) {
+                        sawPosted = true;
+                        System.out.println("[FLOW] Upload reached terminal stage: Posted!");
+                        break;
+                    }
+                    // Priority 2 (less often): banner + completion check, so the
+                    // Posted! probe keeps the highest sampling rate.
+                    if (iter % 4 == 0) {
+                        if (isBannerPresent()) {
+                            bannerSeen = true;
+                            System.out.println("[ASSERT PASS] 'Post uploaded successfully.' banner confirmed");
+                            break;
+                        }
+                        if (!elementPresent(STAGE_XPATH)) {
+                            if (completedAt == 0) {
+                                completedAt = System.currentTimeMillis();
+                                System.out.println("[FLOW] uploadStageTitle disappeared - "
+                                        + "grace-watching for banner");
+                            }
+                            if (System.currentTimeMillis() - completedAt > graceMs) {
+                                break;
+                            }
+                        }
+                    }
+                    iter++;
+                    sleepQuiet(tightMs);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("[FAIL] Upload verification threw: " + e.getMessage());
+        }
+
+        boolean pass = sawPosted || bannerSeen;
+        System.out.println("[FLOW] End-verification summary: sawPosted=" + sawPosted
+                + ", bannerSeen=" + bannerSeen + ", pass=" + pass
+                + " (last stage seen: '" + last + "')");
+        if (!pass) {
+            System.out.println("[FAIL] Neither 'Posted!' stage nor success banner was observed");
+            return 1;
+        }
+        return 0;
+    }
+
     /**
      * Full end-to-end flow: tap +, switch to Text mode, attach an image,
      * caption it, and submit - then verify the upload success toast.
@@ -359,21 +626,57 @@ public class AddPostPage extends AndroidActions {
             clickDone();
             sleepQuiet(800);
 
-            step(7, "Tap Create post");
+            step(7, "Tap GIF");
+            clickByXpath("//android.widget.TextView[@text=\"GIF\"]", "GIF");
+            sleepQuiet(800);
+
+            step(8, "Tap a GIF option from the grid (3rd Sticker)");
+            clickByXpath("(//android.widget.ImageView[@content-desc=\"Sticker\"])[3]",
+                    "GIF option [3]");
+            sleepQuiet(800);
+
+            step(9, "Tap Background color");
+            clickByXpath("//android.widget.FrameLayout[@content-desc=\"Background color\"]",
+                    "Background color");
+            sleepQuiet(600);
+
+            step(10, "Select Yellow color");
+            clickByXpath("//android.widget.HorizontalScrollView/android.widget.LinearLayout"
+                    + "/android.view.View[7]", "Yellow color");
+            sleepQuiet(600);
+
+            step(11, "Tap OK");
+            clickByXpath("//android.widget.Button[@resource-id=\"android:id/button1\"]", "OK");
+            sleepQuiet(800);
+
+            step(12, "Tap Create post");
             clickCreatePost();
             sleepQuiet(1000);
 
-            step(8, "Tap Post media (single-item preview submit)");
+            step(13, "Tap Post media (single-item preview submit)");
             clickPostMedia();
             sleepQuiet(1500);
 
-            step(9, "Enter caption text on Create Post screen");
+            step(14, "Enter caption text on Create Post screen");
             enterCaptionText(captionText);
             sleepQuiet(500);
 
-            step(10, "Tap final Post submit");
+            step(15, "Tap final Post submit");
             clickFinalPost();
             sleepQuiet(1500);
+
+            step(16, "Dismiss onboarding tour if it appears (tap Skip)");
+            dismissOnboardingTourAfterPost();
+
+            step(17, "Verify upload stages -> 'Posted!' then catch success banner");
+            int verifyFailures = verifyPostUploadEndFlow();
+
+            // Aggregate the outcome ONCE, as the final action - every check above
+            // already ran (nothing skipped/aborted). If any failed, fail the test
+            // now so it goes red without having skipped steps.
+            Assert.assertEquals(verifyFailures, 0,
+                    "Post-upload end verification had " + verifyFailures
+                    + " failed check(s) - see [FAIL] log lines above");
         } finally {
             testEnd("postImageWithCaption");
         }
