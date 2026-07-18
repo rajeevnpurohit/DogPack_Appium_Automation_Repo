@@ -207,31 +207,51 @@ public class VideoFeedPage extends AndroidActions {
 	}
 
 	/**
-	 * 4 - close the comment box by long-pressing the bottom-sheet handle
-	 * and swiping it down. W3C touch sequence: press on the handle, hold
-	 * briefly (long press), drag down to near the bottom of the screen,
-	 * then release.
+	 * 4 - close the comment box via device Back, with verify-and-retry.
+	 *
+	 * The comment box is a Material bottom sheet (BottomSheetDialogFragment).
+	 * A single blind Back was racy: fired right after submitting the comment, the
+	 * first Back can be swallowed by the still-open soft keyboard (only hiding the
+	 * IME, leaving the sheet open) or land mid-transition. So we press Back, wait
+	 * a beat, then verify the sheet actually closed; if it's still open we press
+	 * Back again (up to a small cap). This absorbs the keyboard-steals-first-Back
+	 * case and transition timing without hard-coding a single guessed delay.
+	 *
+	 * "Sheet open" is detected via the comment composer (comment-reply-TextInput),
+	 * which is present only while the comment sheet is showing.
 	 */
 	public void closeCommentBox() {
-		WebElement handle = wait.until(ExpectedConditions.visibilityOf(sheetHandle));
-		Point loc = handle.getLocation();
-		Dimension sz = handle.getSize();
-		int startX = loc.getX() + sz.getWidth() / 2;
-		int startY = loc.getY() + sz.getHeight() / 2;
-		int screenH = driver.manage().window().getSize().getHeight();
-		int endY = (int) (screenH * 0.95);
+		int maxAttempts = 3;
+		for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+			driver.navigate().back();
+			System.out.println("[ACTION] Pressed device Back to close comment box (attempt "
+					+ attempt + ")");
+			sleepQuiet(800);   // let the keyboard hide / dismiss animation settle
+			if (!isCommentSheetOpen()) {
+				System.out.println("[ACTION] Comment box closed (verified after attempt "
+						+ attempt + ")");
+				return;
+			}
+			System.out.println("[WARN] Comment box still open after Back attempt "
+					+ attempt + " - retrying");
+		}
+		System.out.println("[WARN] Comment box still appears open after " + maxAttempts
+				+ " Back attempts - proceeding");
+	}
 
-		PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
-		Sequence drag = new Sequence(finger, 1);
-		drag.addAction(finger.createPointerMove(Duration.ZERO,
-				PointerInput.Origin.viewport(), startX, startY));
-		drag.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
-		drag.addAction(new Pause(finger, Duration.ofMillis(800)));   // long press
-		drag.addAction(finger.createPointerMove(Duration.ofMillis(700),
-				PointerInput.Origin.viewport(), startX, endY));         // swipe down
-		drag.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
-		driver.perform(Arrays.asList(drag));
-		System.out.println("[ACTION] Long-pressed sheet handle and swiped down (close comment box)");
+	/** True while the comment sheet is showing (composer input present + visible). */
+	private boolean isCommentSheetOpen() {
+		try {
+			List<WebElement> els = driver.findElements(AppiumBy.xpath(
+					"//android.widget.EditText[@content-desc=\"comment-reply-TextInput\"]"));
+			return !els.isEmpty() && els.get(0).isDisplayed();
+		} catch (Exception ignore) {
+			return false;
+		}
+	}
+
+	private void sleepQuiet(long ms) {
+		try { Thread.sleep(ms); } catch (InterruptedException ignored) { }
 	}
 
 	/** 5 - open Share. */
