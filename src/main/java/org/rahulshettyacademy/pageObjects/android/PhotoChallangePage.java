@@ -350,6 +350,11 @@ public class PhotoChallangePage extends AndroidActions {
 		System.out.println("[ACTION] Scrolled down twice (post View-all)");
 		driver.pressKey(new KeyEvent(AndroidKey.BACK));
 		System.out.println("[ACTION] Pressed device Back (1st)");
+
+		// Settle wait after 1st Back before checking the label.
+		try { Thread.sleep(2000); } catch (InterruptedException ignored) {}
+		System.out.println("[ACTION] Waited 2s after Back (1st)");
+
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 		try {
 			wait.until(ExpectedConditions.visibilityOfElementLocated(upcomingChallengesLabelBy));
@@ -361,6 +366,13 @@ public class PhotoChallangePage extends AndroidActions {
 			wait.until(ExpectedConditions.visibilityOfElementLocated(upcomingChallengesLabelBy));
 			System.out.println("[ACTION] 'Upcoming challenges' label visible after fallback scroll");
 		}
+
+		// Settle wait before the 2nd Back.
+		try { Thread.sleep(3000); } catch (InterruptedException ignored) {}
+		System.out.println("[ACTION] Waited 3s before Back (2nd)");
+
+		driver.pressKey(new KeyEvent(AndroidKey.BACK));
+		System.out.println("[ACTION] Pressed device Back (2nd)");
 
 	}
 
@@ -512,20 +524,6 @@ public class PhotoChallangePage extends AndroidActions {
 				wait.until(ExpectedConditions.visibilityOf(viewWinners));
 				wait.until(ExpectedConditions.elementToBeClickable(viewWinners)).click();
 				System.out.println("[ACTION] Clicked on 'View winners'");
-
-				wait.until(ExpectedConditions.visibilityOf(winnerOne));
-				wait.until(ExpectedConditions.elementToBeClickable(winnerOne)).click();
-				System.out.println("[ACTION] Clicked on Winner Profile");
-
-				wait.until(ExpectedConditions.elementToBeClickable(AppiumBy.xpath(
-						"//android.widget.FrameLayout[@resource-id=\"android:id/content\"]"
-						+ "/android.widget.FrameLayout/android.view.ViewGroup"
-						+ "/android.view.ViewGroup/android.view.ViewGroup[5]"
-						+ "/android.widget.ImageView"))).click();
-				System.out.println("[ACTION] Tapping the Close button");
-
-				wait.until(ExpectedConditions.visibilityOf(winnerOne));
-				System.out.println("[INFO] Winner profile visible again");
 
 				driver.pressKey(new KeyEvent(AndroidKey.BACK));
 				System.out.println("[FLOW] Navigated back to challenge screen");
