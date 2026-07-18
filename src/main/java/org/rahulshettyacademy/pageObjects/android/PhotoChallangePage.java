@@ -109,6 +109,7 @@ public class PhotoChallangePage extends AndroidActions {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 		wait.until(ExpectedConditions.visibilityOf(feedChallengeBtn));
 		wait.until(ExpectedConditions.elementToBeClickable(feedChallengeBtn)).click();
+		System.out.println("[ACTION] Tapped Photo Challenge feed button");
 
 		// Confirm the challenge screen opened by any challenge-action button being
 		// present. This covers every daily/entry state (not-entered -> Enter,
@@ -118,6 +119,7 @@ public class PhotoChallangePage extends AndroidActions {
 		wait.until(ExpectedConditions.or(ExpectedConditions.visibilityOf(enterBtnChallenge),
 				ExpectedConditions.visibilityOf(viewEntry),
 				ExpectedConditions.visibilityOf(voteBtnChallenge)));
+		System.out.println("[ACTION] Photo Challenge screen confirmed (challenge-action button visible)");
 
 	}
 
@@ -144,6 +146,7 @@ public class PhotoChallangePage extends AndroidActions {
 		// 1. Open the Join screen and tap 'Join the challenge'
 		wait.until(ExpectedConditions.visibilityOf(joinTheChallenge));
 		wait.until(ExpectedConditions.elementToBeClickable(joinTheChallenge)).click();
+		System.out.println("[ACTION] Tapped 'Join the challenge'");
 
 		WebDriverWait permWait = new WebDriverWait(driver, Duration.ofSeconds(5));
 		// 2. camera / record-video permission -> 'While using the app'
@@ -162,12 +165,17 @@ public class PhotoChallangePage extends AndroidActions {
 		}
 
 		wait.until(ExpectedConditions.elementToBeClickable(selectFirstImage)).click();
+		System.out.println("[ACTION] Selected first image from gallery");
 		wait.until(ExpectedConditions.elementToBeClickable(cameraRollDone)).click();
+		System.out.println("[ACTION] Tapped camera-roll Done");
 		wait.until(ExpectedConditions.elementToBeClickable(lostDogCrop)).click();
+		System.out.println("[ACTION] Tapped crop confirm");
 
 		wait.until(ExpectedConditions.visibilityOf(postThisPhotoTotheFeed));
 		wait.until(ExpectedConditions.elementToBeClickable(postThisPhotoTotheFeed)).click();
+		System.out.println("[ACTION] Tapped 'Post this photo to the feed'");
 		wait.until(ExpectedConditions.elementToBeClickable(submitPhoto)).click();
+		System.out.println("[ACTION] Tapped Submit photo");
 
 	}
 
@@ -177,11 +185,14 @@ public class PhotoChallangePage extends AndroidActions {
 		try {
 			wait.ignoring(org.openqa.selenium.StaleElementReferenceException.class)
 					.until(ExpectedConditions.elementToBeClickable(Change_deleteBtn)).click();
+			System.out.println("[ACTION] Tapped Change/Delete to open delete dialog");
 
 			wait.until(ExpectedConditions.visibilityOf(deleteThisPhotoLabel));
+			System.out.println("[ACTION] Delete-photo dialog visible");
 
 			wait.until(ExpectedConditions.visibilityOf(cancelPhoto));
 			wait.until(ExpectedConditions.elementToBeClickable(cancelPhoto)).click();
+			System.out.println("[ACTION] Tapped Cancel (kept the photo)");
 		} catch (Exception e) {
 			System.out.println("[WARN]  Delete Challenge Photo Cancel Option Not Performed");
 		}
@@ -194,10 +205,13 @@ public class PhotoChallangePage extends AndroidActions {
 
 		wait.until(ExpectedConditions.visibilityOf(Change_deleteBtn));
 		wait.until(ExpectedConditions.elementToBeClickable(Change_deleteBtn)).click();
+		System.out.println("[ACTION] Tapped Change/Delete to open delete dialog");
 
 		wait.until(ExpectedConditions.visibilityOf(deleteThisPhotoLabel));
+		System.out.println("[ACTION] Delete-photo dialog visible");
 		wait.until(ExpectedConditions.visibilityOf(deletePhoto));
 		wait.until(ExpectedConditions.elementToBeClickable(deletePhoto)).click();
+		System.out.println("[ACTION] Tapped Delete (removed the photo)");
 
 		// After deleting, return to the challenge/join screen via device Back.
 		// (Robust + locale-independent; the in-app back arrow's content-desc embeds
@@ -218,10 +232,12 @@ public class PhotoChallangePage extends AndroidActions {
 
 		wait.until(ExpectedConditions.visibilityOf(joinTheChallenge));
 		wait.until(ExpectedConditions.elementToBeClickable(joinTheChallenge)).click();
+		System.out.println("[ACTION] Tapped 'Join the challenge'");
 
 		try {
 			if (allowBtn.isDisplayed()) {
 				wait.until(ExpectedConditions.elementToBeClickable(allowBtn)).click();
+				System.out.println("[ACTION] Permission -> Allow");
 			}
 		} catch (Exception e) {
 			System.out.println("[WARN] Not Asked for permission");
@@ -230,21 +246,29 @@ public class PhotoChallangePage extends AndroidActions {
 		try {
 			if (allowOneBtn.isDisplayed()) {
 				wait.until(ExpectedConditions.elementToBeClickable(allowOneBtn)).click();
+				System.out.println("[ACTION] Permission -> Allow (one-time)");
 			}
 		} catch (Exception e) {
 			System.out.println("[WARN] Not Asked for permission");
 		}
 
 		wait.until(ExpectedConditions.elementToBeClickable(selectFirstImage)).click();
+		System.out.println("[ACTION] Selected first image from gallery");
 		wait.until(ExpectedConditions.elementToBeClickable(cameraRollDone)).click();
+		System.out.println("[ACTION] Tapped camera-roll Done");
 		wait.until(ExpectedConditions.elementToBeClickable(lostDogCrop)).click();
+		System.out.println("[ACTION] Tapped crop confirm");
 
 		wait.until(ExpectedConditions.visibilityOf(postThisPhotoTotheFeed));
 		wait.until(ExpectedConditions.elementToBeClickable(postThisPhotoTotheFeed)).click();
+		System.out.println("[ACTION] Tapped 'Post this photo to the feed'");
 		wait.until(ExpectedConditions.elementToBeClickable(submitPhoto)).click();
+		System.out.println("[ACTION] Tapped Submit photo");
 		wait.until(ExpectedConditions.visibilityOf(backToChallengesBtn));
 		wait.until(ExpectedConditions.elementToBeClickable(backToChallengesBtn)).click();
+		System.out.println("[ACTION] Tapped 'Back to challenges'");
 		wait.until(ExpectedConditions.visibilityOf(viewEntry));
+		System.out.println("[ACTION] Challenge entry confirmed (View entry visible)");
 
 	}
 
@@ -284,12 +308,16 @@ public class PhotoChallangePage extends AndroidActions {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
 		int count = driver.findElements(AppiumBy.xpath("//android.widget.TextView[@text='View all']")).size();
+		System.out.println("[ACTION] 'View all' links found: " + count);
 
 		if (count == 1) {
 			wait.until(ExpectedConditions.elementToBeClickable(viewAllSingle)).click();
+			System.out.println("[ACTION] Tapped 'View all' (single option)");
 		} else if (count > 1) {
 			wait.until(ExpectedConditions.elementToBeClickable(viewAllMultipleOption1)).click();
+			System.out.println("[ACTION] Tapped 'View all' (first of multiple)");
 		} else {
+			System.out.println("[WARN] 'View all' not visible - scrolling it into view");
 			try {
 				driver.findElement(AppiumBy.androidUIAutomator(
 						"new UiScrollable(new UiSelector().scrollable(true))" + ".scrollTextIntoView(\"View all\")"));
@@ -298,12 +326,15 @@ public class PhotoChallangePage extends AndroidActions {
 
 			count = driver.findElements(AppiumBy.xpath("//android.widget.TextView[@text='View all']")).size();
 
+			System.out.println("[ACTION] 'View all' links found after scroll: " + count);
 			if (count == 0) {
 				throw new RuntimeException("'View all' not found after scroll.");
 			} else if (count == 1) {
 				wait.until(ExpectedConditions.elementToBeClickable(viewAllSingle)).click();
+				System.out.println("[ACTION] Tapped 'View all' (single option, after scroll)");
 			} else {
 				wait.until(ExpectedConditions.elementToBeClickable(viewAllMultipleOption1)).click();
+				System.out.println("[ACTION] Tapped 'View all' (first of multiple, after scroll)");
 			}
 		}
 	}
@@ -316,22 +347,20 @@ public class PhotoChallangePage extends AndroidActions {
 		scrollToPreviousChallenges();
 		clickViewAllFirstOption();
 		scrollDownTwice();
+		System.out.println("[ACTION] Scrolled down twice (post View-all)");
 		driver.pressKey(new KeyEvent(AndroidKey.BACK));
 		System.out.println("[ACTION] Pressed device Back (1st)");
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 		try {
 			wait.until(ExpectedConditions.visibilityOfElementLocated(upcomingChallengesLabelBy));
+			System.out.println("[ACTION] 'Upcoming challenges' label visible");
 		} catch (Exception e) {
+			System.out.println("[WARN] 'Upcoming challenges' not visible - scrolling it into view");
 			driver.findElement(AppiumBy.androidUIAutomator("new UiScrollable(new UiSelector().scrollable(true))"
 					+ ".scrollTextIntoView(\"Upcoming challenges\")"));
 			wait.until(ExpectedConditions.visibilityOfElementLocated(upcomingChallengesLabelBy));
+			System.out.println("[ACTION] 'Upcoming challenges' label visible after fallback scroll");
 		}
-
-		// Device Back navigation - leave the upcoming-challenges screen so the
-		// next step (ViewAllPreviousChallenges) starts from the photo challenge
-		// screen.
-		driver.pressKey(new KeyEvent(AndroidKey.BACK));
-		System.out.println("[ACTION] Pressed device Back (2nd)");
 
 	}
 
@@ -354,14 +383,18 @@ public class PhotoChallangePage extends AndroidActions {
 				throw new RuntimeException("'View all' not found after scroll.");
 		}
 
+		System.out.println("[ACTION] 'View all' links found: " + count);
 		if (count >= 2) {
 			try {
 				wait.until(ExpectedConditions.elementToBeClickable(viewAllMultipleOption2)).click();
+				System.out.println("[ACTION] Tapped 'View all' (2nd option)");
 			} catch (StaleElementReferenceException | TimeoutException e) {
 				wait.until(ExpectedConditions.elementToBeClickable(secondViewAll)).click();
+				System.out.println("[ACTION] Tapped 'View all' (2nd option, retry)");
 			}
 		} else {
 			wait.until(ExpectedConditions.elementToBeClickable(viewAllSingle)).click();
+			System.out.println("[ACTION] Tapped 'View all' (single option fallback)");
 		}
 	}
 
@@ -372,16 +405,23 @@ public class PhotoChallangePage extends AndroidActions {
 		System.out.println("[FLOW] ViewAllPreviousChallenges: View all -> previous challenges");
 		scrollToPreviousChallenges();
 		clickViewAllSecondOption();
+		System.out.println("[ACTION] Tapped 'View all' (previous challenges / 2nd option)");
 		scrollDownTwice();
+		System.out.println("[ACTION] Scrolled down twice");
 		scrollToTop();
+		System.out.println("[ACTION] Scrolled back to top");
 		driver.pressKey(new KeyEvent(AndroidKey.BACK));
+		System.out.println("[ACTION] Pressed device Back");
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 		try {
 			wait.until(ExpectedConditions.visibilityOfElementLocated(PreviousChallengesLabelBy));
+			System.out.println("[ACTION] 'Previous challenges and winners' label visible");
 		} catch (Exception e) {
+			System.out.println("[WARN] 'Previous challenges and winners' not visible - scrolling it into view");
 			driver.findElement(AppiumBy.androidUIAutomator("new UiScrollable(new UiSelector().scrollable(true))"
 					+ ".scrollTextIntoView(\"Previous challenges and winners\")"));
 			wait.until(ExpectedConditions.visibilityOfElementLocated(PreviousChallengesLabelBy));
+			System.out.println("[ACTION] 'Previous challenges and winners' label visible after fallback scroll");
 		}
 
 	}
@@ -517,6 +557,7 @@ public class PhotoChallangePage extends AndroidActions {
 	public void navigatesToLeaderShipBoard() {
 		System.out.println("[FLOW] navigatesToLeaderShipBoard: opening the Leaderboard");
 		driver.findElement(AppiumBy.xpath("//android.widget.TextView[@text=\"Leaderboard\"]")).click();
+		System.out.println("[ACTION] Tapped 'Leaderboard' tab");
 
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 		wait.until(ExpectedConditions.or(ExpectedConditions.visibilityOf(current),
@@ -616,14 +657,19 @@ public class PhotoChallangePage extends AndroidActions {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 		wait.until(ExpectedConditions.visibilityOf(winnerMessageBtn));
 		wait.until(ExpectedConditions.elementToBeClickable(winnerMessageBtn)).click();
+		System.out.println("[ACTION] Tapped winner Message button");
 		wait.until(ExpectedConditions.visibilityOf(chatInput));
 		wait.until(ExpectedConditions.elementToBeClickable(chatInput)).sendKeys("Congratulations");
+		System.out.println("[ACTION] Typed chat message: 'Congratulations'");
 		driver.hideKeyboard();
+		System.out.println("[ACTION] Hid keyboard");
 		wait.until(ExpectedConditions.elementToBeClickable(chatSendBtn)).click();
+		System.out.println("[ACTION] Tapped chat Send");
 
 		try {
 			if (audioPermissionMessage.isDisplayed()) {
 				wait.until(ExpectedConditions.elementToBeClickable(audioPermissionAllowBtn)).click();
+				System.out.println("[ACTION] Audio permission -> Allow");
 			}
 		} catch (Exception e) {
 			System.out.println("[WARN] Audio Permission Popup not displayed.");
@@ -632,13 +678,16 @@ public class PhotoChallangePage extends AndroidActions {
 		try {
 			if (photoPermissionMessage.isDisplayed()) {
 				wait.until(ExpectedConditions.elementToBeClickable(photoPermissionAllowBtn)).click();
+				System.out.println("[ACTION] Photo permission -> Allow");
 			}
 		} catch (Exception e) {
 			System.out.println("[WARN] photo Permission Popup not displayed.");
 		}
 
 		driver.pressKey(new KeyEvent(AndroidKey.BACK));
+		System.out.println("[ACTION] Pressed device Back (leave chat)");
 		wait.until(ExpectedConditions.visibilityOf(winnerMessageBtn));
+		System.out.println("[ACTION] Back on winner profile (Message button visible)");
 
 	}
 
@@ -812,6 +861,7 @@ public class PhotoChallangePage extends AndroidActions {
 	public void navigatesToResultBoard() {
 		System.out.println("[FLOW] navigatesToResultBoard: opening My Results");
 		driver.findElement(AppiumBy.xpath("//android.widget.TextView[@text=\"My Results\"]")).click();
+		System.out.println("[ACTION] Tapped 'My Results' tab");
 
 		try {
 			Thread.sleep(5000);
@@ -827,6 +877,7 @@ public class PhotoChallangePage extends AndroidActions {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 		wait.until(ExpectedConditions.visibilityOf(voteBtnChallenge));
 		wait.until(ExpectedConditions.elementToBeClickable(voteBtnChallenge)).click();
+		System.out.println("[ACTION] Tapped Vote on yesterday's challenge");
 
 	}
 

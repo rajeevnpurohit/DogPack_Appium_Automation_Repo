@@ -121,9 +121,9 @@
 <!--            <class name="org.rahulshettyacademy.Dogpack_AddTextPost_native" />-->
 <!--            <class name="org.rahulshettyacademy.Dogpack_AddPhotoPost_native" />-->
 <!--             <class name="org.rahulshettyacademy.Dogpack_AddVideoPost_native" />-->
-            <class name="org.rahulshettyacademy.Dogpack_VideoFeed" />
+<!--            <class name="org.rahulshettyacademy.Dogpack_VideoFeed" />-->
 <!--            <class name="org.rahulshettyacademy.Dogpack_SearchAndDiscovery" />-->
-<!--            <class name="org.rahulshettyacademy.dogpack_PhotoChallange" />-->
+            <class name="org.rahulshettyacademy.dogpack_PhotoChallange" />
 
 <!--             ================================================================ -->
 <!--                 PHASE 6 - SETTINGS and ACTIVITY-->
