@@ -292,6 +292,7 @@ public class MapPage extends AndroidActions {
 
 	    wait.until(ExpectedConditions.visibilityOf(mapParkBtn));
 	    wait.until(ExpectedConditions.elementToBeClickable(mapParkBtn)).click();
+	    System.out.println("[ACTION] Clicked mapParkBtn");
 
 	    Thread.sleep(600); // let map settle
 
@@ -322,11 +323,13 @@ public class MapPage extends AndroidActions {
 	                    ExpectedConditions.visibilityOf(checkIn)
 	            ));
 	            wait.until(ExpectedConditions.elementToBeClickable(viewBusiness)).click();
+	            System.out.println("[ACTION] Clicked viewBusiness");
 
 	            performedActionAccordingToBusinessType();
 	            
 	            wait.until(ExpectedConditions.visibilityOf(viewBusiness));
 				wait.until(ExpectedConditions.elementToBeClickable(mapParkBtn)).click();
+				System.out.println("[ACTION] Clicked mapParkBtn");
 	            Thread.sleep(400);
 	            return;
 
@@ -351,6 +354,7 @@ public class MapPage extends AndroidActions {
 	    tap.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
 	    tap.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
 	    driver.perform(singletonList(tap));
+	    System.out.println("[ACTION] Performed touch gesture");
 	}
 
 	private boolean isAboveListView(WebElement el, WebElement listViewToggle) {
@@ -426,6 +430,7 @@ public class MapPage extends AndroidActions {
 		
 		wait.until(ExpectedConditions.visibilityOf(profilePost));
 		wait.until(ExpectedConditions.elementToBeClickable(profilePost)).click();
+		System.out.println("[ACTION] Clicked profilePost");
 		try {
 			wait.until(ExpectedConditions.visibilityOf(profileFeedThreeDot));
 		} catch (Exception e) {
@@ -434,11 +439,13 @@ public class MapPage extends AndroidActions {
 		
 		wait.until(ExpectedConditions.visibilityOf(profileInfo));
 		wait.until(ExpectedConditions.elementToBeClickable(profileInfo)).click();
+		System.out.println("[ACTION] Clicked profileInfo");
 		
 		
 		try {
 			wait.until(ExpectedConditions.visibilityOf(business_addview));
 			wait.until(ExpectedConditions.elementToBeClickable(business_addview)).click();
+			System.out.println("[ACTION] Clicked business_addview");
 			WebElement laterBtn = wait
 					.until(ExpectedConditions.elementToBeClickable(parkTabRatingLaterBtnBy));
 			laterBtn.click();
@@ -460,6 +467,7 @@ public class MapPage extends AndroidActions {
 		
 		wait.until(ExpectedConditions.visibilityOf(profileQuestion));
 		wait.until(ExpectedConditions.elementToBeClickable(profileQuestion)).click();
+		System.out.println("[ACTION] Clicked profileQuestion");
 		try {
 			wait.until(ExpectedConditions.visibilityOf(profileFeedThreeDot));
 		} catch (Exception e) {
@@ -471,8 +479,10 @@ public class MapPage extends AndroidActions {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 		wait.until(ExpectedConditions.visibilityOf(profileHambugarMenu));
 		wait.until(ExpectedConditions.elementToBeClickable(profileHambugarMenu)).click();
+		System.out.println("[ACTION] Clicked profileHambugarMenu");
 		wait.until(ExpectedConditions.visibilityOf(reportUserInappropriateBtn));
 		wait.until(ExpectedConditions.elementToBeClickable(reportUserInappropriateBtn)).click();
+		System.out.println("[ACTION] Clicked reportUserInappropriateBtn");
 
 		WebElement inapproBtn = wait.until(ExpectedConditions.elementToBeClickable(appropriateOptionBtnBy));
 		inapproBtn.click();
@@ -505,8 +515,10 @@ public class MapPage extends AndroidActions {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 		wait.until(ExpectedConditions.visibilityOf(profileHambugarMenu));
 		wait.until(ExpectedConditions.elementToBeClickable(profileHambugarMenu)).click();
+		System.out.println("[ACTION] Clicked profileHambugarMenu");
 		wait.until(ExpectedConditions.visibilityOf(businessBlockBtn));
 		wait.until(ExpectedConditions.elementToBeClickable(businessBlockBtn)).click();
+		System.out.println("[ACTION] Clicked businessBlockBtn");
 		handleProfilePopup("Cancel");
 		wait.until(ExpectedConditions.visibilityOf(businessMessageBtn));
 	}
@@ -515,11 +527,15 @@ public class MapPage extends AndroidActions {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 		wait.until(ExpectedConditions.visibilityOf(businessMessageBtn));
 		wait.until(ExpectedConditions.elementToBeClickable(businessMessageBtn)).click();
+		System.out.println("[ACTION] Clicked businessMessageBtn");
 		wait.until(ExpectedConditions.visibilityOf(messageTextbox));
 		wait.until(ExpectedConditions.elementToBeClickable(messageTextbox)).sendKeys("Hey brother");
+		System.out.println("[ACTION] Entered text in messageTextbox");
 		driver.hideKeyboard();
+		System.out.println("[ACTION] Hid keyboard");
 		wait.until(ExpectedConditions.visibilityOf(messageEnterbtn));
 		wait.until(ExpectedConditions.elementToBeClickable(messageEnterbtn)).click();
+		System.out.println("[ACTION] Clicked messageEnterbtn");
 		try {
 			if (exceedMessageLimitPopup.isDisplayed()) {
 				System.out.println("[INFO] ⚠️ Message limit reached.");
@@ -530,17 +546,21 @@ public class MapPage extends AndroidActions {
 			System.out.println("[INFO] ⚠️ Message limit is not reached yet reached.");
 		}
 		driver.pressKey(new KeyEvent(AndroidKey.BACK));
+		System.out.println("[ACTION] Pressed device Back");
 
 		wait.until(ExpectedConditions.visibilityOf(businessMessageBtn));
 		wait.until(ExpectedConditions.elementToBeClickable(businessMessageBtn)).click();
+		System.out.println("[ACTION] Clicked businessMessageBtn");
 
 		// chat gallery
 		wait.until(ExpectedConditions.visibilityOf(chatGallery));
 		wait.until(ExpectedConditions.elementToBeClickable(chatGallery)).click();
+		System.out.println("[ACTION] Clicked chatGallery");
 
 		try {
 			if (allowBtn.isDisplayed()) {
 				wait.until(ExpectedConditions.elementToBeClickable(allowBtn)).click();
+				System.out.println("[ACTION] Clicked allowBtn");
 			}
 		} catch (Exception e) {
 		}
@@ -548,16 +568,22 @@ public class MapPage extends AndroidActions {
 		try {
 			if (allowOneBtn.isDisplayed()) {
 				wait.until(ExpectedConditions.elementToBeClickable(allowOneBtn)).click();
+				System.out.println("[ACTION] Clicked allowOneBtn");
 			}
 		} catch (Exception e) {
 		}
 
 		wait.until(ExpectedConditions.elementToBeClickable(selectFirstImage)).click();
+		System.out.println("[ACTION] Clicked selectFirstImage");
 		wait.until(ExpectedConditions.elementToBeClickable(cameraRollDone)).click();
+		System.out.println("[ACTION] Clicked cameraRollDone");
 		wait.until(ExpectedConditions.elementToBeClickable(lostDogCrop)).click();
+		System.out.println("[ACTION] Clicked lostDogCrop");
 		wait.until(ExpectedConditions.elementToBeClickable(chatGalleryEnterBtn)).click();
+		System.out.println("[ACTION] Clicked chatGalleryEnterBtn");
 		Thread.sleep(3000);
 		driver.pressKey(new KeyEvent(AndroidKey.BACK));
+		System.out.println("[ACTION] Pressed device Back");
 
 		wait.until(ExpectedConditions.visibilityOf(businessMessageBtn));
 	}
@@ -566,6 +592,7 @@ public class MapPage extends AndroidActions {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 		wait.until(ExpectedConditions.visibilityOf(businessAddress));
 		wait.until(ExpectedConditions.elementToBeClickable(businessAddress)).click();
+		System.out.println("[ACTION] Clicked businessAddress");
 
 //		wait.until(ExpectedConditions.or(ExpectedConditions.visibilityOf(businessAddressFollow),
 //				ExpectedConditions.visibilityOf(businessAddressFollowMulti),
@@ -580,24 +607,36 @@ public class MapPage extends AndroidActions {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 		wait.until(ExpectedConditions.visibilityOf(followerTab));
 		wait.until(ExpectedConditions.elementToBeClickable(followerTab)).click();
+		System.out.println("[ACTION] Clicked followerTab");
 		wait.until(ExpectedConditions.visibilityOf(searchField));
 		wait.until(ExpectedConditions.elementToBeClickable(searchField)).sendKeys("xyz");
+		System.out.println("[ACTION] Entered text in searchField");
 		driver.hideKeyboard();
+		System.out.println("[ACTION] Hid keyboard");
 		driver.pressKey(new KeyEvent(AndroidKey.BACK));
+		System.out.println("[ACTION] Pressed device Back");
 
 		wait.until(ExpectedConditions.visibilityOf(followeringTab));
 		wait.until(ExpectedConditions.elementToBeClickable(followeringTab)).click();
+		System.out.println("[ACTION] Clicked followeringTab");
 		wait.until(ExpectedConditions.visibilityOf(searchField));
 		wait.until(ExpectedConditions.elementToBeClickable(searchField)).sendKeys("xyz");
+		System.out.println("[ACTION] Entered text in searchField");
 		driver.hideKeyboard();
+		System.out.println("[ACTION] Hid keyboard");
 		driver.pressKey(new KeyEvent(AndroidKey.BACK));
+		System.out.println("[ACTION] Pressed device Back");
 		driver.pressKey(new KeyEvent(AndroidKey.BACK));
+		System.out.println("[ACTION] Pressed device Back");
 
 		wait.until(ExpectedConditions.visibilityOf(badgeTab));
 		wait.until(ExpectedConditions.elementToBeClickable(badgeTab)).click();
+		System.out.println("[ACTION] Clicked badgeTab");
 		Thread.sleep(3000);
 		driver.pressKey(new KeyEvent(AndroidKey.BACK));
+		System.out.println("[ACTION] Pressed device Back");
 		driver.pressKey(new KeyEvent(AndroidKey.BACK));
+		System.out.println("[ACTION] Pressed device Back");
 		wait.until(ExpectedConditions.visibilityOf(businessMessageBtn));
 
 	}
@@ -610,6 +649,7 @@ public class MapPage extends AndroidActions {
 
 	    wait.until(ExpectedConditions.visibilityOf(mapBusinessBtn));
 	    wait.until(ExpectedConditions.elementToBeClickable(mapBusinessBtn)).click();
+	    System.out.println("[ACTION] Clicked mapBusinessBtn");
 
 	    Thread.sleep(600); // let map settle
 
@@ -637,11 +677,13 @@ public class MapPage extends AndroidActions {
 
 	            wait.until(ExpectedConditions.visibilityOf(viewBusiness));
 	            wait.until(ExpectedConditions.elementToBeClickable(viewBusiness)).click();
+	            System.out.println("[ACTION] Clicked viewBusiness");
 
 	            performedActionAccordingToBusinessType();
 	            
 	            wait.until(ExpectedConditions.visibilityOf(viewBusiness));
 				wait.until(ExpectedConditions.elementToBeClickable(mapBusinessBtn)).click();
+				System.out.println("[ACTION] Clicked mapBusinessBtn");
 	            Thread.sleep(400);
 	            return;
 
@@ -666,13 +708,16 @@ public class MapPage extends AndroidActions {
 		try {
 			new WebDriverWait(driver, Duration.ofSeconds(3))
 					.until(ExpectedConditions.elementToBeClickable(mapLodgings)).click();
+					System.out.println("[ACTION] Clicked mapLodgings");
 			return;
 		} catch (Exception notOnMap) {
 			WebDriverWait w = new WebDriverWait(driver, Duration.ofSeconds(15));
 			try { driver.context("NATIVE_APP"); } catch (Exception ignored) {}
 			w.until(ExpectedConditions.elementToBeClickable(mapViewTab)).click();
+			System.out.println("[ACTION] Clicked mapViewTab");
 			w.until(ExpectedConditions.visibilityOf(mapType));
 			w.until(ExpectedConditions.elementToBeClickable(mapLodgings)).click();
+			System.out.println("[ACTION] Clicked mapLodgings");
 		}
 	}
 
@@ -770,6 +815,7 @@ public class MapPage extends AndroidActions {
 		tap.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
 		tap.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
 		driver.perform(singletonList(tap));
+		System.out.println("[ACTION] Performed touch gesture");
 	}
 
 	private void sleepQuiet(long ms) {
@@ -796,6 +842,7 @@ public class MapPage extends AndroidActions {
 					System.out.println("[ACTION] Clicked on first visible lodging marker.");
 					wait.until(ExpectedConditions.visibilityOf(lodgingReserveBtn));
 					wait.until(ExpectedConditions.elementToBeClickable(lodgingReserveBtn)).click();
+					System.out.println("[ACTION] Clicked lodgingReserveBtn");
 					Set<String> contextNames = driver.getContextHandles();
 					int attempts = 0;
 					while (contextNames.size() < 2 && attempts < 10) {
@@ -811,6 +858,7 @@ public class MapPage extends AndroidActions {
 						driver.context("WEBVIEW_com.dogpack");
 						scrollDownTwice();
 						driver.pressKey(new KeyEvent(AndroidKey.BACK));
+						System.out.println("[ACTION] Pressed device Back");
 						//safeBack();
 						driver.context("NATIVE_APP");
 
@@ -818,6 +866,7 @@ public class MapPage extends AndroidActions {
 						clickBookingChip();
 					} catch (Exception e) {
 						driver.pressKey(new KeyEvent(AndroidKey.BACK));
+						System.out.println("[ACTION] Pressed device Back");
 						wait.until(ExpectedConditions.visibilityOf(lodgingReserveBtn));
 						clickBookingChip();
 					}
@@ -850,6 +899,7 @@ public class MapPage extends AndroidActions {
 		swipe.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
 
 		driver.perform(singletonList(swipe));
+		System.out.println("[ACTION] Performed touch gesture");
 	}
 
 	public void clickOnLodgingsAfterSwipeRight() throws InterruptedException {
@@ -878,6 +928,7 @@ public class MapPage extends AndroidActions {
 		}
 
 		wait.until(ExpectedConditions.elementToBeClickable(mapLodgings)).click();
+		System.out.println("[ACTION] Clicked mapLodgings");
 		Thread.sleep(2000);
 	}
 
@@ -895,6 +946,7 @@ public class MapPage extends AndroidActions {
 		swipe.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
 
 		driver.perform(singletonList(swipe));
+		System.out.println("[ACTION] Performed touch gesture");
 	}
 
 	public void UnSelectDogFriendlyArea() throws InterruptedException {
@@ -923,6 +975,7 @@ public class MapPage extends AndroidActions {
 		}
 
 		wait.until(ExpectedConditions.elementToBeClickable(mapFriendlyAreaBtn)).click();
+		System.out.println("[ACTION] Clicked mapFriendlyAreaBtn");
 		Thread.sleep(2000);
 	}
 
@@ -931,6 +984,7 @@ public class MapPage extends AndroidActions {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 		wait.until(ExpectedConditions.visibilityOf(mapLodgings));
 		wait.until(ExpectedConditions.elementToBeClickable(mapLodgings)).click();
+		System.out.println("[ACTION] Clicked mapLodgings");
 		Thread.sleep(2000);
 	}
 
@@ -939,6 +993,7 @@ public class MapPage extends AndroidActions {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 		wait.until(ExpectedConditions.visibilityOf(mapBusinessBtn));
 		wait.until(ExpectedConditions.elementToBeClickable(mapBusinessBtn)).click();
+		System.out.println("[ACTION] Clicked mapBusinessBtn");
 		Thread.sleep(2000);
 	}
 
@@ -947,6 +1002,7 @@ public class MapPage extends AndroidActions {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 		wait.until(ExpectedConditions.visibilityOf(mapParkBtn));
 		wait.until(ExpectedConditions.elementToBeClickable(mapParkBtn)).click();
+		System.out.println("[ACTION] Clicked mapParkBtn");
 		Thread.sleep(2000);
 	}
 
@@ -956,6 +1012,7 @@ public class MapPage extends AndroidActions {
 
 		wait.until(ExpectedConditions.visibilityOf(SuggestBtn));
 		wait.until(ExpectedConditions.elementToBeClickable(SuggestBtn)).click();
+		System.out.println("[ACTION] Clicked SuggestBtn");
 
 		// Handle location permissions if prompted
 		try {
@@ -969,6 +1026,7 @@ public class MapPage extends AndroidActions {
 		try {
 			if (whileUsingAppPermission.isDisplayed()) {
 				wait.until(ExpectedConditions.elementToBeClickable(whileUsingAppPermission)).click();
+				System.out.println("[ACTION] Clicked whileUsingAppPermission");
 			}
 		} catch (Exception ignored) {
 			System.out.println("[WARN] while using app button not displayed");
@@ -976,19 +1034,25 @@ public class MapPage extends AndroidActions {
 
 		wait.until(ExpectedConditions.visibilityOf(suggestPinMarker));
 		wait.until(ExpectedConditions.elementToBeClickable(suggestPinMarker)).click();
+		System.out.println("[ACTION] Clicked suggestPinMarker");
 
 		wait.until(ExpectedConditions.visibilityOf(enterSuggestedName));
 		wait.until(ExpectedConditions.elementToBeClickable(enterSuggestedName)).sendKeys("AutomationTestingBusiness01");
+		System.out.println("[ACTION] Entered text in enterSuggestedName");
 		driver.hideKeyboard();
+		System.out.println("[ACTION] Hid keyboard");
 
 		wait.until(ExpectedConditions.elementToBeClickable(dogBusinessOption)).click();
+		System.out.println("[ACTION] Clicked dogBusinessOption");
 		wait.until(ExpectedConditions.elementToBeClickable(suggestSave)).click();
+		System.out.println("[ACTION] Clicked suggestSave");
 
 		try {
 			wait.until(ExpectedConditions.or(ExpectedConditions.visibilityOf(businessLabel),
 					ExpectedConditions.visibilityOf(businessLater), ExpectedConditions.visibilityOf(businessConfirm)));
 
 			wait.until(ExpectedConditions.elementToBeClickable(businessLater)).click();
+			System.out.println("[ACTION] Clicked businessLater");
 
 			String expected = "Thank you we are reviewing your suggestion.";
 			String actual = parkSuggestSuccessMessage.getText();
@@ -1024,6 +1088,7 @@ public class MapPage extends AndroidActions {
 
 		wait.until(ExpectedConditions.visibilityOf(SuggestBtn));
 		wait.until(ExpectedConditions.elementToBeClickable(SuggestBtn)).click();
+		System.out.println("[ACTION] Clicked SuggestBtn");
 
 		// Handle location permissions if prompted
 		try {
@@ -1037,6 +1102,7 @@ public class MapPage extends AndroidActions {
 		try {
 			if (whileUsingAppPermission.isDisplayed()) {
 				wait.until(ExpectedConditions.elementToBeClickable(whileUsingAppPermission)).click();
+				System.out.println("[ACTION] Clicked whileUsingAppPermission");
 			}
 		} catch (Exception ignored) {
 			System.out.println("[WARN] while using app button not displayed");
@@ -1044,20 +1110,28 @@ public class MapPage extends AndroidActions {
 
 		wait.until(ExpectedConditions.visibilityOf(suggestPinMarker));
 		wait.until(ExpectedConditions.elementToBeClickable(suggestPinMarker)).click();
+		System.out.println("[ACTION] Clicked suggestPinMarker");
 
 		wait.until(ExpectedConditions.visibilityOf(enterSuggestedName));
 		wait.until(ExpectedConditions.elementToBeClickable(enterSuggestedName)).sendKeys("AutomationTestingPark01");
+		System.out.println("[ACTION] Entered text in enterSuggestedName");
 		driver.hideKeyboard();
+		System.out.println("[ACTION] Hid keyboard");
 
 		wait.until(ExpectedConditions.elementToBeClickable(dogParkOption)).click();
+		System.out.println("[ACTION] Clicked dogParkOption");
 		wait.until(ExpectedConditions.elementToBeClickable(suggestSave)).click();
+		System.out.println("[ACTION] Clicked suggestSave");
 
 		wait.until(ExpectedConditions.or(ExpectedConditions.visibilityOf(parkLabel),
 				ExpectedConditions.visibilityOf(parkConfirm), ExpectedConditions.visibilityOf(parkLater)));
 
 		wait.until(ExpectedConditions.elementToBeClickable(parkChecked)).click();
+		System.out.println("[ACTION] Clicked parkChecked");
 		wait.until(ExpectedConditions.elementToBeClickable(parkCross)).click();
+		System.out.println("[ACTION] Clicked parkCross");
 		wait.until(ExpectedConditions.elementToBeClickable(parkConfirm)).click();
+		System.out.println("[ACTION] Clicked parkConfirm");
 
 		String expected = "Thank you we are reviewing your suggestion.";
 		String actual = parkSuggestSuccessMessage.getText();
@@ -1073,11 +1147,13 @@ public class MapPage extends AndroidActions {
 
 		wait.until(ExpectedConditions.visibilityOf(listBusinessBtn));
 		wait.until(ExpectedConditions.elementToBeClickable(listBusinessBtn)).click();
+		System.out.println("[ACTION] Clicked listBusinessBtn");
 
 		wait.until(ExpectedConditions.or(ExpectedConditions.visibilityOf(labelDogProfile),
 				ExpectedConditions.visibilityOf(labelBusinessProfile)));
 
 		driver.pressKey(new KeyEvent(AndroidKey.BACK));
+		System.out.println("[ACTION] Pressed device Back");
 		wait.until(ExpectedConditions.visibilityOf(listView));
 
 	}
@@ -1089,6 +1165,7 @@ public class MapPage extends AndroidActions {
 
 		wait.until(ExpectedConditions.visibilityOf(mapViewTab));
 		wait.until(ExpectedConditions.elementToBeClickable(mapViewTab)).click();
+		System.out.println("[ACTION] Clicked mapViewTab");
 
 		// Handle location permissions if prompted
 		try {
@@ -1102,6 +1179,7 @@ public class MapPage extends AndroidActions {
 		try {
 			if (whileUsingAppPermission.isDisplayed()) {
 				wait.until(ExpectedConditions.elementToBeClickable(whileUsingAppPermission)).click();
+				System.out.println("[ACTION] Clicked whileUsingAppPermission");
 			}
 		} catch (Exception ignored) {
 			System.out.println("[WARN] while using app button not displayed");
@@ -1121,9 +1199,11 @@ public class MapPage extends AndroidActions {
 
 		wait.until(ExpectedConditions.visibilityOf(mapSearchBar));
 		wait.until(ExpectedConditions.elementToBeClickable(mapSearchBar)).click();
+		System.out.println("[ACTION] Clicked mapSearchBar");
 
 		wait.until(ExpectedConditions.visibilityOf(getCurrentLocation));
 		wait.until(ExpectedConditions.elementToBeClickable(getCurrentLocation)).click();
+		System.out.println("[ACTION] Clicked getCurrentLocation");
 		wait.until(ExpectedConditions.visibilityOf(mapType));
 
 	}
@@ -1135,10 +1215,13 @@ public class MapPage extends AndroidActions {
 
 		wait.until(ExpectedConditions.visibilityOf(mapSearchBar));
 		wait.until(ExpectedConditions.elementToBeClickable(mapSearchBar)).click();
+		System.out.println("[ACTION] Clicked mapSearchBar");
 
 		wait.until(ExpectedConditions.elementToBeClickable(enterLocationHere)).sendKeys("montreal");
+		System.out.println("[ACTION] Entered text in enterLocationHere");
 		wait.until(ExpectedConditions.visibilityOf(MontrealLocation));
 		wait.until(ExpectedConditions.elementToBeClickable(MontrealLocation)).click();
+		System.out.println("[ACTION] Clicked MontrealLocation");
 
 		wait.until(ExpectedConditions.visibilityOf(mapType));
 
@@ -1151,9 +1234,11 @@ public class MapPage extends AndroidActions {
 
 		wait.until(ExpectedConditions.visibilityOf(mapType));
 		wait.until(ExpectedConditions.elementToBeClickable(mapType)).click();
+		System.out.println("[ACTION] Clicked mapType");
 		wait.until(ExpectedConditions.visibilityOf(mapTypeDefault));
 
 		wait.until(ExpectedConditions.elementToBeClickable(mapTypeTraffic)).click();
+		System.out.println("[ACTION] Clicked mapTypeTraffic");
 		wait.until(ExpectedConditions.visibilityOf(listView));
 
 	}
@@ -1165,9 +1250,11 @@ public class MapPage extends AndroidActions {
 
 		wait.until(ExpectedConditions.visibilityOf(mapType));
 		wait.until(ExpectedConditions.elementToBeClickable(mapType)).click();
+		System.out.println("[ACTION] Clicked mapType");
 		wait.until(ExpectedConditions.visibilityOf(mapTypeDefault));
 
 		wait.until(ExpectedConditions.elementToBeClickable(mapTypeTerrain)).click();
+		System.out.println("[ACTION] Clicked mapTypeTerrain");
 		wait.until(ExpectedConditions.visibilityOf(listView));
 
 	}
@@ -1179,9 +1266,11 @@ public class MapPage extends AndroidActions {
 
 		wait.until(ExpectedConditions.visibilityOf(mapType));
 		wait.until(ExpectedConditions.elementToBeClickable(mapType)).click();
+		System.out.println("[ACTION] Clicked mapType");
 		wait.until(ExpectedConditions.visibilityOf(mapTypeDefault));
 
 		wait.until(ExpectedConditions.elementToBeClickable(mapTypeSatellite)).click();
+		System.out.println("[ACTION] Clicked mapTypeSatellite");
 		wait.until(ExpectedConditions.visibilityOf(listView));
 
 	}
@@ -1193,9 +1282,11 @@ public class MapPage extends AndroidActions {
 
 		wait.until(ExpectedConditions.visibilityOf(mapType));
 		wait.until(ExpectedConditions.elementToBeClickable(mapType)).click();
+		System.out.println("[ACTION] Clicked mapType");
 		wait.until(ExpectedConditions.visibilityOf(mapTypeDefault));
 
 		wait.until(ExpectedConditions.elementToBeClickable(mapTypeDefault)).click();
+		System.out.println("[ACTION] Clicked mapTypeDefault");
 		wait.until(ExpectedConditions.visibilityOf(listView));
 
 	}

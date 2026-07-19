@@ -564,6 +564,7 @@ public class SubscriptionPage extends AndroidActions {
                         AppiumBy.accessibilityId("Close"));
                 if (closeBtn.isDisplayed()) {
                     closeBtn.click();
+                    System.out.println("[ACTION] Clicked closeBtn");
                     sleepQuiet(1500);
                 }
             } catch (Exception ignore) {
@@ -672,6 +673,7 @@ public class SubscriptionPage extends AndroidActions {
     private void safeBack() {
         try {
             driver.pressKey(new KeyEvent(AndroidKey.BACK));
+            System.out.println("[ACTION] Pressed device Back");
             Thread.sleep(1000);
         } catch (Exception e) {
             System.out.println("[WARN] safeBack failed: "

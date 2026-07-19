@@ -225,6 +225,7 @@ public class MarketplacePage extends AndroidActions {
         WebElement row = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(ACCOUNT_AND_INFO_ROW_XPATH)));
         row.click();
+        System.out.println("[ACTION] Clicked row");
         log("[OK]       Tapped Account and info");
         sleepQuiet(1500);
     }
@@ -265,6 +266,7 @@ public class MarketplacePage extends AndroidActions {
                         ExpectedConditions.elementToBeClickable(
                                 AppiumBy.xpath(xpath)));
                 el.click();
+                System.out.println("[ACTION] Clicked el");
                 log("[OK]       Tapped permission button: \"" + text
                         + "\" (granted)");
                 sleepQuiet(2000);
@@ -298,6 +300,7 @@ public class MarketplacePage extends AndroidActions {
             throw e;
         }
         btn.click();
+        System.out.println("[ACTION] Clicked btn");
         log("[OK]       Tapped location row");
         sleepQuiet(1500);
     }
@@ -308,6 +311,7 @@ public class MarketplacePage extends AndroidActions {
         WebElement icon = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(ADDRESS_LIST_LOCATOR_XPATH)));
         icon.click();
+        System.out.println("[ACTION] Clicked icon");
         log("[OK]       Tapped address-list locator");
         sleepQuiet(1500);
     }
@@ -333,11 +337,13 @@ public class MarketplacePage extends AndroidActions {
         WebElement box = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(LOCATION_SEARCH_BOX_XPATH)));
         box.click();
+        System.out.println("[ACTION] Clicked box");
         log("[OK]       Tapped textbox");
         sleepQuiet(500);
 
         log("[STEP 2/2] Type '" + query + "'");
         box.sendKeys(query);
+        System.out.println("[ACTION] Entered text in box");
         log("[OK]       Sent keys");
         sleepQuiet(1500);
     }
@@ -370,6 +376,7 @@ public class MarketplacePage extends AndroidActions {
             throw e;
         }
         el.click();
+        System.out.println("[ACTION] Clicked el");
         log("[OK]       Selected " + country);
         sleepQuiet(1500);
     }
@@ -428,6 +435,7 @@ public class MarketplacePage extends AndroidActions {
         WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(UPDATE_BTN_XPATH)));
         btn.click();
+        System.out.println("[ACTION] Clicked btn");
         log("[OK]       Tapped UPDATE");
         // Generous settle - the update can trigger a few seconds of
         // async work (location save, UI refresh) before "Shop" appears.
@@ -476,6 +484,7 @@ public class MarketplacePage extends AndroidActions {
         WebElement shop = wait.until(ExpectedConditions.visibilityOfElementLocated(
                 AppiumBy.xpath(SHOP_ENTRY_XPATH)));
         shop.click();
+        System.out.println("[ACTION] Clicked shop");
         log("[OK]       Tapped Shop");
         sleepQuiet(1000);
     }
@@ -505,6 +514,7 @@ public class MarketplacePage extends AndroidActions {
             throw e;
         }
         el.click();
+        System.out.println("[ACTION] Clicked el");
         log("[OK]       Tapped marketplace view ImageView");
         sleepQuiet(2000);
     }
@@ -555,6 +565,7 @@ public class MarketplacePage extends AndroidActions {
             try {
                 WebElement delBtn = findFirstDeleteButton();
                 delBtn.click();
+                System.out.println("[ACTION] Clicked delBtn");
                 log("[OK]       Deleted item " + i + " of " + count);
                 // 3s settle - list re-renders, animation, etc.
                 sleepQuiet(3000);
@@ -649,6 +660,7 @@ public class MarketplacePage extends AndroidActions {
             throw e;
         }
         box.click();
+        System.out.println("[ACTION] Clicked box");
         log("[OK]       Tapped search box");
         sleepQuiet(1000);
     }
@@ -677,6 +689,7 @@ public class MarketplacePage extends AndroidActions {
             throw e;
         }
         box.sendKeys(query);
+        System.out.println("[ACTION] Entered text in box");
         log("[OK]       Typed \"" + query + "\" into search box");
         sleepQuiet(1000);
     }
@@ -698,6 +711,7 @@ public class MarketplacePage extends AndroidActions {
         log("===> PressEnterToSubmitSearch (AndroidKey.ENTER)");
         try {
             driver.pressKey(new KeyEvent(AndroidKey.ENTER));
+            System.out.println("[ACTION] Pressed device key");
             log("[OK]       Sent ENTER keypress - search submitted");
         } catch (Exception e) {
             log("[FAIL]     Could not send ENTER key. Exception: "
@@ -769,6 +783,7 @@ public class MarketplacePage extends AndroidActions {
             throw e;
         }
         el.click();
+        System.out.println("[ACTION] Clicked el");
         log("[OK]       Tapped card-form field index " + editTextIndex);
         sleepQuiet(1000);
     }
@@ -794,6 +809,7 @@ public class MarketplacePage extends AndroidActions {
             throw e;
         }
         el.sendKeys(value);
+        System.out.println("[ACTION] Entered text in el");
         log("[OK]       Sent " + value.length() + " chars to field index "
                 + editTextIndex);
         sleepQuiet(1500);
@@ -868,6 +884,7 @@ public class MarketplacePage extends AndroidActions {
             throw e;
         }
         btn.click();
+        System.out.println("[ACTION] Clicked btn");
         log("[OK]       Tapped Continue button on PaymentSheet");
         sleepQuiet(3000);
     }
@@ -951,6 +968,7 @@ public class MarketplacePage extends AndroidActions {
             throw e;
         }
         btn.click();
+        System.out.println("[ACTION] Clicked btn");
         log("[OK]       Tapped Continue Shopping");
         sleepQuiet(2000);
     }
@@ -961,6 +979,7 @@ public class MarketplacePage extends AndroidActions {
         WebElement seeAll = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(SEE_ALL_XPATH)));
         seeAll.click();
+        System.out.println("[ACTION] Clicked seeAll");
         log("[OK]       Tapped See all");
         sleepQuiet(2000);
     }
@@ -989,6 +1008,7 @@ public class MarketplacePage extends AndroidActions {
             throw e;
         }
         btn.click();
+        System.out.println("[ACTION] Clicked btn");
         log("[OK]       Tapped Buy Now [" + index + "]");
         sleepQuiet(2500);
     }
@@ -999,6 +1019,7 @@ public class MarketplacePage extends AndroidActions {
         WebElement checkout = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(CHECKOUT_BTN_XPATH)));
         checkout.click();
+        System.out.println("[ACTION] Clicked checkout");
         log("[OK]       Tapped Checkout");
         sleepQuiet(2500);
     }
@@ -1062,6 +1083,7 @@ public class MarketplacePage extends AndroidActions {
         WebElement back = wait.until(ExpectedConditions.visibilityOfElementLocated(
                 AppiumBy.xpath(COMMON_HEADER_BACK_BTN_XPATH)));
         back.click();
+        System.out.println("[ACTION] Clicked back");
         log("[OK]       Tapped back button");
         sleepQuiet(2000);
     }
@@ -1117,6 +1139,7 @@ public class MarketplacePage extends AndroidActions {
         WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(PLACE_YOUR_ORDER_XPATH)));
         btn.click();
+        System.out.println("[ACTION] Clicked btn");
         log("[OK]       Tapped Place your order");
         // No assertion after the click - user spec ends here. If a
         // confirmation screen check is needed in the future, add a
@@ -1146,6 +1169,7 @@ public class MarketplacePage extends AndroidActions {
             throw e;
         }
         btn.click();
+        System.out.println("[ACTION] Clicked btn");
         log("[OK]       Tapped OK - order confirmation dismissed");
         sleepQuiet(2000);
     }
@@ -1176,6 +1200,7 @@ public class MarketplacePage extends AndroidActions {
             throw e;
         }
         el.click();
+        System.out.println("[ACTION] Clicked el");
         log("[OK]       Tapped cart icon - navigating to CartView");
         sleepQuiet(2000);
     }
@@ -1209,6 +1234,7 @@ public class MarketplacePage extends AndroidActions {
             throw e;
         }
         el.click();
+        System.out.println("[ACTION] Clicked el");
         log("[OK]       Tapped Profile tab (by text)");
         sleepQuiet(2000);
     }
@@ -1235,6 +1261,7 @@ public class MarketplacePage extends AndroidActions {
             throw e;
         }
         el.click();
+        System.out.println("[ACTION] Clicked el");
         log("[OK]       Tapped hamburger menu");
         sleepQuiet(2000);
     }
@@ -1259,6 +1286,7 @@ public class MarketplacePage extends AndroidActions {
             throw e;
         }
         el.click();
+        System.out.println("[ACTION] Clicked el");
         log("[OK]       Tapped Account and info (by content-desc)");
         sleepQuiet(2000);
     }

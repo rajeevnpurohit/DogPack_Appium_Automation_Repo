@@ -421,6 +421,7 @@ public class PostingExperiencePage extends AndroidActions {
         for (int i = 0; i < 3; i++) {
             try {
                 driver.pressKey(new KeyEvent(AndroidKey.BACK));
+                System.out.println("[ACTION] Pressed device Back");
                 sleepQuiet(700);
             } catch (Exception ignore) { }
 
@@ -634,10 +635,12 @@ public class PostingExperiencePage extends AndroidActions {
                             + "recovery to continue test.");
                     try {
                         driver.pressKey(new KeyEvent(AndroidKey.BACK));
+                        System.out.println("[ACTION] Pressed device Back");
                         sleepQuiet(1000);
                         // Try a second BACK if still not on composer
                         if (!isDisplayedSafe(tagParkOption)) {
                             driver.pressKey(new KeyEvent(AndroidKey.BACK));
+                            System.out.println("[ACTION] Pressed device Back");
                             sleepQuiet(1000);
                         }
                     } catch (Exception ignore) { /* */ }
@@ -681,6 +684,7 @@ public class PostingExperiencePage extends AndroidActions {
 
                 try {
                     driver.pressKey(new KeyEvent(AndroidKey.BACK));
+                    System.out.println("[ACTION] Pressed device Back");
                     sleepQuiet(1000);
                 } catch (Exception ignore) { /* */ }
 
@@ -762,6 +766,7 @@ public class PostingExperiencePage extends AndroidActions {
                 // Recover via back press, don't hard-fail the test
                 try {
                     driver.pressKey(new KeyEvent(AndroidKey.BACK));
+                    System.out.println("[ACTION] Pressed device Back");
                     sleepQuiet(800);
                 } catch (Exception ignore) { /* */ }
                 return;
@@ -782,6 +787,7 @@ public class PostingExperiencePage extends AndroidActions {
                         + "Bailing: " + e.getMessage());
                 try {
                     driver.pressKey(new KeyEvent(AndroidKey.BACK));
+                    System.out.println("[ACTION] Pressed device Back");
                     sleepQuiet(800);
                 } catch (Exception ignore) { /* */ }
                 return;
@@ -816,6 +822,7 @@ public class PostingExperiencePage extends AndroidActions {
 
             step(3, "Press BACK once to settle on feed top-level");
             driver.pressKey(new KeyEvent(AndroidKey.BACK));
+            System.out.println("[ACTION] Pressed device Back");
             sleepQuiet(2000);
         } finally {
             testEnd("clickSecondPostButton");
@@ -903,6 +910,7 @@ public class PostingExperiencePage extends AndroidActions {
         tap.addAction(finger.createPointerUp(
                 PointerInput.MouseButton.LEFT.asArg()));
         driver.perform(Collections.singletonList(tap));
+        System.out.println("[ACTION] Performed touch gesture");
     }
 
     /**
@@ -921,5 +929,6 @@ public class PostingExperiencePage extends AndroidActions {
         longPress.addAction(finger.createPointerUp(
                 PointerInput.MouseButton.LEFT.asArg()));
         driver.perform(Collections.singletonList(longPress));
+        System.out.println("[ACTION] Performed touch gesture");
     }
 }

@@ -182,6 +182,7 @@ public class ForgotPassword extends AndroidActions {
 		System.out.println("[NAV] Navigating to Login screen via 'signup_login'");
 		wait.until(ExpectedConditions.visibilityOf(loginBtn));
 		wait.until(ExpectedConditions.elementToBeClickable(loginBtn)).click();
+		System.out.println("[ACTION] Clicked loginBtn");
 	}
 
 	/**
@@ -228,6 +229,7 @@ public class ForgotPassword extends AndroidActions {
 
 		try {
 			driver.hideKeyboard();
+			System.out.println("[ACTION] Hid keyboard");
 		} catch (Exception ignore) {
 			// keyboard may not be visible
 		}
@@ -296,6 +298,7 @@ public class ForgotPassword extends AndroidActions {
 
 		try {
 			driver.hideKeyboard();
+			System.out.println("[ACTION] Hid keyboard");
 		} catch (Exception ignore) { }
 
 		wait.until(ExpectedConditions.elementToBeClickable(submitBtn)).click();
@@ -312,6 +315,7 @@ public class ForgotPassword extends AndroidActions {
 			fillOtp(invalidOtp);
 			tryHideKeyboard();
 			wait.until(ExpectedConditions.elementToBeClickable(otpContinueBtn)).click();
+			System.out.println("[ACTION] Clicked otpContinueBtn");
 
 			try {
 				WebElement err = shortWait.until(ExpectedConditions.visibilityOf(invalidOtpMessage));
@@ -465,15 +469,21 @@ public class ForgotPassword extends AndroidActions {
 			Assert.fail("OTP must be 4 digits, got: " + otp);
 		}
 		wait.until(ExpectedConditions.elementToBeClickable(otp1)).sendKeys(otp.substring(0, 1));
+		System.out.println("[ACTION] Entered text in otp1");
 		wait.until(ExpectedConditions.elementToBeClickable(otp2)).sendKeys(otp.substring(1, 2));
+		System.out.println("[ACTION] Entered text in otp2");
 		wait.until(ExpectedConditions.elementToBeClickable(otp3)).sendKeys(otp.substring(2, 3));
+		System.out.println("[ACTION] Entered text in otp3");
 		wait.until(ExpectedConditions.elementToBeClickable(otp4)).sendKeys(otp.substring(3, 4));
+		System.out.println("[ACTION] Entered text in otp4");
 	}
 
 	private void clearOtpFields() {
 		try {
 			otp1.clear();
+			System.out.println("[ACTION] Cleared otp1");
 			otp2.clear();
+			System.out.println("[ACTION] Cleared otp2");
 			otp3.clear();
 			otp4.clear();
 			System.out.println("[CLEAR] OTP fields cleared");
@@ -485,6 +495,7 @@ public class ForgotPassword extends AndroidActions {
 	private void tryHideKeyboard() {
 		try {
 			driver.hideKeyboard();
+			System.out.println("[ACTION] Hid keyboard");
 		} catch (Exception ignore) {
 			// keyboard not shown - skip silently
 		}
@@ -492,5 +503,6 @@ public class ForgotPassword extends AndroidActions {
 
 	public void pressBackKey() {
 		driver.pressKey(new KeyEvent(AndroidKey.BACK));
+		System.out.println("[ACTION] Pressed device Back");
 	}
 }

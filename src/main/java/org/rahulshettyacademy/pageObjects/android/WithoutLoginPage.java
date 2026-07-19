@@ -614,6 +614,7 @@ public class WithoutLoginPage extends AndroidActions {
 		// Now safely press BACK (we know we're in NATIVE_APP context)
 		try {
 			driver.pressKey(new KeyEvent(AndroidKey.BACK));
+			System.out.println("[ACTION] Pressed device Back");
 			Thread.sleep(1500);
 			wait.until(ExpectedConditions.visibilityOf(targetElement));
 			System.out.println("[RECOVERY] Back press successful - on welcome screen");
@@ -767,11 +768,13 @@ public class WithoutLoginPage extends AndroidActions {
 			WebElement headerBack = shortWait.until(ExpectedConditions.elementToBeClickable(
 					AppiumBy.accessibilityId("left_click_back")));
 			headerBack.click();
+			System.out.println("[ACTION] Clicked headerBack");
 			Thread.sleep(1500);
 		} catch (Exception e) {
 			System.out.println("[INFO] Header back button not found - using hardware BACK fallback");
 			try {
 				driver.pressKey(new KeyEvent(AndroidKey.BACK));
+				System.out.println("[ACTION] Pressed device Back");
 				Thread.sleep(1500);
 			} catch (Exception ex) {
 				System.out.println("[WARNING] Hardware BACK also failed: "
@@ -823,6 +826,7 @@ public class WithoutLoginPage extends AndroidActions {
 		System.out.println("\n[WELCOME SCREEN] Clicking 'Report A Lost Dog' link");
 		try { scrollToText("Report A Lost Dog"); } catch (Exception ignore) { /* */ }
 		wait.until(ExpectedConditions.elementToBeClickable(reportLostDogLink)).click();
+		System.out.println("[ACTION] Clicked reportLostDogLink");
 
 		handlePermissionDialogIfPresent();
 
@@ -1429,6 +1433,7 @@ public class WithoutLoginPage extends AndroidActions {
 							"Language dropdown not visible during cleanup - cannot restore English");
 				}
 				wait.until(ExpectedConditions.elementToBeClickable(languageDropdownTrigger)).click();
+				System.out.println("[ACTION] Clicked languageDropdownTrigger");
 
 				WebElement englishOption;
 				try {
@@ -1440,7 +1445,9 @@ public class WithoutLoginPage extends AndroidActions {
 							By.xpath("//android.widget.TextView[@text=\"English\"]")));
 				}
 				wait.until(ExpectedConditions.elementToBeClickable(englishOption)).click();
+				System.out.println("[ACTION] Clicked englishOption");
 				wait.until(ExpectedConditions.elementToBeClickable(languageUpdateBtn)).click();
+				System.out.println("[ACTION] Clicked languageUpdateBtn");
 
 				wait.until(ExpectedConditions.visibilityOfElementLocated(
 						By.xpath("//android.widget.TextView[contains(@text,\""

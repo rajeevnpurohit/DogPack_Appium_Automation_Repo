@@ -177,6 +177,7 @@ public class BoostAccountPage extends AndroidActions {
         WebElement row = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(BOOST_ROW_XPATH)));
         row.click();
+        System.out.println("[ACTION] Clicked row");
         log("[OK]       Tapped Boost row");
 
         log("[STEP 2/2] Wait for Subscribe button to appear (40s)");
@@ -204,6 +205,7 @@ public class BoostAccountPage extends AndroidActions {
         WebElement subBtn = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(getSubscribeBtnXpath())));
         subBtn.click();
+        System.out.println("[ACTION] Clicked subBtn");
         log("[OK]       Tapped Subscribe button");
 
         log("[STEP 2/3] Wait for 'Got it' error dialog (up to 15s)");
@@ -214,6 +216,7 @@ public class BoostAccountPage extends AndroidActions {
 
         log("[STEP 3/3] Tap 'Got it' to dismiss");
         gotItBtn.click();
+        System.out.println("[ACTION] Clicked gotItBtn");
         try { Thread.sleep(1500); } catch (InterruptedException ignore) {
             Thread.currentThread().interrupt();
         }
@@ -240,6 +243,7 @@ public class BoostAccountPage extends AndroidActions {
                     .until(ExpectedConditions.elementToBeClickable(
                             AppiumBy.xpath(GOT_IT_BTN_XPATH)));
             gotItBtn.click();
+            System.out.println("[ACTION] Clicked gotItBtn");
             log("[OK]       Got it dialog found and dismissed");
             try { Thread.sleep(1000); } catch (InterruptedException ignore) {
                 Thread.currentThread().interrupt();
@@ -253,6 +257,7 @@ public class BoostAccountPage extends AndroidActions {
         WebElement closeBtn = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(CLOSE_BTN_XPATH)));
         closeBtn.click();
+        System.out.println("[ACTION] Clicked closeBtn");
         log("[OK]       Tapped Close");
 
         // ---- STEP 3: Verify return to Settings ----
@@ -278,6 +283,7 @@ public class BoostAccountPage extends AndroidActions {
         WebElement card = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(ANNUAL_PLAN_CARD_XPATH)));
         card.click();
+        System.out.println("[ACTION] Clicked card");
         log("[OK]       Tapped Annual Plan card");
 
         log("[STEP 2/2] Wait for 'Annual Plan' card label to be visible "
@@ -306,6 +312,7 @@ public class BoostAccountPage extends AndroidActions {
                     AppiumBy.xpath("//android.widget.Button[@content-desc=\"Subscribe Annual Plan for \u20B92,150.00\"]/android.view.View")));
         }
         subBtn.click();
+        System.out.println("[ACTION] Clicked subBtn");
         log("[OK]       Tapped Subscribe Annual button");
 
         log("[STEP 2/3] Wait for 'Got it' error dialog (up to 15s)");
@@ -316,6 +323,7 @@ public class BoostAccountPage extends AndroidActions {
 
         log("[STEP 3/3] Tap 'Got it' to dismiss");
         gotItBtn.click();
+        System.out.println("[ACTION] Clicked gotItBtn");
         try { Thread.sleep(1500); } catch (InterruptedException ignore) {
             Thread.currentThread().interrupt();
         }

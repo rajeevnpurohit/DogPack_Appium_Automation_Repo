@@ -167,6 +167,7 @@ public class SubscriptionFlowPage extends AndroidActions {
         WebElement row = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(SUBSCRIPTION_ROW_XPATH)));
         row.click();
+        System.out.println("[ACTION] Clicked row");
         log("[OK]       Tapped Subscription row");
 
         log("[STEP 2/2] Wait for 'View Plans' (screen-loaded anchor, 30s)");
@@ -188,6 +189,7 @@ public class SubscriptionFlowPage extends AndroidActions {
         WebElement card = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(VERIFICATION_CARD_XPATH)));
         card.click();
+        System.out.println("[ACTION] Clicked card");
         log("[OK]       Tapped Verification card");
     }
 
@@ -200,6 +202,7 @@ public class SubscriptionFlowPage extends AndroidActions {
         WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(VIEW_PLANS_XPATH)));
         btn.click();
+        System.out.println("[ACTION] Clicked btn");
         log("[OK]       Tapped View Plans");
     }
 
@@ -268,6 +271,7 @@ public class SubscriptionFlowPage extends AndroidActions {
         WebElement closeBtn = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(CLOSE_BTN_XPATH)));
         closeBtn.click();
+        System.out.println("[ACTION] Clicked closeBtn");
         log("[OK]       Tapped Close");
         // brief settle so the next step's wait can fire reliably
         sleepQuiet(1500);
@@ -279,6 +283,7 @@ public class SubscriptionFlowPage extends AndroidActions {
         WebElement card = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(MAGIC_IMAGE_CREDITS_CARD_XPATH)));
         card.click();
+        System.out.println("[ACTION] Clicked card");
         log("[OK]       Tapped Magic image credits card");
     }
 
@@ -327,6 +332,7 @@ public class SubscriptionFlowPage extends AndroidActions {
             throw e;
         }
         backArrow.click();
+        System.out.println("[ACTION] Clicked backArrow");
         log("[OK]       Tapped back arrow");
         sleepQuiet(1500);
     }

@@ -155,6 +155,7 @@ public class BusinessUserEditProfile extends AndroidActions {
 		try {
 			String beforePkg = driver.getCurrentPackage();
 			driver.pressKey(new KeyEvent(AndroidKey.BACK));
+			System.out.println("[ACTION] Pressed device Back");
 			Thread.sleep(1000);
 
 			String afterPkg = driver.getCurrentPackage();
@@ -520,6 +521,7 @@ public class BusinessUserEditProfile extends AndroidActions {
 			System.out.println("[INPUT] " + label + " <- '" + value + "'");
 			try {
 				driver.hideKeyboard();
+				System.out.println("[ACTION] Hid keyboard");
 			} catch (Exception ignore) { /* */ }
 		} catch (Exception e) {
 			System.out.println("[WARN] Could not update field '" + label + "': "

@@ -65,6 +65,7 @@ public class LoginPage extends AndroidActions {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 		wait.until(ExpectedConditions.visibilityOf(loginBtn));
 		wait.until(ExpectedConditions.elementToBeClickable(loginBtn)).click();
+		System.out.println("[ACTION] Clicked loginBtn");
 	}
 
 	public void pressBackWithKeyEvent() {
@@ -77,9 +78,12 @@ public class LoginPage extends AndroidActions {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 		wait.until(ExpectedConditions.visibilityOf(usernameField));
 		wait.until(ExpectedConditions.elementToBeClickable(usernameField)).sendKeys(name);
+		System.out.println("[ACTION] Entered text in usernameField");
 		wait.until(ExpectedConditions.visibilityOf(passwordField));
 		wait.until(ExpectedConditions.elementToBeClickable(passwordField)).sendKeys(password);
+		System.out.println("[ACTION] Entered text in passwordField");
 		driver.hideKeyboard();
+		System.out.println("[ACTION] Hid keyboard");
 	}
 
 	public void clickOnLoginSubmit() {
@@ -87,6 +91,7 @@ public class LoginPage extends AndroidActions {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 		wait.until(ExpectedConditions.visibilityOf(loginSubmit));
 		wait.until(ExpectedConditions.elementToBeClickable(loginSubmit)).click();
+		System.out.println("[ACTION] Clicked loginSubmit");
 	}
 
 	/**
@@ -179,5 +184,6 @@ public class LoginPage extends AndroidActions {
 				.isDisplayed(), "'Search' button is not visible on the HomeScreen screen.");
 
 		driver.pressKey(new KeyEvent(AndroidKey.BACK));
+		System.out.println("[ACTION] Pressed device Back");
 	}
 }

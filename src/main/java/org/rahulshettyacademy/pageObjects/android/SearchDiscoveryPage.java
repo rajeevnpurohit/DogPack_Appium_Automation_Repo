@@ -240,6 +240,7 @@ public class SearchDiscoveryPage extends AndroidActions {
 	public void enterSearchText(String text) {
 		wait.until(ExpectedConditions.visibilityOf(searchTextBox));
 		wait.until(ExpectedConditions.elementToBeClickable(searchTextBox)).click();
+		System.out.println("[ACTION] Clicked searchTextBox");
 		try { searchTextBox.clear(); } catch (Exception ignored) {}
 		searchTextBox.sendKeys(text);
 		System.out.println("[INPUT] Entered search text: " + text);
@@ -561,6 +562,7 @@ public class SearchDiscoveryPage extends AndroidActions {
 			PointerInput.Origin.viewport(), centerX, endY));
 		swipe.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
 		driver.perform(Collections.singletonList(swipe));
+		System.out.println("[ACTION] Performed touch gesture");
 	}
 
 	/** open comments on the hashtag post. */
@@ -576,6 +578,7 @@ public class SearchDiscoveryPage extends AndroidActions {
 	 */
 	public void focusCommentInput() {
 		wait.until(ExpectedConditions.elementToBeClickable(commentReplyInput)).click();
+		System.out.println("[ACTION] Clicked commentReplyInput");
 		// Wait for the keyboard animation to complete and the composer toolbar
 		// (image / GIF icons) to fully render into the view tree before returning.
 		try { Thread.sleep(1200); } catch (InterruptedException ignored) {}

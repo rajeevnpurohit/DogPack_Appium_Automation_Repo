@@ -630,6 +630,7 @@ public class SearchPage extends AndroidActions {
         for (int i = 1; i <= 5; i++) {
             try {
                 driver.pressKey(new KeyEvent(AndroidKey.BACK));
+                System.out.println("[ACTION] Pressed device Back");
                 sleepQuiet(700);
                 if (anyTopTabVisible()) {
                     System.out.println("[FLOW] Recovered to Search "
@@ -644,6 +645,7 @@ public class SearchPage extends AndroidActions {
         if (isDisplayedSafe(searchTabBtn)) {
             try {
                 searchTabBtn.click();
+                System.out.println("[ACTION] Clicked searchTabBtn");
                 sleepQuiet(1200);
                 if (anyTopTabVisible()) {
                     System.out.println("[FLOW] Recovered via "
@@ -886,8 +888,10 @@ public class SearchPage extends AndroidActions {
             step(2, "Type and send a text message");
             wait.until(ExpectedConditions.elementToBeClickable(chatInput))
                     .sendKeys("Hey brother");
+                    System.out.println("[ACTION] Entered text");
             try {
                 driver.hideKeyboard();
+                System.out.println("[ACTION] Hid keyboard");
             } catch (Exception ignore) { /* keyboard may not be visible */ }
             wait.until(ExpectedConditions.elementToBeClickable(chatSendBtn))
                     .click();
@@ -907,17 +911,20 @@ public class SearchPage extends AndroidActions {
 
             step(3, "BACK to return to profile detail");
             driver.pressKey(new KeyEvent(AndroidKey.BACK));
+            System.out.println("[ACTION] Pressed device Back");
             wait.until(ExpectedConditions.visibilityOf(messageBtn));
 
             step(4, "Re-open chat to test image send via gallery");
             wait.until(ExpectedConditions.elementToBeClickable(messageBtn))
                     .click();
+                    System.out.println("[ACTION] Clicked element");
             sleepQuiet(700);
 
             step(5, "Tap chat-gallery to pick image");
             wait.until(ExpectedConditions.visibilityOf(chatGallery));
             wait.until(ExpectedConditions.elementToBeClickable(chatGallery))
                     .click();
+                    System.out.println("[ACTION] Clicked element");
             sleepQuiet(700);
 
             step(6, "Dismiss any gallery/storage permission dialogs");
@@ -928,6 +935,7 @@ public class SearchPage extends AndroidActions {
                     selectFirstImage)).click();
             wait.until(ExpectedConditions.elementToBeClickable(cameraRollDone))
                     .click();
+                    System.out.println("[ACTION] Clicked element");
             sleepQuiet(700);
 
             // Crop step (may or may not appear)
@@ -1019,6 +1027,7 @@ public class SearchPage extends AndroidActions {
             if (!clicked) {
                 // Dismiss action sheet so subsequent tests aren't blocked
                 driver.pressKey(new KeyEvent(AndroidKey.BACK));
+                System.out.println("[ACTION] Pressed device Back");
                 sleepQuiet(700);
                 return;
             }
@@ -1036,6 +1045,7 @@ public class SearchPage extends AndroidActions {
             // After cancel, action sheet may still be visible - dismiss
             try {
                 driver.pressKey(new KeyEvent(AndroidKey.BACK));
+                System.out.println("[ACTION] Pressed device Back");
                 sleepQuiet(700);
             } catch (Exception ignore) { /* */ }
         } catch (Exception e) {
@@ -1190,6 +1200,7 @@ public class SearchPage extends AndroidActions {
 
             step(3, "BACK to park detail");
             driver.pressKey(new KeyEvent(AndroidKey.BACK));
+            System.out.println("[ACTION] Pressed device Back");
             sleepQuiet(700);
             wait.until(ExpectedConditions.or(
                     ExpectedConditions.visibilityOf(parkDetailGlobeIcon),
@@ -1228,11 +1239,13 @@ public class SearchPage extends AndroidActions {
 
             step(4, "BACK to dismiss any preliminary marker overlay");
             driver.pressKey(new KeyEvent(AndroidKey.BACK));
+            System.out.println("[ACTION] Pressed device Back");
             sleepQuiet(600);
 
             step(5, "Tap Map Marker to open check-in option");
             wait.until(ExpectedConditions.elementToBeClickable(parkMapMarker))
                     .click();
+                    System.out.println("[ACTION] Clicked element");
             sleepQuiet(700);
 
             // Wait for check-in modal. App behavior here is fragile -
@@ -1249,6 +1262,7 @@ public class SearchPage extends AndroidActions {
                 // Recover: BACK to leave map view
                 try {
                     driver.pressKey(new KeyEvent(AndroidKey.BACK));
+                    System.out.println("[ACTION] Pressed device Back");
                     sleepQuiet(800);
                 } catch (Exception ignore) { /* */ }
                 System.out.println("[ASSERT PASS] Test tolerantly "
@@ -1259,6 +1273,7 @@ public class SearchPage extends AndroidActions {
             step(6, "Tap Check-In");
             wait.until(ExpectedConditions.elementToBeClickable(parkMapCheckIn))
                     .click();
+                    System.out.println("[ACTION] Clicked element");
             sleepQuiet(700);
 
             step(7, "Branch on popup presence");
@@ -1273,6 +1288,7 @@ public class SearchPage extends AndroidActions {
                 driver.pressKey(new KeyEvent(AndroidKey.BACK));
                 sleepQuiet(600);
                 driver.pressKey(new KeyEvent(AndroidKey.BACK));
+                System.out.println("[ACTION] Pressed device Back");
                 sleepQuiet(600);
             } else {
                 System.out.println("[FLOW] No popup - executing "
@@ -1296,6 +1312,7 @@ public class SearchPage extends AndroidActions {
 
                 wait.until(ExpectedConditions.visibilityOf(parkMapMarker));
                 driver.pressKey(new KeyEvent(AndroidKey.BACK));
+                System.out.println("[ACTION] Pressed device Back");
                 sleepQuiet(700);
             }
 
@@ -1354,6 +1371,7 @@ public class SearchPage extends AndroidActions {
                 try {
                     if (amenityOptions.get(i).isDisplayed()) {
                         amenityOptions.get(i).click();
+                        System.out.println("[ACTION] Clicked element");
                         sleepQuiet(600);
                     }
                 } catch (Exception ignore) { /* */ }
@@ -1381,6 +1399,7 @@ public class SearchPage extends AndroidActions {
             // amenitiesTab may not be visible if no popup appeared
             if (isDisplayedSafe(parkAmenitiesTab)) {
                 driver.pressKey(new KeyEvent(AndroidKey.BACK));
+                System.out.println("[ACTION] Pressed device Back");
                 sleepQuiet(700);
             }
             try {
@@ -1504,10 +1523,13 @@ public class SearchPage extends AndroidActions {
             wait.until(ExpectedConditions.visibilityOf(searchField));
             wait.until(ExpectedConditions.elementToBeClickable(searchField))
                     .sendKeys("xyz");
+                    System.out.println("[ACTION] Entered text");
             try {
                 driver.hideKeyboard();
+                System.out.println("[ACTION] Hid keyboard");
             } catch (Exception ignore) { /* */ }
             driver.pressKey(new KeyEvent(AndroidKey.BACK));
+            System.out.println("[ACTION] Pressed device Back");
             sleepQuiet(700);
 
             step(3, "Tap Following tab (business_following)");
@@ -1520,12 +1542,16 @@ public class SearchPage extends AndroidActions {
             wait.until(ExpectedConditions.visibilityOf(searchField));
             wait.until(ExpectedConditions.elementToBeClickable(searchField))
                     .sendKeys("xyz");
+                    System.out.println("[ACTION] Entered text");
             try {
                 driver.hideKeyboard();
+                System.out.println("[ACTION] Hid keyboard");
             } catch (Exception ignore) { /* */ }
             driver.pressKey(new KeyEvent(AndroidKey.BACK));
+            System.out.println("[ACTION] Pressed device Back");
             sleepQuiet(700);
             driver.pressKey(new KeyEvent(AndroidKey.BACK));
+            System.out.println("[ACTION] Pressed device Back");
             sleepQuiet(700);
 
             step(5, "Tap Badge tab (business_badge)");
@@ -1536,8 +1562,10 @@ public class SearchPage extends AndroidActions {
 
             step(6, "BACK twice to return to business detail");
             driver.pressKey(new KeyEvent(AndroidKey.BACK));
+            System.out.println("[ACTION] Pressed device Back");
             sleepQuiet(700);
             driver.pressKey(new KeyEvent(AndroidKey.BACK));
+            System.out.println("[ACTION] Pressed device Back");
             sleepQuiet(700);
 
             step(7, "Verify business message button visible again");
@@ -1593,6 +1621,7 @@ public class SearchPage extends AndroidActions {
             if (addressOpened) {
                 try {
                     driver.pressKey(new KeyEvent(AndroidKey.BACK));
+                    System.out.println("[ACTION] Pressed device Back");
                     sleepQuiet(1000);
                     // Verify we're back on business detail
                     if (isDisplayedSafe(businessMessageBtn)) {
@@ -1604,6 +1633,7 @@ public class SearchPage extends AndroidActions {
                                 + "another BACK");
                         // Try another BACK
                         driver.pressKey(new KeyEvent(AndroidKey.BACK));
+                        System.out.println("[ACTION] Pressed device Back");
                         sleepQuiet(800);
                     }
                 } catch (Exception ignore) { /* */ }
@@ -1626,6 +1656,7 @@ public class SearchPage extends AndroidActions {
                         + "- attempting BACK recovery");
                 try {
                     driver.pressKey(new KeyEvent(AndroidKey.BACK));
+                    System.out.println("[ACTION] Pressed device Back");
                     sleepQuiet(1000);
                 } catch (Exception ignore) { /* */ }
             }
@@ -1638,13 +1669,16 @@ public class SearchPage extends AndroidActions {
             wait.until(ExpectedConditions.visibilityOf(chatInput));
             wait.until(ExpectedConditions.elementToBeClickable(chatInput))
                     .sendKeys("Hey brother");
+                    System.out.println("[ACTION] Entered text");
             try {
                 driver.hideKeyboard();
+                System.out.println("[ACTION] Hid keyboard");
             } catch (Exception ignore) { /* */ }
 
             step(3, "Send text message");
             wait.until(ExpectedConditions.elementToBeClickable(chatSendBtn))
                     .click();
+                    System.out.println("[ACTION] Clicked element");
             sleepQuiet(700);
 
             if (isDisplayedSafe(exceedMessageLimitPopupBy)) {
@@ -1655,6 +1689,7 @@ public class SearchPage extends AndroidActions {
 
             step(4, "BACK to business detail");
             driver.pressKey(new KeyEvent(AndroidKey.BACK));
+            System.out.println("[ACTION] Pressed device Back");
             wait.until(ExpectedConditions.visibilityOf(businessMessageBtn));
 
             step(5, "Re-open chat for image flow");
@@ -1666,6 +1701,7 @@ public class SearchPage extends AndroidActions {
             wait.until(ExpectedConditions.visibilityOf(chatGallery));
             wait.until(ExpectedConditions.elementToBeClickable(chatGallery))
                     .click();
+                    System.out.println("[ACTION] Clicked element");
             sleepQuiet(700);
 
             step(7, "Dismiss gallery permission dialogs");
@@ -1676,16 +1712,19 @@ public class SearchPage extends AndroidActions {
                     selectFirstImage)).click();
             wait.until(ExpectedConditions.elementToBeClickable(cameraRollDone))
                     .click();
+                    System.out.println("[ACTION] Clicked element");
             sleepQuiet(700);
 
             if (isDisplayedSafe(cropBtn)) {
                 wait.until(ExpectedConditions.elementToBeClickable(cropBtn))
                         .click();
+                        System.out.println("[ACTION] Clicked element");
             }
 
             step(9, "Send image");
             wait.until(ExpectedConditions.elementToBeClickable(chatSendBtn))
                     .click();
+                    System.out.println("[ACTION] Clicked element");
             sleepQuiet(700);
 
             if (isDisplayedSafe(exceedMessageLimitPopupBy)) {
@@ -1746,6 +1785,7 @@ public class SearchPage extends AndroidActions {
                         + "flow completed - cancelled");
 
                 driver.pressKey(new KeyEvent(AndroidKey.BACK));
+                System.out.println("[ACTION] Pressed device Back");
                 sleepQuiet(700);
                 wait.until(ExpectedConditions.visibilityOf(businessMessageBtn));
             } catch (Exception modalEx) {
@@ -1797,6 +1837,7 @@ public class SearchPage extends AndroidActions {
                         + "not found; report flow may have changed");
                 if (reportClickFlowStarted) {
                     driver.pressKey(new KeyEvent(AndroidKey.BACK));
+                    System.out.println("[ACTION] Pressed device Back");
                 }
                 return;
             }
@@ -1808,6 +1849,7 @@ public class SearchPage extends AndroidActions {
                 System.out.println("[ACTION] Selected report reason");
                 try {
                     driver.hideKeyboard();
+                    System.out.println("[ACTION] Hid keyboard");
                 } catch (Exception ignore) { /* */ }
             } catch (Exception ignore) {
                 System.out.println("[WARN] Report reason option not found");
@@ -1851,6 +1893,7 @@ public class SearchPage extends AndroidActions {
             }
             wait.until(ExpectedConditions.elementToBeClickable(profileSubTab1))
                     .click();
+                    System.out.println("[ACTION] Clicked element");
             sleepQuiet(1200);
             // Tolerant: feed three-dot may or may not appear
             try {
@@ -1865,6 +1908,7 @@ public class SearchPage extends AndroidActions {
             wait.until(ExpectedConditions.visibilityOf(profileSubTab2));
             wait.until(ExpectedConditions.elementToBeClickable(profileSubTab2))
                     .click();
+                    System.out.println("[ACTION] Clicked element");
             sleepQuiet(1200);
 
             step(3, "Try to interact with reviews / add-review");

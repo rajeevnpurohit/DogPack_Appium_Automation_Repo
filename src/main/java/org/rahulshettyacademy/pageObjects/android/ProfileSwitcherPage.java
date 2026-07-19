@@ -154,6 +154,7 @@ public class ProfileSwitcherPage extends AndroidActions {
         WebElement profileTab = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(PROFILE_TAB_XPATH)));
         profileTab.click();
+        System.out.println("[ACTION] Clicked profileTab");
         log("[OK]       Tapped Profile tab");
         sleepQuiet(1000);
 
@@ -162,6 +163,7 @@ public class ProfileSwitcherPage extends AndroidActions {
         WebElement dropdown = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(USERNAME_DROPDOWN_XPATH)));
         dropdown.click();
+        System.out.println("[ACTION] Clicked dropdown");
         log("[OK]       Tapped username dropdown");
         sleepQuiet(1500);
 
@@ -170,6 +172,7 @@ public class ProfileSwitcherPage extends AndroidActions {
         WebElement bizSection = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(BUSINESS_PROFILE_SECTION_XPATH)));
         bizSection.click();
+        System.out.println("[ACTION] Clicked bizSection");
         log("[OK]       Tapped Business Profile section");
         sleepQuiet(1500);
 
@@ -186,6 +189,7 @@ public class ProfileSwitcherPage extends AndroidActions {
             throw e;
         }
         firstBiz.click();
+        System.out.println("[ACTION] Clicked firstBiz");
         log("[OK]       Tapped first business profile entry");
         sleepQuiet(1500);
 
@@ -202,6 +206,7 @@ public class ProfileSwitcherPage extends AndroidActions {
             throw e;
         }
         profileSelection.click();
+        System.out.println("[ACTION] Clicked profileSelection");
         log("[OK]       Tapped ProfileSelection");
         sleepQuiet(2000);
 
@@ -218,6 +223,7 @@ public class ProfileSwitcherPage extends AndroidActions {
         WebElement profileTabAgain = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(PROFILE_TAB_XPATH)));
         profileTabAgain.click();
+        System.out.println("[ACTION] Clicked profileTabAgain");
         log("[OK]       Tapped Profile tab again");
         sleepQuiet(2000);
 
@@ -329,6 +335,7 @@ public class ProfileSwitcherPage extends AndroidActions {
                             "new UiSelector().text(\"" + text + "\")"));
             if (!found.isEmpty() && found.get(0).isDisplayed()) {
                 found.get(0).click();
+                System.out.println("[ACTION] Clicked element");
                 log("[COACHMARK] Dismissed overlay via text: \"" + text + "\"");
                 return true;
             }
@@ -373,6 +380,7 @@ public class ProfileSwitcherPage extends AndroidActions {
             throw e;
         }
         el.click();
+        System.out.println("[ACTION] Clicked el");
         log("[OK]       Tapped Profile tab (TextView[2])");
         sleepQuiet(2000);
     }
@@ -399,6 +407,7 @@ public class ProfileSwitcherPage extends AndroidActions {
             throw e;
         }
         el.click();
+        System.out.println("[ACTION] Clicked el");
         log("[OK]       Tapped arrow_down_click chevron");
         sleepQuiet(2000);
     }
@@ -424,6 +433,7 @@ public class ProfileSwitcherPage extends AndroidActions {
             throw e;
         }
         el.click();
+        System.out.println("[ACTION] Clicked el");
         log("[OK]       Tapped dog profile tile (dogbus-action-dog)");
         sleepQuiet(2000);
     }
@@ -448,6 +458,7 @@ public class ProfileSwitcherPage extends AndroidActions {
             throw e;
         }
         el.click();
+        System.out.println("[ACTION] Clicked el");
         log("[OK]       Tapped SwitchProfile - dog selection committed");
         sleepQuiet(2500);
     }

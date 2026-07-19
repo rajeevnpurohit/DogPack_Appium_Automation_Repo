@@ -271,6 +271,7 @@ public class AiPhotoGenerationPage extends AndroidActions {
         WebElement row = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(AI_PHOTO_GEN_ROW_XPATH)));
         row.click();
+        System.out.println("[ACTION] Clicked row");
         log("[OK]       Tapped AI photo generations row");
 
         log("[STEP 2/2] Wait for Subscribe tab to appear (40s)");
@@ -299,6 +300,7 @@ public class AiPhotoGenerationPage extends AndroidActions {
         WebElement tab = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(SUBSCRIBE_TAB_XPATH)));
         tab.click();
+        System.out.println("[ACTION] Clicked tab");
         log("[OK]       Tapped Subscribe tab");
 
         log("[STEP 2/2] Wait for Subscribe tab to be active (40s)");
@@ -325,6 +327,7 @@ public class AiPhotoGenerationPage extends AndroidActions {
         WebElement card = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath("//android.widget.TextView[@text=\"Monthly\"]")));
         card.click();
+        System.out.println("[ACTION] Clicked card");
         log("[OK]       Tapped Monthly card");
 
         log("[STEP 2/2] Wait for 'Subscribe Monthly for <RUPEE>420.00' "
@@ -352,6 +355,7 @@ public class AiPhotoGenerationPage extends AndroidActions {
         WebElement subBtn = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(getSubscribeMonthlyBtnXpath())));
         subBtn.click();
+        System.out.println("[ACTION] Clicked subBtn");
         log("[OK]       Tapped Subscribe button");
 
         log("[STEP 2/3] Wait for 'Got it' error dialog (up to 15s)");
@@ -362,6 +366,7 @@ public class AiPhotoGenerationPage extends AndroidActions {
 
         log("[STEP 3/3] Tap 'Got it' to dismiss");
         gotItBtn.click();
+        System.out.println("[ACTION] Clicked gotItBtn");
         try { Thread.sleep(1500); } catch (InterruptedException ignore) {
             Thread.currentThread().interrupt();
         }
@@ -387,6 +392,7 @@ public class AiPhotoGenerationPage extends AndroidActions {
         WebElement closeBtn = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(CLOSE_BTN_XPATH)));
         closeBtn.click();
+        System.out.println("[ACTION] Clicked closeBtn");
         log("[OK]       Tapped Close");
 
         log("[STEP 2/2] Verify return to Settings (25s)");
@@ -427,6 +433,7 @@ public class AiPhotoGenerationPage extends AndroidActions {
         WebElement card = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(ANNUAL_CARD_XPATH)));
         card.click();
+        System.out.println("[ACTION] Clicked card");
         log("[OK]       Tapped Annual card");
 
         log("[STEP 2/2] Wait for 'Subscribe Annual for <RUPEE>4,800.00' "
@@ -456,6 +463,7 @@ public class AiPhotoGenerationPage extends AndroidActions {
         WebElement subBtn = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(SUBSCRIBE_ANNUAL_BTN_XPATH)));
         subBtn.click();
+        System.out.println("[ACTION] Clicked subBtn");
         log("[OK]       Tapped Subscribe Annual button");
 
         log("[STEP 2/3] Wait for 'Got it' error dialog (up to 15s)");
@@ -466,6 +474,7 @@ public class AiPhotoGenerationPage extends AndroidActions {
 
         log("[STEP 3/3] Tap 'Got it' to dismiss");
         gotItBtn.click();
+        System.out.println("[ACTION] Clicked gotItBtn");
         try { Thread.sleep(1500); } catch (InterruptedException ignore) {
             Thread.currentThread().interrupt();
         }
@@ -493,6 +502,7 @@ public class AiPhotoGenerationPage extends AndroidActions {
             log("[STEP] Tap 'Purchase' tab (attempt " + attempt + ")");
             try {
                 wait.until(ExpectedConditions.elementToBeClickable(purchaseTab)).click();
+                System.out.println("[ACTION] Clicked purchaseTab");
                 log("[OK]       Tapped Purchase tab");
             } catch (Exception e) {
                 log("[WARN] Purchase tab not clickable on attempt " + attempt);
@@ -531,6 +541,7 @@ public class AiPhotoGenerationPage extends AndroidActions {
         WebElement card = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(TEN_PACK_CARD_XPATH)));
         card.click();
+        System.out.println("[ACTION] Clicked card");
         log("[OK]       Tapped 10 Pack card");
 
         log("[STEP 2/2] Wait for 'Purchase 10 Pack for <RUPEE>110.00' "
@@ -559,6 +570,7 @@ public class AiPhotoGenerationPage extends AndroidActions {
         WebElement purBtn = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(PURCHASE_10_PACK_BTN_XPATH)));
         purBtn.click();
+        System.out.println("[ACTION] Clicked purBtn");
         log("[OK]       Tapped Purchase 10 Pack button");
 
         log("[STEP 2/3] Wait for 'Got it' error dialog (up to 15s)");
@@ -569,6 +581,7 @@ public class AiPhotoGenerationPage extends AndroidActions {
 
         log("[STEP 3/3] Tap 'Got it' to dismiss");
         gotItBtn.click();
+        System.out.println("[ACTION] Clicked gotItBtn");
         try { Thread.sleep(1500); } catch (InterruptedException ignore) {
             Thread.currentThread().interrupt();
         }
@@ -589,6 +602,7 @@ public class AiPhotoGenerationPage extends AndroidActions {
         WebElement card = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(FIFTY_PACK_CARD_XPATH)));
         card.click();
+        System.out.println("[ACTION] Clicked card");
         log("[OK]       Tapped 50 Pack card");
 
         log("[STEP 2/2] Wait for 'Purchase 50 Pack for <RUPEE>420.00' "
@@ -616,6 +630,7 @@ public class AiPhotoGenerationPage extends AndroidActions {
         WebElement purBtn = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(PURCHASE_50_PACK_BTN_XPATH)));
         purBtn.click();
+        System.out.println("[ACTION] Clicked purBtn");
         log("[OK]       Tapped Purchase 50 Pack button");
 
         log("[STEP 2/3] Wait for 'Got it' error dialog (up to 15s)");
@@ -626,6 +641,7 @@ public class AiPhotoGenerationPage extends AndroidActions {
 
         log("[STEP 3/3] Tap 'Got it' to dismiss");
         gotItBtn.click();
+        System.out.println("[ACTION] Clicked gotItBtn");
         try { Thread.sleep(1500); } catch (InterruptedException ignore) {
             Thread.currentThread().interrupt();
         }
@@ -646,6 +662,7 @@ public class AiPhotoGenerationPage extends AndroidActions {
         WebElement card = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(TWO_HUNDRED_PACK_CARD_XPATH)));
         card.click();
+        System.out.println("[ACTION] Clicked card");
         log("[OK]       Tapped 200 Pack card");
 
         log("[STEP 2/2] Wait for 'Purchase 200 Pack for <RUPEE>1,600.00' "
@@ -673,6 +690,7 @@ public class AiPhotoGenerationPage extends AndroidActions {
         WebElement purBtn = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(PURCHASE_200_PACK_BTN_XPATH)));
         purBtn.click();
+        System.out.println("[ACTION] Clicked purBtn");
         log("[OK]       Tapped Purchase 200 Pack button");
 
         log("[STEP 2/3] Wait for 'Got it' error dialog (up to 15s)");
@@ -683,6 +701,7 @@ public class AiPhotoGenerationPage extends AndroidActions {
 
         log("[STEP 3/3] Tap 'Got it' to dismiss");
         gotItBtn.click();
+        System.out.println("[ACTION] Clicked gotItBtn");
         try { Thread.sleep(1500); } catch (InterruptedException ignore) {
             Thread.currentThread().interrupt();
         }
@@ -726,6 +745,7 @@ public class AiPhotoGenerationPage extends AndroidActions {
         WebElement card = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(THOUSAND_PACK_CARD_XPATH)));
         card.click();
+        System.out.println("[ACTION] Clicked card");
         log("[OK]       Tapped 1000 Pack card (TextView)");
 
         // The "1000 Pack" TextView tap sometimes does NOT register on the card
@@ -749,6 +769,7 @@ public class AiPhotoGenerationPage extends AndroidActions {
                         AppiumBy.xpath("//android.widget.TextView[@text=\"1000 Pack\"]"
                                 + "/ancestor::android.view.ViewGroup[@clickable=\"true\"][1]")));
                 parentCard.click();
+                System.out.println("[ACTION] Clicked parentCard");
                 log("[OK]       Re-tapped 1000 Pack card (parent container)");
             } catch (Exception e2) {
                 log("[WARN]     Parent-container re-tap failed - retrying TextView tap: "
@@ -786,6 +807,7 @@ public class AiPhotoGenerationPage extends AndroidActions {
         WebElement purBtn = wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.xpath(PURCHASE_1000_PACK_BTN_XPATH)));
         purBtn.click();
+        System.out.println("[ACTION] Clicked purBtn");
         log("[OK]       Tapped Purchase 1000 Pack button");
 
         log("[STEP 2/3] Wait for 'Got it' error dialog (up to 15s)");
@@ -796,6 +818,7 @@ public class AiPhotoGenerationPage extends AndroidActions {
 
         log("[STEP 3/3] Tap 'Got it' to dismiss");
         gotItBtn.click();
+        System.out.println("[ACTION] Clicked gotItBtn");
         try { Thread.sleep(1500); } catch (InterruptedException ignore) {
             Thread.currentThread().interrupt();
         }

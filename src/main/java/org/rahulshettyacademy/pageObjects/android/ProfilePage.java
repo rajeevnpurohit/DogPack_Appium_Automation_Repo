@@ -244,6 +244,7 @@ public class ProfilePage extends AndroidActions {
 		try {
 			String beforePkg = driver.getCurrentPackage();
 			driver.pressKey(new KeyEvent(AndroidKey.BACK));
+			System.out.println("[ACTION] Pressed device Back");
 			Thread.sleep(1000);
 
 			String afterPkg = driver.getCurrentPackage();
@@ -569,20 +570,26 @@ public class ProfilePage extends AndroidActions {
 
 		WebDriverWait shortWait = new WebDriverWait(driver, Duration.ofSeconds(10));
 		shortWait.until(ExpectedConditions.visibilityOf(addFeedBtn)).click();
+		System.out.println("[ACTION] Clicked addFeedBtn");
 		shortWait.until(ExpectedConditions.visibilityOf(postTextField)).clear();
+		System.out.println("[ACTION] Cleared field");
 		postTextField.sendKeys(testDataProp.getProperty("PostText"));
+		System.out.println("[ACTION] Entered text in postTextField");
 		try { driver.hideKeyboard(); } catch (Exception ignore) { /* */ }
 		scrollToText("POST");
 		shortWait.until(ExpectedConditions.visibilityOf(postButton)).click();
+		System.out.println("[ACTION] Clicked postButton");
 
 		try {
 			shortWait.until(ExpectedConditions.visibilityOf(profileViewBtn));
 			profileViewBtn.click();
+			System.out.println("[ACTION] Clicked profileViewBtn");
 		} catch (Exception e) {
 			Assert.fail("Unable to navigate back to profile after post");
 		}
 
 		listViewTab.click();
+		System.out.println("[ACTION] Clicked listViewTab");
 		Thread.sleep(3000);
 		try {
 			shortWait.until(ExpectedConditions.visibilityOf(verifyPost));
@@ -645,6 +652,7 @@ public class ProfilePage extends AndroidActions {
 
 		wait.until(ExpectedConditions.visibilityOf(addDogBreedField));
 		wait.until(ExpectedConditions.elementToBeClickable(addDogBreedField)).click();
+		System.out.println("[ACTION] Clicked addDogBreedField");
 
 		String dynamicText2 = testDataProp.getProperty("editDogBreed");
 		try {
@@ -665,6 +673,7 @@ public class ProfilePage extends AndroidActions {
 
 		wait.until(ExpectedConditions.visibilityOf(addDogBreedMixField));
 		wait.until(ExpectedConditions.elementToBeClickable(addDogBreedMixField)).click();
+		System.out.println("[ACTION] Clicked addDogBreedMixField");
 
 		String dynamicText3 = testDataProp.getProperty("editDogBreedMix");
 		try {
@@ -685,6 +694,7 @@ public class ProfilePage extends AndroidActions {
 
 		wait.until(ExpectedConditions.visibilityOf(addDogDob));
 		wait.until(ExpectedConditions.elementToBeClickable(addDogDob)).click();
+		System.out.println("[ACTION] Clicked addDogDob");
 		wait.until(ExpectedConditions.visibilityOf(addDogDobConfirm));
 		wait.until(ExpectedConditions.elementToBeClickable(addDogDobConfirm)).click();
 		System.out.println("[ACTION] DOB selected and confirmed");

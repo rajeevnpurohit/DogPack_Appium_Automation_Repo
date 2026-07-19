@@ -202,6 +202,7 @@ public class SocialLoginPage extends AndroidActions {
 		try {
 			String beforePkg = driver.getCurrentPackage();
 			driver.pressKey(new KeyEvent(AndroidKey.BACK));
+			System.out.println("[ACTION] Pressed device Back");
 			Thread.sleep(1000);
 
 			String afterPkg = driver.getCurrentPackage();
@@ -423,6 +424,7 @@ public class SocialLoginPage extends AndroidActions {
 			String retryName = username + "x" + (System.currentTimeMillis() % 1000);
 			WebElement field2 = wait.until(ExpectedConditions.elementToBeClickable(userNameField));
 			field2.clear();
+			System.out.println("[ACTION] Cleared field2");
 			field2.sendKeys(retryName);
 			wait.until(ExpectedConditions.elementToBeClickable(userNameScreenContinueBtn)).click();
 			System.out.println("[ACTION] Retried with: " + retryName);

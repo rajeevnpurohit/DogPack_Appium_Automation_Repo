@@ -1543,6 +1543,7 @@ public class SettingsAndActivityPage extends AndroidActions {
     private void safeBack() {
         try {
             driver.pressKey(new KeyEvent(AndroidKey.BACK));
+            System.out.println("[ACTION] Pressed device Back");
             Thread.sleep(1000);
         } catch (Exception e) {
             String msg = e.getMessage() == null ? "" : e.getMessage();
@@ -1755,6 +1756,7 @@ public class SettingsAndActivityPage extends AndroidActions {
                     AppiumBy.androidUIAutomator(
                             "new UiSelector().text(\"YES\")")));
             yesBtn.click();
+            System.out.println("[ACTION] Clicked yesBtn");
             sleepQuiet(1000);
             return true;
         } catch (Exception ignore) { /* try next */ }
@@ -1765,6 +1767,7 @@ public class SettingsAndActivityPage extends AndroidActions {
                     AppiumBy.androidUIAutomator(
                             "new UiSelector().text(\"Yes\")")));
             yesBtn.click();
+            System.out.println("[ACTION] Clicked yesBtn");
             sleepQuiet(1000);
             return true;
         } catch (Exception ignore) { /* try next */ }
@@ -1775,6 +1778,7 @@ public class SettingsAndActivityPage extends AndroidActions {
                     AppiumBy.androidUIAutomator(
                             "new UiSelector().text(\"Discard\")")));
             discardBtn.click();
+            System.out.println("[ACTION] Clicked discardBtn");
             sleepQuiet(1000);
             return true;
         } catch (Exception ignore) { /* */ }
@@ -1869,6 +1873,7 @@ public class SettingsAndActivityPage extends AndroidActions {
             try { beforePkg = driver.getCurrentPackage(); } catch (Exception ignore) { /* */ }
 
             driver.pressKey(new KeyEvent(AndroidKey.BACK));
+            System.out.println("[ACTION] Pressed device Back");
             sleepQuiet(800);
 
             // Foreground guard - if BACK pushed app out, reactivate
@@ -2312,6 +2317,7 @@ public class SettingsAndActivityPage extends AndroidActions {
         try {
             shortWait.until(ExpectedConditions.elementToBeClickable(field));
             field.clear();
+            System.out.println("[ACTION] Cleared field");
             sleepQuiet(200); // brief settle for clear's re-render
             if (value != null) field.sendKeys(value);
             sleepQuiet(300); // brief settle for KAWS to handle new value
@@ -2960,6 +2966,7 @@ public class SettingsAndActivityPage extends AndroidActions {
             try {
                 shortWait.until(ExpectedConditions.elementToBeClickable(searchBoxMyPark))
                         .sendKeys("First Park");
+                        System.out.println("[ACTION] Entered text");
                 safeHideKeyboard();
                 sleepQuiet(1500); // API debounce
 
@@ -3216,6 +3223,7 @@ public class SettingsAndActivityPage extends AndroidActions {
                 System.out.println("[FLOW] myReview cleanup: pressing BACK to "
                         + "exit UserReviewList Tab.Navigator");
                 driver.pressKey(new KeyEvent(AndroidKey.BACK));
+                System.out.println("[ACTION] Pressed device Back");
                 sleepQuiet(1500);
 
                 // STEP 3: Check if we landed on Profile (hamburger visible)
@@ -3261,6 +3269,7 @@ public class SettingsAndActivityPage extends AndroidActions {
                                     + "trying second BACK");
                             try {
                                 driver.pressKey(new KeyEvent(AndroidKey.BACK));
+                                System.out.println("[ACTION] Pressed device Back");
                                 sleepQuiet(1500);
                                 // Try hamburger again
                                 List<WebElement> hams = driver.findElements(
@@ -3387,6 +3396,7 @@ public class SettingsAndActivityPage extends AndroidActions {
                     try {
                         if (dot.isDisplayed()) {
                             shortWait.until(ExpectedConditions.elementToBeClickable(dot)).click();
+                            System.out.println("[ACTION] Clicked dot");
                             shortWait.until(ExpectedConditions.or(
                                     ExpectedConditions.visibilityOf(SavePostOption),
                                     ExpectedConditions.visibilityOf(DownloadOption)));
@@ -5311,6 +5321,7 @@ public class SettingsAndActivityPage extends AndroidActions {
                 System.out.println("[ACTION] Tapping photo trigger ("
                         + matchedStrategy + ")");
                 photoTrigger.click();
+                System.out.println("[ACTION] Clicked photoTrigger");
                 sleepQuiet(2500); // image picker opens
 
                 // Handle gallery permission via universal Allow handler
@@ -5633,6 +5644,7 @@ public class SettingsAndActivityPage extends AndroidActions {
             // Profile picture
             try {
                 wait.until(ExpectedConditions.elementToBeClickable(profileImage)).click();
+                System.out.println("[ACTION] Clicked profileImage");
                 try { if (isDisplayedSafe(allowBtn))    allowBtn.click(); }    catch (Exception ignore) { /* */ }
                 try { if (isDisplayedSafe(allowOneBtn)) allowOneBtn.click(); } catch (Exception ignore) { /* */ }
                 shortWait.until(ExpectedConditions.elementToBeClickable(
@@ -5657,6 +5669,7 @@ public class SettingsAndActivityPage extends AndroidActions {
             // Breed
             try {
                 wait.until(ExpectedConditions.elementToBeClickable(addDogBreedField)).click();
+                System.out.println("[ACTION] Clicked addDogBreedField");
                 String breed = testDataProp.getProperty("editDogBreed");
                 if (breed != null) {
                     // SAFE scroll via W3C gesture - NOT UiScrollable
@@ -5672,7 +5685,9 @@ public class SettingsAndActivityPage extends AndroidActions {
             // Mix breed toggle + 2nd breed
             try {
                 wait.until(ExpectedConditions.elementToBeClickable(mixBtn)).click();
+                System.out.println("[ACTION] Clicked mixBtn");
                 wait.until(ExpectedConditions.elementToBeClickable(addDogBreedMixField)).click();
+                System.out.println("[ACTION] Clicked addDogBreedMixField");
                 String mixBreed = testDataProp.getProperty("editDogBreedMix");
                 if (mixBreed != null) {
                     // SAFE scroll via W3C gesture - NOT UiScrollable
@@ -5688,6 +5703,7 @@ public class SettingsAndActivityPage extends AndroidActions {
             // Gender + DOB
             try {
                 wait.until(ExpectedConditions.elementToBeClickable(addDogGender)).click();
+                System.out.println("[ACTION] Clicked addDogGender");
                 wait.until(ExpectedConditions.elementToBeClickable(addDogDob)).click();
                 wait.until(ExpectedConditions.elementToBeClickable(addDogDobConfirm)).click();
                 System.out.println("[ACTION] Gender + DOB confirmed");
@@ -5700,7 +5716,9 @@ public class SettingsAndActivityPage extends AndroidActions {
                 scrollToTextSafe("Save", 10);
                 wait.until(ExpectedConditions.elementToBeClickable(addDogWeight));
                 addDogWeight.clear();
+                System.out.println("[ACTION] Cleared addDogWeight");
                 addDogWeight.sendKeys(testDataProp.getProperty("weight"));
+                System.out.println("[ACTION] Entered text in addDogWeight");
                 wait.until(ExpectedConditions.elementToBeClickable(addDogFavFood));
                 addDogFavFood.clear();
                 addDogFavFood.sendKeys(testDataProp.getProperty("favFood"));

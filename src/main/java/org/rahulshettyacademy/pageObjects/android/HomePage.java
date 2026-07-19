@@ -338,6 +338,7 @@ public class HomePage extends AndroidActions {
 		try {
 			String beforePkg = driver.getCurrentPackage();
 			driver.pressKey(new KeyEvent(AndroidKey.BACK));
+			System.out.println("[ACTION] Pressed device Back");
 			Thread.sleep(1200);
 
 			String afterPkg = driver.getCurrentPackage();
@@ -370,6 +371,7 @@ public class HomePage extends AndroidActions {
 			tap.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
 			tap.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
 			driver.perform(Collections.singletonList(tap));
+			System.out.println("[ACTION] Performed touch gesture");
 			Thread.sleep(1200);
 		} catch (Exception e) {
 			System.out.println("[WARN] tap-outside dismissal failed: " + e.getMessage().split("\n")[0]);
@@ -713,6 +715,7 @@ public class HomePage extends AndroidActions {
 
 		openThreeDotMenuRobust();
 		wait.until(ExpectedConditions.elementToBeClickable(reportPost)).click();
+		System.out.println("[ACTION] Clicked reportPost");
 
 		try {
 			WebDriverWait shortWait = new WebDriverWait(driver, Duration.ofSeconds(8));
@@ -883,6 +886,7 @@ public class HomePage extends AndroidActions {
 			WebElement filterIcon = shortWait.until(ExpectedConditions.elementToBeClickable(
 					AppiumBy.accessibilityId("right_click_feed")));
 			filterIcon.click();
+			System.out.println("[ACTION] Clicked filterIcon");
 			Thread.sleep(2000);
 			if (isDisplayedSafe(breedFilter) || isDisplayedSafe(locationPermissionMsg)) {
 				System.out.println("[ACTION] Filter opened via right_click_feed testID");
@@ -1118,31 +1122,41 @@ public class HomePage extends AndroidActions {
 
 		Thread.sleep(3000);
 		wait.until(ExpectedConditions.visibilityOf(addFeedBtn)).click();
+		System.out.println("[ACTION] Clicked addFeedBtn");
 		wait.until(ExpectedConditions.visibilityOf(postTextField)).clear();
+		System.out.println("[ACTION] Cleared field");
 		wait.until(ExpectedConditions.visibilityOf(postTextField))
 				.sendKeys("This is my Automation Test Post");
+				System.out.println("[ACTION] Entered text");
 
 		wait.until(ExpectedConditions.elementToBeClickable(addPhotoBtn)).click();
+		System.out.println("[ACTION] Clicked addPhotoBtn");
 
 		try {
 			if (allowBtn.isDisplayed()) {
 				wait.until(ExpectedConditions.elementToBeClickable(allowBtn)).click();
+				System.out.println("[ACTION] Clicked allowBtn");
 			}
 		} catch (Exception ignore) { /* */ }
 
 		try {
 			if (allowOneBtn.isDisplayed()) {
 				wait.until(ExpectedConditions.elementToBeClickable(allowOneBtn)).click();
+				System.out.println("[ACTION] Clicked allowOneBtn");
 			}
 		} catch (Exception ignore) { /* */ }
 
 		wait.until(ExpectedConditions.visibilityOf(cameraRollTitle));
 		wait.until(ExpectedConditions.elementToBeClickable(selectFirstImage)).click();
+		System.out.println("[ACTION] Clicked selectFirstImage");
 		wait.until(ExpectedConditions.elementToBeClickable(cameraRollDone)).click();
+		System.out.println("[ACTION] Clicked cameraRollDone");
 		wait.until(ExpectedConditions.elementToBeClickable(previewDone)).click();
+		System.out.println("[ACTION] Clicked previewDone");
 
 		scrollUntilPostButtonVisible();
 		wait.until(ExpectedConditions.elementToBeClickable(postButton)).click();
+		System.out.println("[ACTION] Clicked postButton");
 
 		try {
 			wait.until(ExpectedConditions.visibilityOf(verifyPost));
@@ -1157,6 +1171,7 @@ public class HomePage extends AndroidActions {
 
 		wait.until(ExpectedConditions.visibilityOf(listViewTab));
 		wait.until(ExpectedConditions.elementToBeClickable(listViewTab)).click();
+		System.out.println("[ACTION] Clicked listViewTab");
 
 		int maxScrollAttempts = 7;
 		boolean found = false;
@@ -1168,6 +1183,7 @@ public class HomePage extends AndroidActions {
 			for (WebElement dot : feedThreedotList) {
 				if (dot.isDisplayed()) {
 					wait.until(ExpectedConditions.elementToBeClickable(dot)).click();
+					System.out.println("[ACTION] Clicked dot");
 					wait.until(ExpectedConditions.or(
 							ExpectedConditions.visibilityOf(BlockUser),
 							ExpectedConditions.visibilityOf(SavePostOption),
@@ -1186,6 +1202,7 @@ public class HomePage extends AndroidActions {
 		}
 
 		wait.until(ExpectedConditions.elementToBeClickable(deleteOption)).click();
+		System.out.println("[ACTION] Clicked deleteOption");
 		wait.until(ExpectedConditions.elementToBeClickable(
 				AppiumBy.androidUIAutomator("new UiSelector().textContains(\"Confirm\")"))).click();
 		System.out.println("[ASSERT PASS] Post deleted");

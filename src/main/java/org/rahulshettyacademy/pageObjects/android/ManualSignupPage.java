@@ -333,6 +333,7 @@ public class ManualSignupPage extends AndroidActions {
 		clearFieldRobustly(emailEl, "email");
 		if (email != null && !email.isEmpty()) {
 			emailEl.sendKeys(email);
+			System.out.println("[ACTION] Entered text in emailEl");
 		}
 		tryHideKeyboard();
 
@@ -340,6 +341,7 @@ public class ManualSignupPage extends AndroidActions {
 		clearFieldRobustly(passEl, "password");
 		if (password != null && !password.isEmpty()) {
 			passEl.sendKeys(password);
+			System.out.println("[ACTION] Entered text in passEl");
 		}
 		tryHideKeyboard();
 
@@ -444,6 +446,7 @@ public class ManualSignupPage extends AndroidActions {
 			System.out.println("[PATH A] Legacy modal detected - clicking Cancel");
 			try {
 				wait.until(ExpectedConditions.elementToBeClickable(modalCancelBtn)).click();
+				System.out.println("[ACTION] Clicked modalCancelBtn");
 				cancelClicked = true;
 			} catch (Exception e) {
 				System.out.println("[WARN] onCancel click failed: " + e.getMessage());
@@ -470,6 +473,7 @@ public class ManualSignupPage extends AndroidActions {
 					+ "(error_code 1001 -> login). Recovering by going back to SignUp.");
 			try {
 				wait.until(ExpectedConditions.elementToBeClickable(homePageDistanceSubmitBtn)).click();
+				System.out.println("[ACTION] Clicked homePageDistanceSubmitBtn");
 			} catch (Exception ignore) { }
 			// Logout to return to SignUp Welcome
 			try {
@@ -548,7 +552,9 @@ public class ManualSignupPage extends AndroidActions {
 				return;
 			}
 			field.click();
+			System.out.println("[ACTION] Clicked field");
 			field.clear();
+			System.out.println("[ACTION] Cleared field");
 
 			// Verify cleared
 			String remaining = "";
@@ -568,6 +574,7 @@ public class ManualSignupPage extends AndroidActions {
 			// Move cursor to end then send DEL
 			for (int i = 0; i < len + 5; i++) {
 				driver.pressKey(new KeyEvent(AndroidKey.DEL));
+				System.out.println("[ACTION] Pressed device key");
 			}
 		} catch (Exception e) {
 			System.out.println("[CLEAR WARN] " + label + " clear failed: " + e.getMessage());
@@ -844,8 +851,10 @@ public class ManualSignupPage extends AndroidActions {
 			WebElement searchEl = wait.until(
 					ExpectedConditions.elementToBeClickable(unclaimedSearchBox));
 			searchEl.click();
+			System.out.println("[ACTION] Clicked searchEl");
 			clearFieldRobustly(searchEl, "search");
 			searchEl.sendKeys(searchTerm);
+			System.out.println("[ACTION] Entered text in searchEl");
 			tryHideKeyboard();
 
 			// Allow debounce (1s in app) + API call to populate list
@@ -899,6 +908,7 @@ public class ManualSignupPage extends AndroidActions {
 			WebElement searchEl = wait.until(
 					ExpectedConditions.elementToBeClickable(unclaimedSearchBox));
 			searchEl.click();
+			System.out.println("[ACTION] Clicked searchEl");
 			clearFieldRobustly(searchEl, "search");
 			tryHideKeyboard();
 		} catch (Exception e) {
@@ -1036,7 +1046,9 @@ public class ManualSignupPage extends AndroidActions {
 		try {
 			wait.until(ExpectedConditions.visibilityOf(profileViewBtn));
 			wait.until(ExpectedConditions.elementToBeClickable(profileViewBtn)).click();
+			System.out.println("[ACTION] Clicked profileViewBtn");
 			driver.pressKey(new KeyEvent(AndroidKey.BACK));
+			System.out.println("[ACTION] Pressed device Back");
 		} catch (Exception e) {
 			Assert.fail("[FAIL] Could not navigate to Profile screen: " + e.getMessage());
 		}
@@ -1051,12 +1063,14 @@ public class ManualSignupPage extends AndroidActions {
 		tap.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
 		tap.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
 		driver.perform(Collections.singletonList(tap));
+		System.out.println("[ACTION] Performed touch gesture");
 	}
 
 	public void LogoutUser() {
 		try {
 			scrollableToText("Logout");
 			wait.until(ExpectedConditions.visibilityOf(logoutOption)).click();
+			System.out.println("[ACTION] Clicked logoutOption");
 			wait.until(ExpectedConditions.visibilityOf(modalConfirmBtn)).click();
 			wait.until(ExpectedConditions.visibilityOf(createAccountBtn));
 			System.out.println("[FLOW] Logout completed");
@@ -1131,6 +1145,7 @@ public class ManualSignupPage extends AndroidActions {
 			System.out.println("[INFO] Username taken (attempt " + attempt
 					+ ") - retrying with a fresh compact name");
 			wait.until(ExpectedConditions.elementToBeClickable(modalCancelBtn)).click();
+			System.out.println("[ACTION] Clicked modalCancelBtn");
 			String retryName = compactUsernameToken();
 			typeUsernameAndContinue(retryName);
 			System.out.println("[ACTION] Retried with username: " + retryName);
@@ -1142,6 +1157,7 @@ public class ManualSignupPage extends AndroidActions {
 					+ maxTryAnother + " retries - clicking Confirm to let the "
 					+ "app auto-generate a username");
 			wait.until(ExpectedConditions.elementToBeClickable(modalConfirmBtn)).click();
+			System.out.println("[ACTION] Clicked modalConfirmBtn");
 		}
 	}
 
@@ -1150,8 +1166,11 @@ public class ManualSignupPage extends AndroidActions {
 		WebElement field = wait.until(
 				ExpectedConditions.elementToBeClickable(userNameField));
 		field.clear();
+		System.out.println("[ACTION] Cleared field");
 		field.sendKeys(username);
+		System.out.println("[ACTION] Entered text in field");
 		wait.until(ExpectedConditions.elementToBeClickable(userNameContinueBtn)).click();
+		System.out.println("[ACTION] Clicked userNameContinueBtn");
 	}
 
 	/** True if the "Username taken" modal is visible within shortWait. */
@@ -1187,11 +1206,13 @@ public class ManualSignupPage extends AndroidActions {
 
 		// Breed selection
 		wait.until(ExpectedConditions.elementToBeClickable(breedDropdown)).click();
+		System.out.println("[ACTION] Clicked breedDropdown");
 		try {
 			// Try to type a known/common breed for stable results across builds
 			String breedSearch = testDataProp.getProperty("signupDogBreedSearch", "Adopted");
 			shortWait.until(ExpectedConditions.visibilityOf(searchBreedField));
 			searchBreedField.sendKeys(breedSearch);
+			System.out.println("[ACTION] Entered text in searchBreedField");
 
 			By breedItem = By.xpath("//android.widget.TextView[@text=\"" + breedSearch + "\"]");
 			WebElement breedEl = wait.until(ExpectedConditions.elementToBeClickable(breedItem));
@@ -1223,6 +1244,7 @@ public class ManualSignupPage extends AndroidActions {
 		// Profile image (optional - if upload fails, app's Finish still skips with no image)
 		try {
 			wait.until(ExpectedConditions.elementToBeClickable(dogProfileImagePicker)).click();
+			System.out.println("[ACTION] Clicked dogProfileImagePicker");
 			handleMultiplePermissionDialogs(3);
 			wait.until(ExpectedConditions.elementToBeClickable(firstImageInGallery)).click();
 			wait.until(ExpectedConditions.elementToBeClickable(gallerySelectionDone)).click();
@@ -1385,6 +1407,7 @@ public class ManualSignupPage extends AndroidActions {
 			try {
 				WebElement el = wait.until(ExpectedConditions.elementToBeClickable(field));
 				el.click();
+				System.out.println("[ACTION] Clicked el");
 				clearFieldRobustly(el, label);
 				el.sendKeys(value);
 				System.out.println("[INPUT] " + label + " = " + value);
@@ -1596,9 +1619,13 @@ public class ManualSignupPage extends AndroidActions {
 			Assert.fail("OTP must be 4 digits, got: " + otp);
 		}
 		wait.until(ExpectedConditions.elementToBeClickable(otp1)).sendKeys(otp.substring(0, 1));
+		System.out.println("[ACTION] Entered text in otp1");
 		wait.until(ExpectedConditions.elementToBeClickable(otp2)).sendKeys(otp.substring(1, 2));
+		System.out.println("[ACTION] Entered text in otp2");
 		wait.until(ExpectedConditions.elementToBeClickable(otp3)).sendKeys(otp.substring(2, 3));
+		System.out.println("[ACTION] Entered text in otp3");
 		wait.until(ExpectedConditions.elementToBeClickable(otp4)).sendKeys(otp.substring(3, 4));
+		System.out.println("[ACTION] Entered text in otp4");
 	}
 
 	private void fillBusinessSecondScreen() {
@@ -1644,6 +1671,7 @@ public class ManualSignupPage extends AndroidActions {
 		// Image
 		try {
 			wait.until(ExpectedConditions.elementToBeClickable(firstBusinessImageSlot)).click();
+			System.out.println("[ACTION] Clicked firstBusinessImageSlot");
 			handleMultiplePermissionDialogs(3);
 			wait.until(ExpectedConditions.elementToBeClickable(firstImageInGallery)).click();
 			wait.until(ExpectedConditions.elementToBeClickable(gallerySelectionDone)).click();
@@ -1830,12 +1858,14 @@ public class ManualSignupPage extends AndroidActions {
 	private void tryHideKeyboard() {
 		try {
 			driver.hideKeyboard();
+			System.out.println("[ACTION] Hid keyboard");
 		} catch (Exception ignore) {
 		}
 	}
 
 	private void pressBackKey() {
 		driver.pressKey(new KeyEvent(AndroidKey.BACK));
+		System.out.println("[ACTION] Pressed device Back");
 	}
 
 	// Run-scoped unique-token generator (collision-resistant across runs).
