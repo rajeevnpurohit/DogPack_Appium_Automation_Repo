@@ -1056,9 +1056,9 @@ public class AddPhotoPostPage extends AndroidActions {
             clickByXpath("//android.widget.Button[@content-desc=\"Next\"]", "NEXT");
             sleepQuiet(1500);
 
-            step(25, "Tap NEXT / btnPost");
-            clickByXpath("//android.widget.Button[@resource-id=\"com.dogpack:id/btnPost\"]",
-                    "btnPost");
+            step(25, "Tap NEXT / Post media");
+            clickByXpath("//android.widget.Button[@content-desc=\"Post media\"]",
+                    "Post media");
             sleepQuiet(1500);
 
             step(26, "Enter caption text on the SharePost screen");
@@ -1080,7 +1080,7 @@ public class AddPhotoPostPage extends AndroidActions {
             step(28, "Dismiss onboarding tour if it appears (tap Skip)");
             dismissOnboardingTourAfterPost();
 
-            step(29, "Verify upload: fast-retry for 'Posted!' then catch success banner");
+            step(29, "Verify upload: fast-retry for 'Post Created!' then catch success banner");
             int verifyFailures = verifyPostUploadEndFlow();
 
             // Aggregate the outcome ONCE, as the final action - every check above
@@ -1100,24 +1100,24 @@ public class AddPhotoPostPage extends AndroidActions {
     // Copied in-file (NOT imported from AddPostPage) to keep this native photo
     // page object standalone. Mirrors the text-post verification: after Final
     // Post, dismiss the intermittent onboarding tour, then fast-retry for the
-    // "Posted!" upload stage (primary, robust signal) with the success banner as
+    // "Post Created!" upload stage (primary, robust signal) with the success banner as
     // a secondary confirmation.
     //
     // Photo upload stages (uploadStageTitle cycles through, 5 states):
-    //   Preparing -> Getting Ready -> Uploading -> Publishing -> Posted!
+    //   Preparing -> Getting Ready -> Uploading -> Publishing -> Post Created!
     // (Text posting has 4 - no "Preparing".) The logic is state-list-agnostic:
     // it logs every transition and only anchors on "Publishing" (hand off to the
-    // tight Posted! retry) and "Posted!" (success), so the extra leading state
+    // tight Post Created! retry) and "Post Created!" (success), so the extra leading state
     // needs no special handling.
 
     private static final String STAGE_XPATH =
             "//android.widget.TextView[@resource-id=\"com.dogpack:id/uploadStageTitle\"]";
     private static final String BANNER_XPATH =
             "//android.widget.TextView[@text=\"Post uploaded successfully.\"]";
-    /** Lightweight, punctuation/whitespace-tolerant probe for the "Posted!" state. */
+    /** Lightweight, punctuation/whitespace-tolerant probe for the "Post Created!" state. */
     private static final String POSTED_XPATH =
             "//android.widget.TextView[@resource-id=\"com.dogpack:id/uploadStageTitle\""
-            + " and contains(@text,\"Posted\")]";
+            + " and contains(@text,\"Post Created\")]";
 
     /** Single fast presence probe by xpath (one findElements, no getText). */
     private boolean elementPresent(String xpath) {
@@ -1200,13 +1200,13 @@ public class AddPhotoPostPage extends AndroidActions {
     /**
      * Upload verification. Phase 1: track stages at a moderate poll until
      * "Publishing". Phase 2: at "Publishing", tight fast-retry that prioritises
-     * catching the brief "Posted!" state (single lightweight probe every
-     * iteration; banner + disappearance checked every 4th iteration so "Posted!"
-     * gets the highest sampling rate). PASS if EITHER "Posted!" or the banner is
+     * catching the brief "Post Created!" state (single lightweight probe every
+     * iteration; banner + disappearance checked every 4th iteration so "Post Created!"
+     * gets the highest sampling rate). PASS if EITHER "Post Created!" or the banner is
      * seen; FAIL only if neither. Returns 0 on pass, 1 on failure.
      */
     public int verifyPostUploadEndFlow() {
-        System.out.println("[FLOW] Verifying upload: tracking stages, fast-retrying for Posted! ...");
+        System.out.println("[FLOW] Verifying upload: tracking stages, fast-retrying for Post Created! ...");
         long guardMs = 90000;
         long deadline = System.currentTimeMillis() + guardMs;
 
@@ -1228,9 +1228,9 @@ public class AddPhotoPostPage extends AndroidActions {
                 }
                 if (cur != null) {
                     String c = cur.trim();
-                    if (c.equalsIgnoreCase("Posted!")) {
+                    if (c.equalsIgnoreCase("Post Created!")) {
                         sawPosted = true;
-                        System.out.println("[FLOW] Upload reached terminal stage: Posted!");
+                        System.out.println("[FLOW] Upload reached terminal stage: Post Created!");
                         break;
                     }
                     if (c.equalsIgnoreCase("Publishing")) {
@@ -1246,10 +1246,10 @@ public class AddPhotoPostPage extends AndroidActions {
                 sleepQuiet(stagePollMs);
             }
 
-            // --- Phase 2: tight fast-retry for Posted! (prioritised) ------------
+            // --- Phase 2: tight fast-retry for Post Created! (prioritised) ------
             if (!sawPosted) {
                 if (reachedPublishing) {
-                    System.out.println("[FLOW] At Publishing - fast-retrying for 'Posted!' ...");
+                    System.out.println("[FLOW] At Publishing - fast-retrying for 'Post Created!' ...");
                 }
                 long tightMs = 60;
                 long graceMs = 8000;
@@ -1258,7 +1258,7 @@ public class AddPhotoPostPage extends AndroidActions {
                 while (System.currentTimeMillis() < deadline) {
                     if (elementPresent(POSTED_XPATH)) {
                         sawPosted = true;
-                        System.out.println("[FLOW] Upload reached terminal stage: Posted!");
+                        System.out.println("[FLOW] Upload reached terminal stage: Post Created!");
                         break;
                     }
                     if (iter % 4 == 0) {
@@ -1291,7 +1291,7 @@ public class AddPhotoPostPage extends AndroidActions {
                 + ", bannerSeen=" + bannerSeen + ", pass=" + pass
                 + " (last stage seen: '" + last + "')");
         if (!pass) {
-            System.out.println("[FAIL] Neither 'Posted!' stage nor success banner was observed");
+            System.out.println("[FAIL] Neither 'Post Created!' stage nor success banner was observed");
             return 1;
         }
         return 0;

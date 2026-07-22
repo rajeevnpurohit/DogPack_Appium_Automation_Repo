@@ -356,8 +356,8 @@ public class AddPostPage extends AndroidActions {
      * Two phases:
      *   Phase 1 - track the upload stage TextView (com.dogpack:id/uploadStageTitle),
      *             which cycles through: "Getting Ready" -> "Uploading" ->
-     *             "Publishing" -> "Posted!". We poll (moderate interval) and log
-     *             each distinct stage seen, until it reads "Posted!" OR the element
+     *             "Publishing" -> "Post Created!". We poll (moderate interval) and log
+     *             each distinct stage seen, until it reads "Post Created!" OR the element
      *             disappears (either = upload finished), capped by a runaway guard.
      *   Phase 2 - the instant the stage completes, fast-poll for the in-app banner
      *             //TextView[@text="Post uploaded successfully."] over a short
@@ -376,10 +376,10 @@ public class AddPostPage extends AndroidActions {
             "//android.widget.TextView[@resource-id=\"com.dogpack:id/uploadStageTitle\"]";
     private static final String BANNER_XPATH =
             "//android.widget.TextView[@text=\"Post uploaded successfully.\"]";
-    /** Lightweight, punctuation/whitespace-tolerant probe for the "Posted!" state. */
+    /** Lightweight, punctuation/whitespace-tolerant probe for the "Post Created!" state. */
     private static final String POSTED_XPATH =
             "//android.widget.TextView[@resource-id=\"com.dogpack:id/uploadStageTitle\""
-            + " and contains(@text,\"Posted\")]";
+            + " and contains(@text,\"Post Created\")]";
 
     /** Single fast presence probe by xpath (one findElements, no getText). */
     private boolean elementPresent(String xpath) {
@@ -403,8 +403,8 @@ public class AddPostPage extends AndroidActions {
     }
 
     /**
-     * Phase 1: poll the stage title until "Posted!" or the element disappears.
-     * @return true if a terminal state ("Posted!" or element-gone after progress)
+     * Phase 1: poll the stage title until "Post Created!" or the element disappears.
+     * @return true if a terminal state ("Post Created!" or element-gone after progress)
      *         was observed; false if the runaway guard elapsed first.
      */
     /**
@@ -440,28 +440,21 @@ public class AddPostPage extends AndroidActions {
     }
 
     /**
-     * Explicit onboarding-tour dismissal, run right after the final Post tap and
-     * before stage tracking. The 5-step "Customize your Feed" tour appears
-     * intermittently just after posting; one Skip clears all of it.
-     *
-     * To avoid delaying tour-free runs, this polls briefly for EITHER the Skip
-     * control (tour present -> tap it, done) OR the first upload stage (tour
-     * absent -> upload already progressing, return immediately). Best-effort;
-     * never throws.
+     * Dismiss the "Customize your Feed" onboarding tour that appears after login
+     * (once the home feed becomes interactive, following HandleCustomDialog's
+     * device Back). One Skip tap clears the whole tour. Polls up to 6s for the
+     * Skip control; best-effort - never throws, fast no-op if no tour appears.
+     * Called from the TC right after login so the feed is clear before the post
+     * flow starts.
      */
-    public void dismissOnboardingTourAfterPost() {
-        System.out.println("[FLOW] Checking for onboarding tour after final Post ...");
+    public void dismissOnboardingTour() {
+        System.out.println("[FLOW] Checking for onboarding tour (post-login) ...");
         long windowMs = 6000;
         long pollMs   = 300;
         long deadline = System.currentTimeMillis() + windowMs;
         while (System.currentTimeMillis() < deadline) {
             if (dismissOnboardingTourIfPresent()) {
                 return;  // tour found and skipped
-            }
-            // If an upload stage is already visible, no tour is blocking - stop waiting.
-            if (readStageText() != null) {
-                System.out.println("[FLOW] Upload stage visible - no onboarding tour, proceeding");
-                return;
             }
             sleepQuiet(pollMs);
         }
@@ -486,21 +479,21 @@ public class AddPostPage extends AndroidActions {
      *   Phase 1 - track stages at a moderate poll, logging transitions, until we
      *             reach "Publishing" (the stage right before completion).
      *   Phase 2 - at "Publishing", run a TIGHT fast-retry loop that prioritises
-     *             catching the brief "Posted!" state: a single lightweight probe
-     *             (one findElements, no getText, contains(@text,"Posted")) checked
+     *             catching the brief "Post Created!" state: a single lightweight probe
+     *             (one findElements, no getText, contains(@text,"Post Created")) checked
      *             every iteration at high frequency. The banner and the
-     *             stage-disappearance check run less often so "Posted!" gets the
-     *             highest sampling rate. "Posted!" is the robust primary signal;
+     *             stage-disappearance check run less often so "Post Created!" gets the
+     *             highest sampling rate. "Post Created!" is the robust primary signal;
      *             the banner is the secondary confirmation.
      *
-     * Success policy: PASS if EITHER "Posted!" is observed OR the banner is seen.
+     * Success policy: PASS if EITHER "Post Created!" is observed OR the banner is seen.
      * FAIL only if neither positive signal is seen.
      *
      * @return 0 on pass, 1 on failure (so the caller can surface one aggregate
      *         assertion without aborting/skipping).
      */
     public int verifyPostUploadEndFlow() {
-        System.out.println("[FLOW] Verifying upload: tracking stages, fast-retrying for Posted! ...");
+        System.out.println("[FLOW] Verifying upload: tracking stages, fast-retrying for Post Created! ...");
         long guardMs = 90000;   // runaway guard only
         long deadline = System.currentTimeMillis() + guardMs;
 
@@ -522,18 +515,18 @@ public class AddPostPage extends AndroidActions {
                 }
                 if (cur != null) {
                     String c = cur.trim();
-                    if (c.equalsIgnoreCase("Posted!")) {   // caught it already
+                    if (c.equalsIgnoreCase("Post Created!")) {   // caught it already
                         sawPosted = true;
-                        System.out.println("[FLOW] Upload reached terminal stage: Posted!");
+                        System.out.println("[FLOW] Upload reached terminal stage: Post Created!");
                         break;
                     }
                     if (c.equalsIgnoreCase("Publishing")) {
                         reachedPublishing = true;
-                        break;   // hand off to the tight Posted! retry loop
+                        break;   // hand off to the tight Post Created! retry loop
                     }
                 }
                 if (cur == null && sawAnyStage) {
-                    // Stage vanished before we ever saw Publishing/Posted! - go
+                    // Stage vanished before we ever saw Publishing/Post Created! - go
                     // straight to a banner grace-watch below.
                     System.out.println("[FLOW] uploadStageTitle disappeared after progress "
                             + "(last seen: '" + last + "') before Publishing");
@@ -545,21 +538,21 @@ public class AddPostPage extends AndroidActions {
             // --- Phase 2: tight fast-retry for Posted! (prioritised) ------------
             if (!sawPosted) {
                 if (reachedPublishing) {
-                    System.out.println("[FLOW] At Publishing - fast-retrying for 'Posted!' ...");
+                    System.out.println("[FLOW] At Publishing - fast-retrying for 'Post Created!' ...");
                 }
                 long tightMs = 60;      // very fast retries
                 long graceMs = 8000;    // banner grace after stage completes
                 long completedAt = 0;
                 int iter = 0;
                 while (System.currentTimeMillis() < deadline) {
-                    // Priority 1 (every iteration): the brief "Posted!" state.
+                    // Priority 1 (every iteration): the brief "Post Created!" state.
                     if (elementPresent(POSTED_XPATH)) {
                         sawPosted = true;
-                        System.out.println("[FLOW] Upload reached terminal stage: Posted!");
+                        System.out.println("[FLOW] Upload reached terminal stage: Post Created!");
                         break;
                     }
                     // Priority 2 (less often): banner + completion check, so the
-                    // Posted! probe keeps the highest sampling rate.
+                    // Post Created! probe keeps the highest sampling rate.
                     if (iter % 4 == 0) {
                         if (isBannerPresent()) {
                             bannerSeen = true;
@@ -590,7 +583,7 @@ public class AddPostPage extends AndroidActions {
                 + ", bannerSeen=" + bannerSeen + ", pass=" + pass
                 + " (last stage seen: '" + last + "')");
         if (!pass) {
-            System.out.println("[FAIL] Neither 'Posted!' stage nor success banner was observed");
+            System.out.println("[FAIL] Neither 'Post Created!' stage nor success banner was observed");
             return 1;
         }
         return 0;
@@ -665,10 +658,7 @@ public class AddPostPage extends AndroidActions {
             clickFinalPost();
             sleepQuiet(1500);
 
-            step(16, "Dismiss onboarding tour if it appears (tap Skip)");
-            dismissOnboardingTourAfterPost();
-
-            step(17, "Verify upload stages -> 'Posted!' then catch success banner");
+            step(16, "Verify upload stages -> 'Post Created!' then catch success banner");
             int verifyFailures = verifyPostUploadEndFlow();
 
             // Aggregate the outcome ONCE, as the final action - every check above

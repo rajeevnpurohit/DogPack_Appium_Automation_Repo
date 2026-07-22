@@ -97,7 +97,7 @@ public abstract class AppiumUtils {
 				.withIPAddress(ipAddress)
 				.usingPort(port)
 				// ⬇️ THE ACTUAL FIX
-				.withArgument(() -> "--allow-insecure", "uiautomator2:chromedriver_autodownload")
+				.withArgument(() -> "--allow-insecure", "uiautomator2:chromedriver_autodownload,uiautomator2:adb_shell")
 				.build();
 
 		service.start();

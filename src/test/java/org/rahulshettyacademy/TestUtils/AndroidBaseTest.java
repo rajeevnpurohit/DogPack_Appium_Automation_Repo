@@ -167,6 +167,37 @@ public class AndroidBaseTest extends AppiumUtils {
 		driver = new AndroidDriver(service.getUrl(), options);
 		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
 
+		// ================================================================
+		// Location handling (suite-wide) - LOCATION ONLY, on purpose.
+		// NOTE: autoGrantPermissions is intentionally NOT used (see above) -
+		// it would suppress the notification-permission popups that the login
+		// flow handles in LoginPage.CompleteLoginProccess(). So we grant ONLY
+		// the location permission here, leaving all other permission flows
+		// intact, and enable the device GPS master switch. Both best-effort.
+		// ================================================================
+		// (A) grant ONLY the app location runtime permissions
+		try {
+			driver.executeScript("mobile: changePermissions", java.util.Map.of(
+					"permissions", java.util.List.of(
+							"android.permission.ACCESS_FINE_LOCATION",
+							"android.permission.ACCESS_COARSE_LOCATION"),
+					"appPackage", "com.dogpack",
+					"action", "grant"));
+			System.out.println("[SETUP] Granted location runtime permission to com.dogpack");
+		} catch (Exception e) {
+			System.out.println("[SETUP][INFO] Could not grant location permission (ignored): " + e.getMessage());
+		}
+		// (B) enable device location services (GPS master switch). Idempotent
+		// (leaves GPS on if already on). Needs adb_shell allowed on the server.
+		try {
+			driver.executeScript("mobile: shell", java.util.Map.of(
+					"command", "cmd",
+					"args", java.util.List.of("location", "set-location-enabled", "true")));
+			System.out.println("[SETUP] Enabled device location services (GPS)");
+		} catch (Exception e) {
+			System.out.println("[SETUP][INFO] Could not enable GPS via shell (ignored): " + e.getMessage());
+		}
+
 		System.out.println("=== ConfigureAppium COMPLETED ===");
 		System.out.println("Device: " + deviceName + " | Android API: "
 				+ driver.getCapabilities().getCapability("deviceApiLevel"));

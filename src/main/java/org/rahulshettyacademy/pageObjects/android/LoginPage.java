@@ -1,6 +1,7 @@
 package org.rahulshettyacademy.pageObjects.android;
 
 import java.time.Duration;
+import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -10,6 +11,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.rahulshettyacademy.utils.AndroidActions;
 import org.testng.Assert;
 
+import io.appium.java_client.AppiumBy;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.nativekey.AndroidKey;
 import io.appium.java_client.android.nativekey.KeyEvent;
@@ -183,7 +185,36 @@ public class LoginPage extends AndroidActions {
 						.presenceOfElementLocated(By.xpath("//android.view.View[@content-desc=\"profile-view\"]")))
 				.isDisplayed(), "'Search' button is not visible on the HomeScreen screen.");
 
-		driver.pressKey(new KeyEvent(AndroidKey.BACK));
-		System.out.println("[ACTION] Pressed device Back");
+		// Landed on home feed -> the "Customize your Feed" onboarding tour can
+		// appear here. Dismiss it via Skip. (The old device Back was removed:
+		// once Skip clears the tour there is nothing left to close, and a Back
+		// would overshoot to the device home screen.)
+		dismissOnboardingTourIfPresent();
+	}
+
+	/**
+	 * Best-effort dismissal of the post-login "Customize your Feed" onboarding
+	 * tour. One Skip tap clears the whole tour. Self-contained in LoginPage so
+	 * it has no cross-page dependency. Never throws; fast no-op if no tour.
+	 */
+	private void dismissOnboardingTourIfPresent() {
+		try {
+			List<WebElement> skip = driver.findElements(AppiumBy.accessibilityId("Skip"));
+			if (skip.isEmpty()) {
+				skip = driver.findElements(
+						By.xpath("//android.view.ViewGroup[@content-desc=\"Skip\"]"));
+			}
+			if (!skip.isEmpty() && skip.get(0).isDisplayed()) {
+				skip.get(0).click();
+				System.out.println("[FLOW] Onboarding tour detected -> tapped Skip "
+						+ "(dismisses whole tour)");
+				try { Thread.sleep(800); } catch (InterruptedException ignored) {}
+			} else {
+				System.out.println("[INFO] No onboarding tour to dismiss");
+			}
+		} catch (Exception e) {
+			System.out.println("[WARN] Onboarding-tour dismiss attempt threw (ignored): "
+					+ e.getMessage());
+		}
 	}
 }
